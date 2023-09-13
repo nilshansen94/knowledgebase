@@ -6,6 +6,7 @@
 import express from 'express';
 import * as path from 'path';
 import mysql from "mysql2";
+import {listToTree} from "./utils/list-to-tree";
 
 // create the connection to database
 const connection = mysql.createConnection({
@@ -30,6 +31,14 @@ app.get('/user', (req, res) => {
       res.status(500).json(err)
     }
     res.json(results)
+  })
+});
+
+app.get('/folders/:userId', (req, res) => {
+  console.log(req.params)
+  connection.query('select * from `folder` where user_id = ?', [req.params.userId], (err, rows) => {
+    const tree = listToTree(rows as any[]);
+    res.json(tree);
   })
 });
 

@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "kb:serve": "nx serve kb-rest",
     "backend:serve": "nx serve backend"
   },
   "private": true,
