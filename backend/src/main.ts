@@ -9,6 +9,7 @@ import mysql from "mysql2";
 import {listToTree} from "./utils/list-to-tree";
 import { Folder } from './api';
 import {getSubFolders} from "./utils/get-sub-folders";
+import cors from 'cors';
 
 // create the connection to database
 const connection = mysql.createConnection({
@@ -22,6 +23,7 @@ const connection = mysql.createConnection({
 const app = express();
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use(cors());
 
 app.get('/api', (req, res) => {
   res.send({ message: 'Welcome to backend!' });
