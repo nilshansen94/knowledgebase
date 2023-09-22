@@ -1,0 +1,30 @@
+.main-wrapper {
+  position: absolute;
+  top: 50px;
+  width: 100%;
+  height: calc(100% - 50px);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+nav {
+  background: grey;
+  min-width: 200px;
+  transition: min-width 0.5s, max-width 0.5s;
+  &.hideNav {
+    min-width: 0;
+    max-width: 0;
+  }
+}
+
+main {
+  background: darkgrey;
+  flex-grow: 1;
+  padding: 1rem;
+  h1 {
+    margin-top: 0;
+  }
+
+  overflow: auto;
+}
