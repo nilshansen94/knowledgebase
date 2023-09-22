@@ -12,5 +12,9 @@ ul {
     &:hover {
       background: #a6a6a6;
     }
+    &.active {
+      background: #0000b7;
+      color: white;
+    }
   }
 }

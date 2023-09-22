@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
-import {filter, map, tap} from "rxjs";
+import {Subject, filter, map, tap} from "rxjs";
+import {Folder} from "../../features/sidenav/api/folder";
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +13,15 @@ export class AppService {
     map((e: NavigationEnd) => e.url === '/login'),
   );
 
+  private selectedFolder = new Subject<Folder>();
+  selectedFolder$ = this.selectedFolder.asObservable();
+
   constructor(
     private router: Router,
   ) {}
+
+  setSelectedFolder(folder: Folder) {
+    this.selectedFolder.next(folder);
+  }
 
 }

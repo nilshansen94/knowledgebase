@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {NavItem} from "./api/nav-item";
+import {Folder} from "../api/folder";
 
 @Component({
   selector: 'app-sidenav',
@@ -11,6 +11,20 @@ import {NavItem} from "./api/nav-item";
 })
 export class SidenavComponent {
 
-  @Input() navItems: NavItem[];
+  currentlySelectedItem: Folder;
+
+  @Input() navItems: Folder[];
+
+  @Output() selectedItem = new EventEmitter<Folder>();
+
+  setSelectedItem(folder: Folder) {
+    if (this.currentlySelectedItem?.id === folder.id) {
+      this.currentlySelectedItem = undefined;
+      this.selectedItem.emit(undefined);
+      return;
+    }
+    this.currentlySelectedItem = folder;
+    this.selectedItem.emit(folder);
+  }
 
 }
