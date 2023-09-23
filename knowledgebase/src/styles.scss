@@ -1,5 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
+@import '../../node_modules/@odymaui/angular-tree-component/css/angular-tree-component.css';
 html, body {
   margin: 0;
   padding: 0;
+}
+
+//angular tree component
+.node-content-wrapper{
+  background: #ccc;
+  width: 100%;
+  margin-right: 5px;
+  padding: 10px 5px;
+}
+.node-wrapper {
+  align-items: center;
+}
+.toggle-children-wrapper {
+  padding: 50% 5px;
+  border-radius: 2px;
+  &:hover {
+    background: #acacac80;
+  }
+}
+.node-content-wrapper-active,
+.node-content-wrapper.node-content-wrapper-active:hover,
+.node-content-wrapper-active.node-content-wrapper-focused{
+  background: white;
 }

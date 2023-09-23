@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "all:serve": "nx run-many --target=serve --projects=knowledgebase,backend --parallel",
     "kb:serve": "nx serve knowledgebase",
     "backend:serve": "nx serve backend"
   },
@@ -17,6 +18,7 @@
     "@angular/platform-browser-dynamic": "~16.2.0",
     "@angular/router": "~16.2.0",
     "@nx/angular": "16.8.1",
+    "@odymaui/angular-tree-component": "^16.0.4",
     "axios": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",

@@ -1,10 +1,1 @@
-Todo nested
-<ul>
-  <li
-    *ngFor="let item of navItems"
-    (click)="setSelectedItem(item)"
-    [class.active]="currentlySelectedItem?.id == item.id"
-  >
-    {{item.name}}
-  </li>
-</ul>
+<tree-root [nodes]="navItems" [options]="treeOptions" (activate)="setSelectedItem($event.node)" (deactivate)="setSelectedItem($event.node)" />
