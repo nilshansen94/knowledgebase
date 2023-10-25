@@ -2,17 +2,17 @@
   <h1>Login</h1>
 
   <div>
-    <form action="">
+    <form [formGroup]="loginForm" (submit)="submitLogin()">
       <div class="row">
         <label for="userName">Username</label>
-        <input type="text" name="userName" placeholder="userName" id="userName">
+        <input type="text" name="username" placeholder="username" id="username" formControlName="username">
       </div>
       <div class="row">
         <label for="password">Password</label>
-        <input type="text" name="password" placeholder="password" id="password">
+        <input type="password" name="password" placeholder="password" id="password" formControlName="password">
       </div>
       <div class="row flex-center">
-        <button type="submit">Login</button>
+        <button type="submit" [disabled]="!loginForm.valid">Login</button>
       </div>
     </form>
   </div>
