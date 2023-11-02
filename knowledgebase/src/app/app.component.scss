@@ -18,6 +18,22 @@ nav {
   }
 }
 
+/*.snippets-nav {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px black solid;
+  padding: 0.5rem 2px;
+  input {
+    padding: 0.5em;
+    margin-bottom: 5px;
+    outline: none;
+  }
+  button {
+    padding: 1em;
+    cursor: pointer;
+  }
+}*/
+
 main {
   background: darkgrey;
   flex-grow: 1;

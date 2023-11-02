@@ -11,7 +11,8 @@ import {AppService} from "../../../services/app/app.service";
   template: `
     <app-sidenav
       [navItems]="this.sidenavService.folders$ | async"
-      (selectedItem)="appService.setSelectedFolder($event)"
+      [selectedItemId]="this.appService.selectedFolder$ | async"
+      (selectedItemChange)="appService.setSelectedFolder($event)"
     />
   `,
   styles: [

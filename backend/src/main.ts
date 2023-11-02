@@ -12,15 +12,19 @@ import {Folder} from './api';
 import {getSubFolders} from "./utils/get-sub-folders";
 import cors from 'cors';
 import cookieParser from "cookie-parser";
+import {PoolConnection} from "mysql2/promise";
 
 // create the connection to database
-const connection = mysql.createConnection({
+const mysqlConfig = {
   host: 'localhost',
   port: 8889,
   user: 'root',
   password: 'root',
   database: 'kb_rest'
-});
+};
+const connection = mysql.createConnection(mysqlConfig);
+const pool = mysql.createPool(mysqlConfig);
+const promisePool = pool.promise();
 
 const app = express();
 
@@ -38,11 +42,13 @@ app.use(cookieParser());
 //todo remember me (with cookies: https://stackoverflow.com/questions/16209145)
 const verifyLogin = (req, res, next) => {
   if (req.session.loggedIn) {
-    console.log('login by session')
+    //console.log('login by session')
     return next();
   }
   if(req.cookies['rememberMe']) {
-    console.log('login by cookie')
+    //console.log('login by cookie')
+    //todo security
+    req.session.userId = req.cookies['rememberMe'];
     return next();
   }
   return res.status(403).send({message: 'No access, you are not logged in'});
@@ -55,7 +61,7 @@ app.get('/api', [verifyLogin], (req, res) => {
 //see https://codeshack.io/basic-login-system-nodejs-express-mysql/
 //and https://stackoverflow.com/questions/12276046/nodejs-express-how-to-secure-a-url
 //security: https://expressjs.com/en/advanced/best-practice-security.html
-//see how to secure the api calls with express middlewaren: https://www.bezkoder.com/node-js-express-login-example/
+//see how to secure the api calls with express middleware: https://www.bezkoder.com/node-js-express-login-example/
 app.post('/login', (req, res) => {
   console.log(req.body)
   const username = req.body.username;
@@ -85,13 +91,8 @@ app.post('/login', (req, res) => {
   })
 })
 
-app.get('/user', (req, res) => {
-  connection.query('select * from `user`', (err, results, fields) => {
-    if (err) {
-      res.status(500).json(err)
-    }
-    res.json(results)
-  })
+app.get('/checkLogin', [verifyLogin], (req, res) => {
+  res.json({success: true});
 });
 
 app.get('/folders/:userId', (req, res) => {
@@ -101,10 +102,15 @@ app.get('/folders/:userId', (req, res) => {
   })
 });
 
-app.get('/snippets/:userId/:folderId?', (req, res) => {
-  const userId = req.params.userId;
+app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
+  const userId = req.session.userId;
+  console.log('get snippets for user', userId, 'and folder', req.params.folderId)
+  //https://stackoverflow.com/questions/53945089/nodejs-await-async-with-nested-mysql-query
+  //todo connection.promise().query()
   connection.query('select * from `folder` where user_id = ?', [userId], (err, rows) => {
+    console.log('folders from query', rows)
     const tree = listToTree(rows as Folder[]);
+    console.log('tree',tree)
     let query = `select *
                  from usr_fold_snip
                         join user on user.id = usr_fold_snip.user_id
@@ -116,12 +122,44 @@ app.get('/snippets/:userId/:folderId?', (req, res) => {
     if (folderId) {
       query += ` and usr_fold_snip.folder in (?)`;
       folderIds = getSubFolders(tree, +folderId);
+      console.log('folderIds',folderIds)
     }
     connection.query(query, [userId, folderIds], (err, rows) => {
       res.json(rows);
     });
   })
 })
+
+app.put('/snippet', [verifyLogin], (req, res) => {
+  const snippet = req.body;
+  const userId = req.session.userId;
+  console.log('[title, content, user_id]', [snippet.title, snippet.content, req.session.userId])
+  addSnippet(snippet, userId).then(r => {
+    res.json(r);
+    res.end();
+    return;
+  });
+})
+
+async function addSnippet(snippet, userId) {
+  let conn: PoolConnection;
+  try {
+    conn = await promisePool.getConnection();
+    await conn.beginTransaction();
+    //userId is req.session.userId
+    const [insertResult] = await conn.query('INSERT INTO snippet (title, content, user_id) VALUES (?,?,?)', [snippet.title, snippet.content, userId]);
+    // @ts-ignore
+    const snippetId = insertResult.insertId;
+    const insert2 = await conn.query('INSERT INTO usr_fold_snip (user_id, snip_id, folder) VALUES (?,?,?)', [userId, snippetId, snippet.folder]);
+    await conn.commit();
+    console.log('committed insert-snip')
+    return {success: true};
+  } catch(e) {
+    console.log('rolling back insert-snip', e)
+    await conn?.rollback();
+    return {success: false};
+  }
+}
 
 const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {

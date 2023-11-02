@@ -1,7 +1,7 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {Folder} from "../api/folder";
-import {ITreeOptions, TreeModule} from "@odymaui/angular-tree-component";
+import {ITreeOptions, TreeComponent, TreeModule, TreeNode} from "@odymaui/angular-tree-component";
 
 @Component({
   selector: 'app-sidenav',
@@ -10,27 +10,50 @@ import {ITreeOptions, TreeModule} from "@odymaui/angular-tree-component";
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss']
 })
-export class SidenavComponent {
+export class SidenavComponent implements OnChanges {
 
   currentlySelectedItem: Folder;
+
+  firstNavItemsChange = true;
 
   //angular-tree docs: https://angular2-tree.readme.io/docs
   treeOptions: ITreeOptions = {
     childrenField: 'childNodes',
   };
 
+  @ViewChild(TreeComponent)
+  private tree: TreeComponent;
+
   @Input() navItems: Folder[];
 
-  @Output() selectedItem = new EventEmitter<Folder>();
+  @Input() selectedItemId: number;
 
-  setSelectedItem(folder: Folder) {
+  @Output() selectedItemChange = new EventEmitter<Folder>();
+
+  ngOnChanges(changes: SimpleChanges) {
+    if(changes['navItems']?.currentValue && this.firstNavItemsChange){
+      const folderId = new URLSearchParams(window.location.search).get('folder');
+      if(!folderId){
+        return;
+      }
+      this.tree.treeModel.setData({nodes: this.navItems, options: this.treeOptions, events: null})
+      const node = this.tree.treeModel.getNodeById(folderId + '');
+      if(node){
+        this.firstNavItemsChange = false;
+        node.setActiveAndVisible();
+      }
+    }
+  }
+
+  setSelectedItem(folder: TreeNode&Folder) {
     if (this.currentlySelectedItem?.id === folder.id) {
       this.currentlySelectedItem = undefined;
-      this.selectedItem.emit(undefined);
+      this.selectedItemChange.emit(undefined);
       return;
     }
+    folder.expand();
     this.currentlySelectedItem = folder;
-    this.selectedItem.emit(folder);
+    this.selectedItemChange.emit(folder);
   }
 
 }
