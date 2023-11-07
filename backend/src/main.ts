@@ -7,14 +7,13 @@ import express from 'express';
 import session from 'express-session';
 import * as path from 'path';
 import mysql from 'mysql2';
-import {getSubFolders, listToTree, loginByPw, register} from './utils';
+import {getSubFolders, listToTree, loginByCookie, loginByPw, register} from './utils';
 import {Folder} from './api';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import {PoolConnection} from 'mysql2/promise';
 import {LoginRequest, SALT_ROUNDS} from '@kb-rest/shared';
 import * as bcrypt from 'bcrypt';
-import {loginByCookie} from './utils/loginByCookie';
 
 // create the connection to database
 const mysqlConfig = {
