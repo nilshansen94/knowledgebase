@@ -4,15 +4,17 @@
  */
 
 import express from 'express';
-import session from "express-session";
+import session from 'express-session';
 import * as path from 'path';
-import mysql from "mysql2";
-import {listToTree} from "./utils/list-to-tree";
+import mysql from 'mysql2';
+import {getSubFolders, listToTree, loginByPw, register} from './utils';
 import {Folder} from './api';
-import {getSubFolders} from "./utils/get-sub-folders";
 import cors from 'cors';
-import cookieParser from "cookie-parser";
-import {PoolConnection} from "mysql2/promise";
+import cookieParser from 'cookie-parser';
+import {PoolConnection} from 'mysql2/promise';
+import {LoginRequest, SALT_ROUNDS} from '@kb-rest/shared';
+import * as bcrypt from 'bcrypt';
+import {loginByCookie} from './utils/loginByCookie';
 
 // create the connection to database
 const mysqlConfig = {
@@ -32,7 +34,8 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use(cors({credentials: true, origin: 'http://localhost:4200'}));
 app.use(express.json());
 app.use(session({
-  secret: 'secret',
+  //todo use env variable
+  secret: '573696fb-8612-4f29-988c-062390c72694',
   resave: true,
   saveUninitialized: true
 }));
@@ -40,59 +43,80 @@ app.use(cookieParser());
 
 //todo move to file. Is not secure yet.
 //todo remember me (with cookies: https://stackoverflow.com/questions/16209145)
-const verifyLogin = (req, res, next) => {
-  if (req.session.loggedIn) {
-    //console.log('login by session')
+const verifyLogin = async (req, res, next) => {
+  const conn = await promisePool.getConnection();
+  if (req.session.secret) {
+    const loginResult = await loginByCookie(req.session.userId, req.session.secret, req.headers['user-agent'], conn);
+    conn.release();
+    if(!loginResult){
+      return res.status(403).send({message: 'Login by session denied'});
+    }
+    console.log('login by session');
     return next();
   }
-  if(req.cookies['rememberMe']) {
-    //console.log('login by cookie')
-    //todo security
-    req.session.userId = req.cookies['rememberMe'];
-    return next();
+  if(req.cookies && req.cookies['secret']) {
+    console.log('login by cookie')
+    const userId = req.cookies['userId'];
+    const byCookieResult = await loginByCookie(userId, req.cookies['secret'], req.headers['user-agent'], conn);
+    conn.release();
+    if(byCookieResult) {
+      req.session.userId = userId;
+      return next();
+    }
+    conn.release();
+    return res.status(403).send({message: 'Login by cookie denied'});
   }
+  console.log('not logged in')
   return res.status(403).send({message: 'No access, you are not logged in'});
 }
 
-app.get('/api', [verifyLogin], (req, res) => {
-  res.send({message: 'Welcome to backend!'});
-});
+app.post('/register', async (req, res) => {
+  //todo verify email
+  const request = req.body as LoginRequest;
+  try {
+    const conn = await promisePool.getConnection();
+    const userId = await register(request, conn);
+    res.json({userId, success: true});
+    res.end();
+  } catch(e) {
+    //todo return types
+    console.log('error during registration', e)
+    return res.status(403).send({success: false, message: e});
+  }
+})
 
 //see https://codeshack.io/basic-login-system-nodejs-express-mysql/
 //and https://stackoverflow.com/questions/12276046/nodejs-express-how-to-secure-a-url
 //security: https://expressjs.com/en/advanced/best-practice-security.html
 //see how to secure the api calls with express middleware: https://www.bezkoder.com/node-js-express-login-example/
-app.post('/login', (req, res) => {
-  console.log(req.body)
-  const username = req.body.username;
-  const pw = req.body.password;
-  const query = 'SELECT id, name FROM `user` WHERE name = ?';
-  connection.query(query, [username], (err, rows) => {
-    if (err) {
-      res.json({success: false})
-      res.end();
-      return;
-    }
-    const result = rows as any[];
-    //todo security. check username and PW
-    if (result.length === 1) {
-      // @ts-ignore
-      req.session.loggedIn = true;
-      // @ts-ignore
-      req.session.userId = result[0].id;
-      //todo not safe
-      res.cookie('rememberMe', result[0].id);
-      res.json({success: true});
-      res.end();
-      return;
-    }
-    res.json({success: false})
-    res.end();
-  })
+app.post('/login', async (req, res) => {
+  const loginRequest = req.body as LoginRequest;
+  const conn = await promisePool.getConnection();
+  await conn.beginTransaction();
+  const loginResult = await loginByPw(loginRequest, conn);
+  if(loginResult.success === false) {
+    await conn.commit();
+    return res.status(403).send({success: false});
+  }
+  const secret = await bcrypt.genSalt(SALT_ROUNDS);
+  const secretForDb = await bcrypt.hash(secret + req.headers['user-agent'], SALT_ROUNDS);
+  const query = 'UPDATE `user` SET secret=? WHERE name=?';
+  const result = await conn.query(query, [secretForDb, loginRequest.user]);
+  await conn.commit();
+  console.log('login update', result);
+  res.cookie('secret', secret);
+  res.cookie('userId', loginResult.userId);
+  // @ts-ignore
+  req.session.secret = secret;
+  // @ts-ignore
+  req.session.userId = loginResult.userId;
+  res.json({userId: loginResult.userId});
+  res.end();
 })
 
 app.get('/checkLogin', [verifyLogin], (req, res) => {
   res.json({success: true});
+  res.end();
 });
 
 app.get('/folders/:userId', (req, res) => {
@@ -104,13 +128,13 @@ app.get('/folders/:userId', (req, res) => {
 
 app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
   const userId = req.session.userId;
-  console.log('get snippets for user', userId, 'and folder', req.params.folderId)
+  //console.log('get snippets for user', userId, 'and folder', req.params.folderId)
   //https://stackoverflow.com/questions/53945089/nodejs-await-async-with-nested-mysql-query
   //todo connection.promise().query()
   connection.query('select * from `folder` where user_id = ?', [userId], (err, rows) => {
-    console.log('folders from query', rows)
+    //console.log('folders from query', rows)
     const tree = listToTree(rows as Folder[]);
-    console.log('tree',tree)
+    //console.log('tree',tree)
     let query = `select *
                  from usr_fold_snip
                         join user on user.id = usr_fold_snip.user_id
@@ -122,7 +146,7 @@ app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
     if (folderId) {
       query += ` and usr_fold_snip.folder in (?)`;
       folderIds = getSubFolders(tree, +folderId);
-      console.log('folderIds',folderIds)
+      //console.log('folderIds',folderIds)
     }
     connection.query(query, [userId, folderIds], (err, rows) => {
       res.json(rows);
@@ -133,7 +157,7 @@ app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
 app.put('/snippet', [verifyLogin], (req, res) => {
   const snippet = req.body;
   const userId = req.session.userId;
-  console.log('[title, content, user_id]', [snippet.title, snippet.content, req.session.userId])
+  //console.log('[title, content, user_id]', [snippet.title, snippet.content, req.session.userId])
   addSnippet(snippet, userId).then(r => {
     res.json(r);
     res.end();

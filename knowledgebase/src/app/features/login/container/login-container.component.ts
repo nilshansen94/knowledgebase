@@ -10,6 +10,7 @@ import {LoginService} from "../service/login.service";
   template: `
     <app-login-page
       (login)="loginService.login($event)"
+      (registration)="loginService.registration($event)"
     />
   `,
   styles: [

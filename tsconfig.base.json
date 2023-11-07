@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@kb-rest/shared": ["shared/src/index.ts"],
       "@nx/node": ["@nx/node/src/index.ts"]
     }
   },

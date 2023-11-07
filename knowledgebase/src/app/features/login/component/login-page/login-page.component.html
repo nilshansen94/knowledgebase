@@ -14,6 +14,11 @@
       <div class="row flex-center">
         <button type="submit" [disabled]="!loginForm.valid">Login</button>
       </div>
+      <div class="row">
+        <label for="email">Email</label>
+        <input type="text" placeholder="email" id="email" formControlName="email">
+        <button class="btn-sm" (click)="submitRegistration($event)" [disabled]="!loginForm.valid || !loginForm.value.email">register</button>
+      </div>
     </form>
   </div>
 </div>

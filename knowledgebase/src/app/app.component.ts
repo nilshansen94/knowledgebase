@@ -1,11 +1,12 @@
 import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterOutlet} from '@angular/router';
-import {SidenavComponent} from "./features/sidenav/component/sidenav.component";
-import {SidenavContainerComponent} from "./features/sidenav/container/sidenav-container.component";
-import {SnippetsContainerComponent} from "./features/snippets/container/snippets-container.component";
-import {HeaderComponent} from "./features/header/component/header.component";
-import {AppService} from "./services/app/app.service";
+import {SidenavComponent} from './features/sidenav/component/sidenav.component';
+import {SidenavContainerComponent} from './features/sidenav/container/sidenav-container.component';
+import {SnippetsContainerComponent} from './features/snippets/container/snippets-container.component';
+import {HeaderComponent} from './features/header/component/header.component';
+import {AppService} from './services/app/app.service';
+import {AuthService} from './services/auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,9 @@ import {AppService} from "./services/app/app.service";
 })
 export class AppComponent {
 
-  constructor(public appService: AppService) {}
+  constructor(
+    public appService: AppService,
+    private authService: AuthService,
+  ) {}
 
 }

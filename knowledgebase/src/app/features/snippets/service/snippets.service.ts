@@ -34,6 +34,10 @@ export class SnippetsService {
 
   addSnippet(title: string, content: string) {
     const folder = +this.route.snapshot.queryParamMap.get('folder');
+    if(!folder){
+      alert('Please select a folder');
+      return;
+    }
     this.httpService.put('snippet', {title, content, folder}).pipe(
       tap(res => console.log(res))
     ).subscribe();
