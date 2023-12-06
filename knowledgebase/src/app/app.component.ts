@@ -7,6 +7,7 @@ import {SnippetsContainerComponent} from './features/snippets/container/snippets
 import {HeaderComponent} from './features/header/component/header.component';
 import {AppService} from './services/app/app.service';
 import {AuthService} from './services/auth/auth.service';
+import {LoginService} from './features/login/service/login.service';
 
 @Component({
   selector: 'app-root',
@@ -26,7 +27,8 @@ export class AppComponent {
 
   constructor(
     public appService: AppService,
-    private authService: AuthService,
+    public loginService: LoginService,
+    public authService: AuthService,
   ) {}
 
 }

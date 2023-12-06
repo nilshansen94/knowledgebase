@@ -2,6 +2,7 @@
   <span id="logo">Logo</span>
   <div class="justify-between">
     <a [routerLink]="['']">Snippets</a>
-    <a [routerLink]="['login']">Login</a>
+    <a *ngIf="!isLoggedIn" [routerLink]="['login']">Login</a>
+    <a *ngIf="isLoggedIn" (click)="emitLogout()" [routerLink]="[]">Logout</a>
   </div>
 </header>

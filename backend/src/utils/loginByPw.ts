@@ -6,6 +6,10 @@ import {DbUser} from '../api';
 export async function loginByPw(request: LoginRequest, conn: PoolConnection) {
   const query = 'SELECT id, name, password, salt, secret FROM `user` WHERE name=?';
   const [result] = await conn.query(query, [request.user]);
+  //@ts-ignore
+  if(result.length !== 1){
+    return {success: false};
+  }
   // @ts-ignore
   const user = result[0] as DbUser;
   if (!isNaN(user.id)) {

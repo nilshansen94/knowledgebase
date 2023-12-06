@@ -1,4 +1,4 @@
-<app-header />
+<app-header [isLoggedIn]="authService.isLoggedIn$ | async" (logout)="loginService.logout()" />
 
 <div class="main-wrapper">
   <nav [class.hideNav]="appService.hideNav$ |async">

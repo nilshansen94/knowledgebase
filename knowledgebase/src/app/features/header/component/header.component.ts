@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {RouterLink} from "@angular/router";
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -10,5 +10,15 @@ import {RouterLink} from "@angular/router";
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+
+  @Input()
+  isLoggedIn: boolean;
+
+  @Output()
+  logout = new EventEmitter<void>();
+
+  emitLogout() {
+    this.logout.emit();
+  }
 
 }

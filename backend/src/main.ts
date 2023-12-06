@@ -40,6 +40,14 @@ app.use(session({
 }));
 app.use(cookieParser());
 
+//https://stackoverflow.com/questions/65108033
+declare module 'express-session' {
+  export interface SessionData {
+    userId: number;
+    secret: string;
+  }
+}
+
 //todo move to file. Is not secure yet.
 //todo remember me (with cookies: https://stackoverflow.com/questions/16209145)
 const verifyLogin = async (req, res, next) => {
@@ -102,14 +110,11 @@ app.post('/login', async (req, res) => {
   const query = 'UPDATE `user` SET secret=? WHERE name=?';
   const result = await conn.query(query, [secretForDb, loginRequest.user]);
   await conn.commit();
-  console.log('login update', result);
   res.cookie('secret', secret);
   res.cookie('userId', loginResult.userId);
-  // @ts-ignore
   req.session.secret = secret;
-  // @ts-ignore
   req.session.userId = loginResult.userId;
-  res.json({userId: loginResult.userId});
+  res.json({userId: loginResult.userId, success: true});
   res.end();
 })
 
@@ -118,8 +123,28 @@ app.get('/checkLogin', [verifyLogin], (req, res) => {
   res.end();
 });
 
+app.get('/logout', async (req, res) => {
+  const userId = req.session.userId;
+  if(!userId){
+    console.warn('Trying to logout, but no session is set');
+    return;
+  }
+  connection.query('UPDATE user SET secret = NULL WHERE id = ?', [userId], (err, rows) => {
+    if(err){
+      console.error('Could not logout user', userId, err);
+    }
+    if(req.session){
+      req.session.destroy((e) => {
+        console.error('Logout: Could not destroy session')
+        res.end();
+      });
+    }
+    res.end();
+  });
+})
+
 app.get('/folders/:userId', (req, res) => {
-  connection.query('select * from `folder` where user_id = ?', [req.params.userId], (err, rows) => {
+  connection.query('select * from `folder` where user_id = ?', [req.session.userId], (err, rows) => {
     const tree: Folder[] = listToTree(rows as Folder[]);
     res.json(tree);
   })

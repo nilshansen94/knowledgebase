@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {map, shareReplay, startWith, switchMap, tap} from "rxjs";
+import {catchError, map, of, shareReplay, startWith, switchMap, tap} from 'rxjs';
 import {MyHttpService} from "../../../services/http/my-http.service";
 import {Snippet} from "../api/snippet";
 import {AppService} from "../../../services/app/app.service";
@@ -28,6 +28,10 @@ export class SnippetsService {
     startWith(null),
     map(folder => folder ? '/'+folder: ''),
     switchMap(folder => this.httpService.get('snippets' + folder)),
+    catchError(e => {
+      console.log('Cannot get snippets', e)
+      return of([]);
+    }),
     shareReplay(),
     map(folders => folders as Snippet[])
   );
