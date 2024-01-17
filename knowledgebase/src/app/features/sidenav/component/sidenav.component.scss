@@ -18,3 +18,19 @@ ul {
     }
   }
 }
+
+.add-folder {
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+}
+
+.new-folder-wrapper {
+  //todo make width auto
+  width: 250px;
+}
+.new-folder {
+  margin: 0.25rem;
+  background: #ff8800;
+}

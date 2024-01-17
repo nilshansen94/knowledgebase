@@ -143,7 +143,7 @@ app.get('/logout', async (req, res) => {
   });
 })
 
-app.get('/folders/:userId', (req, res) => {
+app.get('/folders', [verifyLogin],  (req, res) => {
   connection.query('select * from `folder` where user_id = ?', [req.session.userId], (err, rows) => {
     const tree: Folder[] = listToTree(rows as Folder[]);
     res.json(tree);

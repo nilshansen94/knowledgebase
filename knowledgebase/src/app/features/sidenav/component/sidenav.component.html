@@ -1,1 +1,49 @@
-<tree-root [nodes]="navItems" [options]="treeOptions" (activate)="setSelectedItem($event.node)" (deactivate)="setSelectedItem($event.node)" />
+<div class="add-folder">
+  <input type="text"
+         placeholder="folder-name"
+         [(ngModel)]="folderNameToAdd"
+         (keydown.enter)="addFolderDragItem()"
+         [disabled]="!!folderToDrag || folderPlaced"
+  >
+  <button (click)="addFolderDragItem()" [disabled]="!!folderToDrag || folderPlaced">+</button>
+</div>
+<div *ngIf="folderToDrag" class="new-folder-wrapper">
+  <p>Place the new folder at the location you want and click on save</p>
+  <div [treeDrag]="folderToDrag" [treeDragEnabled]="true" class="node-content-wrapper new-folder">{{folderToDrag.name}}</div>
+</div>
+<div *ngIf="folderPlaced" class="new-folder-wrapper">
+  <p>Click on save when the folder is placed at the right location</p>
+  <button (click)="saveAddedFolder()">save</button>
+</div>
+
+<tree-root
+  [nodes]="navItems"
+  [options]="treeOptions"
+  (activate)="setSelectedItem($event.node)"
+  (deactivate)="setSelectedItem($event.node)"
+>
+  <ng-template #treeNodeWrapperTemplate let-node let-index="index">
+    <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
+      <tree-node-expander [node]="node"></tree-node-expander>
+      <div class="node-content-wrapper"
+           [class.node-content-wrapper-active]="node.isActive"
+           [class.node-content-wrapper-focused]="node.isFocused"
+           [class.adding]="node.id === -1"
+
+           (click)="node.mouseAction('click', $event)"
+           (dblclick)="node.mouseAction('dblClick', $event)"
+           (contextmenu)="node.mouseAction('contextMenu', $event)"
+           (treeDrop)="node.onDrop($event)"
+           [treeAllowDrop]="node.allowDrop"
+           [treeDrag]="node"
+           [treeDragEnabled]="node.allowDrag()">
+
+        <!-- *ngIf on node.id or sth like that and switch between tree-node-content and own stuff -->
+        <tree-node-content [node]="node" [index]="index"></tree-node-content>
+        <!--<div *ngIf="node.id === -1">
+          <input type="text"><button>+</button>
+        </div>-->
+      </div>
+    </div>
+  </ng-template>
+</tree-root>

@@ -10,7 +10,7 @@
 
 nav {
   background: grey;
-  min-width: 200px;
+  //min-width: 200px;
   transition: min-width 0.5s, max-width 0.5s;
   &.hideNav {
     min-width: 0;

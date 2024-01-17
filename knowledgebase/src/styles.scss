@@ -5,6 +5,10 @@ html, body {
   padding: 0;
 }
 
+input {
+  outline: none;
+}
+
 //angular tree component
 .node-content-wrapper{
   background: #ccc;
@@ -26,4 +30,7 @@ html, body {
 .node-content-wrapper.node-content-wrapper-active:hover,
 .node-content-wrapper-active.node-content-wrapper-focused{
   background: white;
+}
+.node-content-wrapper.adding {
+  background: #ff8800;
 }

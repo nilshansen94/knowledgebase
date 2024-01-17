@@ -21,9 +21,11 @@ export class SidenavService {
     {name: 'Nav 2'},
   ]);
 
-  folders$ = this.httpService.get('folders/1').pipe(
+  folders$: Observable<Folder[]> = this.httpService.get('folders').pipe(
     shareReplay(),
-    map(folders => folders as Folder[])
+    map(folders => folders as Folder[]),
+    //map(folders => [{id: -1, name: '+'} as Folder, ...folders]),
+    tap(f => console.log('folders$', f)),
   );
 
 }

@@ -8,6 +8,7 @@ import {Folder} from "../../features/sidenav/api/folder";
 })
 export class AppService {
 
+  //todo move all to sidenavService ?
   hideNav$ = this.router.events.pipe(
     filter(e => e instanceof NavigationEnd),
     map((e: NavigationEnd) => e.url === '/login'),
