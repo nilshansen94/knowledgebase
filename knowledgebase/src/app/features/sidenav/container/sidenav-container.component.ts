@@ -13,6 +13,7 @@ import {AppService} from "../../../services/app/app.service";
       [navItems]="this.sidenavService.folders$ | async"
       [selectedItemId]="this.appService.selectedFolder$ | async"
       (selectedItemChange)="appService.setSelectedFolder($event)"
+      (newFolder)="sidenavService.addFolder($event)"
     />
   `,
   styles: [

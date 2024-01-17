@@ -28,4 +28,11 @@ export class SidenavService {
     tap(f => console.log('folders$', f)),
   );
 
+  addFolder(folder: Folder){
+    this.httpService.put('addFolder', folder).pipe(
+      tap(res => console.log(res)),
+      switchMap(() => this.folders$)
+    ).subscribe();
+  }
+
 }

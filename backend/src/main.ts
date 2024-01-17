@@ -150,6 +150,16 @@ app.get('/folders', [verifyLogin],  (req, res) => {
   })
 });
 
+app.put('/addFolder', [verifyLogin], (req, res) => {
+  const folder = req.body;
+  const userId = req.session.userId;
+  addFolder(folder, userId).then(r => {
+    res.json(r);
+    res.end();
+    return;
+  });
+})
+
 app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
   const userId = req.session.userId;
   //console.log('get snippets for user', userId, 'and folder', req.params.folderId)
@@ -204,6 +214,23 @@ async function addSnippet(snippet, userId) {
     return {success: true};
   } catch(e) {
     console.log('rolling back insert-snip', e)
+    await conn?.rollback();
+    return {success: false};
+  }
+}
+
+async function addFolder(folder: Folder, userId: number) {
+  let conn: PoolConnection;
+  try {
+    conn = await promisePool.getConnection();
+    await conn.beginTransaction();
+    //userId is req.session.userId
+    const [insertResult] = await conn.query('INSERT INTO folder(name, parent_id, user_id) VALUES (?,?,?)', [folder.name, folder.parent_id, userId]);
+    await conn.commit();
+    console.log('committed insert-folder')
+    return {success: true};
+  } catch(e) {
+    console.log('rolling back insert-folder', e)
     await conn?.rollback();
     return {success: false};
   }
