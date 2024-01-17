@@ -91,9 +91,9 @@ export class SidenavComponent implements OnChanges {
   }
 
   saveAddedFolder(){
-    const newFolderNodeData = this.tree.treeModel.getNodeById(-1).parent.data;
-    const parent_id = newFolderNodeData.virtual ? null: newFolderNodeData.id;
-    this.newFolder.emit({id: -1, name: newFolderNodeData.name, parent_id});
+    const newFolderNode = this.tree.treeModel.getNodeById(-1);
+    const parent_id = newFolderNode.parent.data.virtual ? null: newFolderNode.parent.data.id;
+    this.newFolder.emit({id: -1, name: newFolderNode.data.name, parent_id});
   }
 
 }
