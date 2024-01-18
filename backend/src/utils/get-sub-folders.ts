@@ -4,16 +4,21 @@ import { Folder } from "../api";
  * Get array of ids of the subFolders, including the searched id
  * If no subFolders are present, return array with the searched id
  * */
-export const getSubFolders = (tree: Folder[], id: number) => {
+export const getSubFolders = (tree: Folder[], id: number): number[] => {
+  const folder = findInTree(tree, id);
+  return [folder.id, ...getChildrenOf(folder).map(f => f.id)];
+}
+
+const findInTree = (tree: Folder[], id: number): Folder => {
   for(const folder of tree) {
-    if(folder.id === id){
-      const subFolders = getChildrenOf(folder).map(c => c.id);
-      return [id, ...subFolders];
-    } else if (folder.childNodes?.length > 0){
-      return getSubFolders(folder.childNodes, id);
+    if (folder.id === id){
+      return folder;
+    }
+    if(folder.childNodes?.length > 0){
+      const result = findInTree(folder.childNodes, id);
+      if(result){return result}
     }
   }
-  return [id];
 }
 
 const getChildrenOf = (folder: Folder): Folder[] => {

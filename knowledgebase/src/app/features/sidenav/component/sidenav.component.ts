@@ -19,10 +19,10 @@ export class SidenavComponent implements OnChanges {
 
   firstNavItemsChange = true;
 
-  //angular-tree docs: https://angular2-tree.readme.io/docs
+  //angular-tree docs: https://angular2-tree.readme.io/docs/drag-drop
   treeOptions: ITreeOptions = {
     childrenField: 'childNodes',
-    allowDrag: true,
+    allowDrag: (node) => node.data.id === -1,
   };
 
   folderNameToAdd: string;

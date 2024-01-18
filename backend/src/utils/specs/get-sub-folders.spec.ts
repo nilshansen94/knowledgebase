@@ -26,4 +26,14 @@ describe('getSubFolders', () => {
     expect(result).toStrictEqual([8]);
   })
 
+  it('should work with first tree-item having children', () => {
+    const list2 = [
+      ...list,
+      {id: 12, name: 'TIMS', parent_id: 1, user_id: 1},
+    ];
+    const tree = listToTree(list2);
+    const result = getSubFolders(tree, 2);
+    expect(result).toStrictEqual([2,3,4,5,6]);
+  })
+
 });
