@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
-import {filter, map, Observable} from "rxjs";
-import {Folder} from "../../features/sidenav/api/folder";
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import {BehaviorSubject, filter, map} from 'rxjs';
+import {Folder} from '../../features/sidenav/api/folder';
 
 @Injectable({
   providedIn: 'root'
@@ -14,14 +14,17 @@ export class AppService {
     map((e: NavigationEnd) => e.url === '/login'),
   );
 
-  selectedFolder$: Observable<number> = this.activatedRoute.queryParams.pipe(
-    map(params => params['folder'] ? params['folder']: undefined)
-  );
+  private selectedFolder = new BehaviorSubject<number>(undefined);
+  selectedFolder$ = this.selectedFolder.asObservable();
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-  ) {}
+  ) {
+    this.activatedRoute.queryParams.pipe(
+      map(params => params['folder'] ? params['folder']: null)
+    ).subscribe(folder => this.selectedFolder.next(folder));
+  }
 
   setSelectedFolder(folder: Folder) {
     //selectedFolder$ listens to ActivatedRoute
@@ -33,6 +36,10 @@ export class AppService {
         //queryParamsHandling: 'merge'
       }
     );
+  }
+
+  refreshSelectedFolder() {
+    this.selectedFolder.next(this.selectedFolder.value);
   }
 
 }

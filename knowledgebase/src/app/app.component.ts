@@ -3,7 +3,6 @@ import {CommonModule} from '@angular/common';
 import {RouterOutlet} from '@angular/router';
 import {SidenavComponent} from './features/sidenav/component/sidenav.component';
 import {SidenavContainerComponent} from './features/sidenav/container/sidenav-container.component';
-import {SnippetsContainerComponent} from './features/snippets/container/snippets-container.component';
 import {HeaderComponent} from './features/header/component/header.component';
 import {AppService} from './services/app/app.service';
 import {AuthService} from './services/auth/auth.service';
@@ -17,7 +16,6 @@ import {LoginService} from './features/login/service/login.service';
     RouterOutlet,
     SidenavComponent,
     SidenavContainerComponent,
-    SnippetsContainerComponent,
     HeaderComponent
   ],
   templateUrl: './app.component.html',

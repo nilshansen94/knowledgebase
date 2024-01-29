@@ -1,0 +1,15 @@
+<div class="editor">
+  <button *ngIf="!addSnippet" (click)="addSnippet = !addSnippet">add Snippet</button>
+  <input type="text" *ngIf="addSnippet" placeholder="title" [(ngModel)]="newSnippetTitle">
+  <md-editor
+    *ngIf="addSnippet"
+    [(ngModel)]="newSnippetContent"
+  />
+  <div class="action-bar">
+    <button *ngIf="addSnippet" (click)="saveSnippet()" class="primary">save</button>
+    <button *ngIf="addSnippet" (click)="resetState()">cancel</button>
+  </div>
+</div>
+<div class="snippets-container">
+  <app-snippet *ngFor="let snippet of snippets" [snippet]="snippet" />
+</div>

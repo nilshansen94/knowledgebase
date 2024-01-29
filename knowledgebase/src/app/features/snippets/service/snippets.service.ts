@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {catchError, map, of, shareReplay, startWith, switchMap, tap} from 'rxjs';
+import {catchError, map, of, shareReplay, startWith, switchMap, take, tap} from 'rxjs';
 import {MyHttpService} from "../../../services/http/my-http.service";
 import {Snippet} from "../api/snippet";
 import {AppService} from "../../../services/app/app.service";
@@ -36,14 +36,17 @@ export class SnippetsService {
     map(folders => folders as Snippet[])
   );
 
-  addSnippet(title: string, content: string) {
+  addSnippet(snippet: Partial<Snippet>) {
     const folder = +this.route.snapshot.queryParamMap.get('folder');
     if(!folder){
       alert('Please select a folder');
       return;
     }
-    this.httpService.put('snippet', {title, content, folder}).pipe(
-      tap(res => console.log(res))
+    this.httpService.put('snippet', {title: snippet.title, content: snippet.content, folder}).pipe(
+      tap(res => {
+        console.log(res);
+        this.appService.refreshSelectedFolder();
+      }),
     ).subscribe();
   }
 

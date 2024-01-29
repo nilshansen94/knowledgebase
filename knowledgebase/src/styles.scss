@@ -5,6 +5,16 @@ html, body {
   padding: 0;
 }
 
+//todo use bootstrap-buttons or remove bootstrap
+button {
+  border: 1px #797979 solid;
+
+  &.primary {
+    background: #3737dd;
+    color: white;
+  }
+}
+
 input {
   outline: none;
 }
