@@ -1,12 +1,40 @@
+@import "knowledgebase/src/variables";
+
 .snippet-container {
+  position: relative;
   max-width: 500px;
   min-width: 300px;
   border: 1px black solid;
-  border-radius: 5px;
+  border-radius: $border-radius;
   padding: 1rem;
+  &:hover .control-icons {
+    display: initial;
+  }
 }
 
 h5 {
   margin-top: 0;
   margin-bottom: 1em;
+}
+
+.control-icons {
+  display: none;
+  position: absolute;
+  top: 3px;
+  right: 3px;
+
+  button {
+    background: #ccc;
+    line-height: 1em;
+    padding: 3px;
+    margin-left: 3px;
+    border-radius: $border-radius;
+
+    span {
+      font-size: 1.25rem;
+    }
+  }
+  .delete-snippet {
+    color: #e40000;
+  }
 }

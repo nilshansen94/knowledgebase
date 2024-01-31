@@ -29,6 +29,7 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "font-awesome": "^4.7.0",
+    "material-icons": "^1.13.12",
     "mysql2": "^3.6.0",
     "ngx-markdown-editor": "^5.3.4",
     "rxjs": "~7.8.0",

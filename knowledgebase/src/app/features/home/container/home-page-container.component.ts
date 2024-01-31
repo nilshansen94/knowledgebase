@@ -11,7 +11,10 @@ import {SnippetsService} from '../../snippets/service/snippets.service';
     <h1>My Snippets</h1>
     <app-home
       [snippets]="snippetsService.snippets$ | async"
+      [updateResult]="snippetsService.updateResult$ | async"
       (newSnippet)="snippetsService.addSnippet($event)"
+      (editSnippet)="snippetsService.editSnippet($event)"
+      (deleteSnippet)="snippetsService.deleteSnippet($event)"
     />
   `,
   styles: [
@@ -19,6 +22,6 @@ import {SnippetsService} from '../../snippets/service/snippets.service';
 })
 export class HomePageContainerComponent {
 
-  constructor(public snippetsService: SnippetsService,) {}
+  constructor(public snippetsService: SnippetsService) {}
 
 }

@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
-import {catchError, map, of, shareReplay, startWith, switchMap, take, tap} from 'rxjs';
-import {MyHttpService} from "../../../services/http/my-http.service";
-import {Snippet} from "../api/snippet";
-import {AppService} from "../../../services/app/app.service";
-import {ActivatedRoute} from "@angular/router";
+import {catchError, map, of, shareReplay, startWith, Subject, switchMap, tap} from 'rxjs';
+import {MyHttpService} from '../../../services/http/my-http.service';
+import {Snippet} from '../api/snippet';
+import {AppService} from '../../../services/app/app.service';
+import {ActivatedRoute} from '@angular/router';
+import {DbResult} from '@kb-rest/shared';
 
 @Injectable({
   providedIn: 'root'
@@ -16,15 +17,7 @@ export class SnippetsService {
     private route: ActivatedRoute,
   ) { }
 
-  private lorem = `Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
-  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-  sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-  Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
-  invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et
-  justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. `;
-
-  snippets$ = this.appService.selectedFolder$.pipe(
+   snippets$ = this.appService.selectedFolder$.pipe(
     startWith(null),
     map(folder => folder ? '/'+folder: ''),
     switchMap(folder => this.httpService.get('snippets' + folder)),
@@ -36,6 +29,10 @@ export class SnippetsService {
     map(folders => folders as Snippet[])
   );
 
+  private updateResult = new Subject<DbResult>();
+  /** The result of an update or delete operation */
+  updateResult$ = this.updateResult.asObservable();
+
   addSnippet(snippet: Partial<Snippet>) {
     const folder = +this.route.snapshot.queryParamMap.get('folder');
     if(!folder){
@@ -44,9 +41,26 @@ export class SnippetsService {
     }
     this.httpService.put('snippet', {title: snippet.title, content: snippet.content, folder}).pipe(
       tap(res => {
-        console.log(res);
         this.appService.refreshSelectedFolder();
+        this.updateResult.next(res as DbResult);
       }),
+    ).subscribe();
+  }
+
+  editSnippet(snippet: Snippet) {
+    this.httpService.post('snippet', snippet).pipe(
+      tap(res => {
+        this.appService.refreshSelectedFolder();
+        this.updateResult.next(res as DbResult);
+      })
+    ).subscribe();
+  }
+
+  deleteSnippet(snippet: any) {
+    this.httpService.delete('snippet', snippet.snip_id).pipe(
+      tap(res => {
+        this.appService.refreshSelectedFolder();
+      })
     ).subscribe();
   }
 

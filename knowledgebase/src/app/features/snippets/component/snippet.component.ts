@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {Snippet} from "../api/snippet";
 
@@ -11,6 +11,24 @@ import {Snippet} from "../api/snippet";
 })
 export class SnippetComponent {
 
+  confirmDelete = false;
+
   @Input() snippet: Snippet;
+
+  @Output() editSnippet = new EventEmitter<Snippet>();
+
+  @Output() deleteSnippet = new EventEmitter<Snippet>();
+
+  doEditSnippet() {
+    this.editSnippet.emit(this.snippet);
+  }
+
+  doDeleteSnippet() {
+    if(!this.confirmDelete){
+      this.confirmDelete = true;
+      return;
+    }
+    this.deleteSnippet.emit(this.snippet);
+  }
 
 }

@@ -27,4 +27,10 @@ export class MyHttpService {
     return this.http.put(this.baseUrl + path, data, this.options);
   }
 
+  delete(path: string, id: number) {
+    const fullPath = this.baseUrl + path + '/' + id;
+    console.debug('http-delete', fullPath);
+    return this.http.delete(fullPath, this.options);
+  }
+
 }

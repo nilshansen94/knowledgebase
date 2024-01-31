@@ -199,6 +199,26 @@ app.put('/snippet', [verifyLogin], (req, res) => {
   });
 })
 
+app.post('/snippet', [verifyLogin], (req, res) => {
+  const snippet = req.body;
+  const userId = req.session.userId;
+  updateSnippet(snippet, userId).then(r => {
+    res.json(r);
+    res.end();
+    return;
+  });
+})
+
+app.delete('/snippet/:id', [verifyLogin], (req, res) => {
+  const snippetId = req.params.id;
+  const userId = req.session.userId;
+  deleteSnippet(snippetId, userId).then(r => {
+    res.json(r);
+    res.end();
+    return;
+  })
+})
+
 async function addSnippet(snippet, userId) {
   let conn: PoolConnection;
   try {
@@ -214,6 +234,48 @@ async function addSnippet(snippet, userId) {
     return {success: true};
   } catch(e) {
     console.log('rolling back insert-snip', e)
+    await conn?.rollback();
+    return {success: false};
+  }
+}
+
+async function updateSnippet(snippet, userId) {
+  //todo check user_id?
+  let conn: PoolConnection;
+  try {
+    conn = await promisePool.getConnection();
+    await conn.beginTransaction();
+    //userId is req.session.userId
+    const [result] = await conn.query('UPDATE snippet SET title = ?, content = ? WHERE id = ?', [snippet.title, snippet.content, snippet.snip_id]);
+    // @ts-ignore
+    console.log(result);
+    await conn.commit();
+    console.log('committed update-snip')
+    // @ts-ignore
+    return {success: result?.affectedRows === 1};
+  } catch(e) {
+    console.log('rolling back update-snip', e)
+    await conn?.rollback();
+    return {success: false};
+  }
+}
+
+async function deleteSnippet(snippetId, userId) {
+  //todo check userId?
+  let conn: PoolConnection;
+  try {
+    conn = await promisePool.getConnection();
+    await conn.beginTransaction();
+    //userId is req.session.userId
+    const [result] = await conn.query('DELETE FROM snippet WHERE id = ?', [snippetId]);
+    // @ts-ignore
+    console.log(result);
+    await conn.commit();
+    console.log('committed delete-snip')
+    // @ts-ignore
+    return {success: result?.affectedRows === 1};
+  } catch(e) {
+    console.log('rolling back delete-snip', e)
     await conn?.rollback();
     return {success: false};
   }
