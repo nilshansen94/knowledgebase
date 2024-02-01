@@ -26,7 +26,8 @@ export class SnippetsService {
       return of([]);
     }),
     shareReplay(),
-    map(folders => folders as Snippet[])
+    //todo more db interfaces
+    map(folders => folders as (Snippet & {folder: number})[])
   );
 
   private updateResult = new Subject<DbResult>();

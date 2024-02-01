@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {Folder} from '../api/folder';
 import {ITreeOptions, TreeComponent, TreeModule, TreeNode} from '@odymaui/angular-tree-component';
 import {FormsModule} from '@angular/forms';
+import {KbTreeNode} from '../api/kb-tree-node';
 
 @Component({
   selector: 'app-sidenav',
@@ -23,6 +24,7 @@ export class SidenavComponent implements OnChanges {
   treeOptions: ITreeOptions = {
     childrenField: 'childNodes',
     allowDrag: (node) => node.data.id === -1 || this.allowMoveFolders,
+    allowDrop: (from, to) => to.parent.data.isFolder,
   };
 
   showAddFolderInput = false;
@@ -34,6 +36,7 @@ export class SidenavComponent implements OnChanges {
   allowMoveFolders = false;
   navItemsBackupJson: string;
   movedFoldersMap = new Map<number, Folder>();
+  movedSnippetsMap = new Map<number, Folder>();
 
   @ViewChild(TreeComponent)
   private tree: TreeComponent;
@@ -47,6 +50,8 @@ export class SidenavComponent implements OnChanges {
   @Output() newFolder = new EventEmitter<Folder>();
 
   @Output() movedFolders = new EventEmitter<Map<number, Folder>>();
+
+  @Output() movedSnippets = new EventEmitter<Map<number, Folder>>();
 
   ngOnChanges(changes: SimpleChanges) {
     if(changes['navItems']?.currentValue && this.firstNavItemsChange){
@@ -68,9 +73,14 @@ export class SidenavComponent implements OnChanges {
     this.tree.treeModel.update();
   }
 
-  setSelectedItem(folder: TreeNode&Folder) {
+  setSelectedItem(folder: TreeNode&KbTreeNode) {
     if(this.folderPlaced){
       console.log('Ignoring selection of folder item because a new folder is being placed');
+      return;
+    }
+    if(!folder.isFolder){
+      //todo set parent folder as active (and maybe snippet)
+      console.log('Ignore click on snippet so far');
       return;
     }
     if (this.currentlySelectedItem?.id === folder.id) {
@@ -112,21 +122,37 @@ export class SidenavComponent implements OnChanges {
   onMoveNode(e){
     e.node.parent_id = e.to.parent.virtual ? null: e.to.parent.id;
     e.node.isMoved = true;
+    if(e.node.isFolder){
+      this.movedFoldersMap.set(e.node.id, e.node);
+    }
+    if(!e.node.isFolder){
+      this.movedSnippetsMap.set(e.node.id, e.to.parent);
+    }
+    this.tree.treeModel.getNodeById(e.to.parent.id).expand();
     this.tree.treeModel.update();
-    this.movedFoldersMap.set(e.node.id, e.node);
   }
 
   cancelMovingFolders() {
     this.movedFoldersMap.clear();
+    this.movedSnippetsMap.clear();
     this.navItems = JSON.parse(this.navItemsBackupJson);
     this.allowMoveFolders = false;
     this.tree.treeModel.update();
   }
 
   saveMovedFolders() {
-    console.log(this.movedFoldersMap)
-    this.movedFolders.emit(this.movedFoldersMap);
-    this.movedFoldersMap.clear();
+    if (this.movedFoldersMap.size === 0 && this.movedSnippetsMap.size === 0) {
+      this.cancelMovingFolders();
+      return;
+    }
+    if(this.movedFoldersMap.size > 0){
+      this.movedFolders.emit(this.movedFoldersMap);
+      this.movedFoldersMap.clear();
+    }
+    if(this.movedSnippetsMap.size > 0) {
+      this.movedSnippets.emit(this.movedSnippetsMap);
+      this.movedSnippetsMap.clear();
+    }
     this.allowMoveFolders = false;
   }
 

@@ -15,6 +15,7 @@ import {AppService} from "../../../services/app/app.service";
       (selectedItemChange)="appService.setSelectedFolder($event)"
       (newFolder)="sidenavService.addFolder($event)"
       (movedFolders)="sidenavService.moveFolders($event)"
+      (movedSnippets)="sidenavService.moveSnippets($event)"
     />
   `,
   styles: [

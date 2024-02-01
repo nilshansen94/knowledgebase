@@ -52,6 +52,8 @@
            [treeDragEnabled]="node.allowDrag()">
 
         <!-- *ngIf on node.id or sth like that and switch between tree-node-content and own stuff -->
+        <span *ngIf="node.data.isFolder && node.isCollapsed" class="folder-icon material-icons-outlined">folder</span>
+        <span *ngIf="node.data.isFolder && !node.isCollapsed" class="folder-icon material-symbols-outlined">folder_open</span>
         <tree-node-content [node]="node" [index]="index"></tree-node-content>
         <span style="font-size: 8px">{{node.id}}</span>
         <!--<div *ngIf="node.id === -1">

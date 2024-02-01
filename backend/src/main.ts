@@ -172,6 +172,18 @@ app.post('/moveFolders', [verifyLogin], (req, res) => {
   })
 })
 
+app.post('/moveSnippets', [verifyLogin], (req, res) => {
+  const data = req.body as number[][];
+  console.log('/moveSnippets', data)
+  const userId = req.session.userId;
+  //todo check userId?
+  moveSnippets(data).then(r => {
+    res.json(r);
+    res.end();
+    return;
+  })
+})
+
 app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
   const userId = req.session.userId;
   //console.log('get snippets for user', userId, 'and folder', req.params.folderId)
@@ -181,7 +193,7 @@ app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
     //console.log('folders from query', rows)
     const tree = listToTree(rows as Folder[]);
     //console.log('tree',tree)
-    let query = `select *
+    let query = `select snippet.*, usr_fold_snip.folder
                  from usr_fold_snip
                         join user on user.id = usr_fold_snip.user_id
                         join folder on folder.id = usr_fold_snip.folder
@@ -329,6 +341,27 @@ async function moveFolders(data: number[][]) {
     return {success: false};
   }
 }
+
+async function moveSnippets(data: number[][]) {
+  let conn: PoolConnection;
+  try {
+    conn = await promisePool.getConnection();
+    await conn.beginTransaction();
+    //userId is req.session.userId
+    for(const d of data){
+      console.log('UPDATE usr_fold_snip SET folder = ? WHERE snip_id = ?', JSON.stringify(d))
+      await conn.query('UPDATE usr_fold_snip SET folder = ? WHERE snip_id = ?', d);
+    }
+    await conn.commit();
+    console.log('committed move-snippets')
+    return {success: true};
+  } catch(e) {
+    console.log('rolling back move-snippets', e)
+    await conn?.rollback();
+    return {success: false};
+  }
+}
+
 
 const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {

@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import '../../node_modules/@odymaui/angular-tree-component/css/angular-tree-component.css';
 @import 'material-icons/iconfont/material-icons.scss';
+@import 'material-symbols';
 
 html, body {
   margin: 0;
@@ -48,4 +49,8 @@ input {
 }
 .node-content-wrapper.isMoved {
   background: #ff8800;
+}
+.node-content-wrapper .folder-icon {
+  vertical-align: middle;
+  margin-right: 0.25em;
 }

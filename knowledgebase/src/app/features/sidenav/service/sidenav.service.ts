@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
-import {map, Observable, of, shareReplay, startWith, switchMap, tap} from "rxjs";
-import {Folder} from "../api/folder";
-import {HttpClient} from "@angular/common/http";
-import {MyHttpService} from "../../../services/http/my-http.service";
-import {AppService} from "../../../services/app/app.service";
+import {Injectable} from '@angular/core';
+import {map, Observable, shareReplay, startWith, switchMap, tap, withLatestFrom} from 'rxjs';
+import {Folder} from '../api/folder';
+import {MyHttpService} from '../../../services/http/my-http.service';
+import {AppService} from '../../../services/app/app.service';
+import {SnippetsService} from '../../snippets/service/snippets.service';
+import {KbTreeNode} from '../api/kb-tree-node';
+import {Snippet} from '../../snippets/api/snippet';
 
 @Injectable({
   providedIn: 'root'
@@ -14,22 +16,44 @@ export class SidenavService {
   constructor(
     private httpService: MyHttpService,
     private appService: AppService,
+    private snippetsService: SnippetsService,
   ) {}
 
-  navItems$: Observable<Partial<Folder>[]> = of([
-    {name: 'Nav 1'},
-    {name: 'Nav 2'},
-  ]);
-
   //we pipe from selectedFolder$ to allow a refresh
-  folders$: Observable<Folder[]> = this.appService.selectedFolder$.pipe(
+  folders$: Observable<KbTreeNode[]> = this.appService.selectedFolder$.pipe(
     startWith(null),
     switchMap(() => this.httpService.get('folders')),
     shareReplay(),
     map(folders => folders as Folder[]),
     //map(folders => [{id: -1, name: '+'} as Folder, ...folders]),
     tap(f => console.log('folders$', f)),
+    withLatestFrom(this.snippetsService.snippets$),//todo blocks sometimes
+    map(([folders, snippets]) => {
+      const snippetsByFolder = new Map<number, Snippet[]>();
+      for(const snippet of snippets){
+        if(!snippetsByFolder.has(snippet.folder)){
+          snippetsByFolder.set(snippet.folder, []);
+        }
+        snippetsByFolder.get(snippet.folder).push(snippet);
+      }
+      this.addSnippetsToFolders(folders as KbTreeNode[], snippetsByFolder);
+      return folders as KbTreeNode[];
+    }),
   );
+
+  addSnippetsToFolders(folders: KbTreeNode[], snippetMap: Map<number, Snippet[]>){
+    for(const folder of folders){
+      folder.isFolder = true;
+      if(!folder.childNodes){
+        folder.childNodes = [];
+      }
+      if(folder.childNodes.length > 0){
+        this.addSnippetsToFolders(folder.childNodes, snippetMap);
+      }
+      const snippets = snippetMap.get(folder.id) || [];
+      folder.childNodes = folder.childNodes.concat(snippets.map(snippet => ({name: snippet.title, id: snippet.id}) as KbTreeNode));
+    }
+  }
 
   addFolder(folder: Folder){
     this.httpService.put('addFolder', folder).pipe(
@@ -39,10 +63,18 @@ export class SidenavService {
   }
 
   moveFolders(map: Map<number, Folder>) {
-    //todo at the moment we can only move folders but not snippets
     const data = Array.from(map.entries()).map(([k, v]) => [v.parent_id, k]);
     console.log(data);
     this.httpService.post('moveFolders', data).pipe(
+      tap(res => {
+        this.appService.refreshSelectedFolder();
+      })
+    ).subscribe();
+  }
+
+  moveSnippets(map: Map<number, Folder>) {
+    const data = Array.from(map.entries()).map(([k,v]) => [v.id, k]);
+    this.httpService.post('moveSnippets', data).pipe(
       tap(res => {
         this.appService.refreshSelectedFolder();
       })
