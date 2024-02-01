@@ -270,7 +270,7 @@ async function updateSnippet(snippet, userId) {
     conn = await promisePool.getConnection();
     await conn.beginTransaction();
     //userId is req.session.userId
-    const [result] = await conn.query('UPDATE snippet SET title = ?, content = ? WHERE id = ?', [snippet.title, snippet.content, snippet.snip_id]);
+    const [result] = await conn.query('UPDATE snippet SET title = ?, content = ? WHERE id = ?', [snippet.title, snippet.content, snippet.id]);
     // @ts-ignore
     console.log(result);
     await conn.commit();

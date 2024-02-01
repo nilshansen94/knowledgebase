@@ -78,7 +78,7 @@ export class SidenavComponent implements OnChanges {
       console.log('Ignoring selection of folder item because a new folder is being placed');
       return;
     }
-    if(!folder.isFolder){
+    if(!folder.data.isFolder){
       //todo set parent folder as active (and maybe snippet)
       console.log('Ignore click on snippet so far');
       return;
