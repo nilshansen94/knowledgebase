@@ -160,6 +160,18 @@ app.put('/addFolder', [verifyLogin], (req, res) => {
   });
 })
 
+app.post('/moveFolders', [verifyLogin], (req, res) => {
+  const data = req.body as number[][];
+  console.log('/moveFolder', data)
+  const userId = req.session.userId;
+  //todo check userId?
+  moveFolders(data).then(r => {
+    res.json(r);
+    res.end();
+    return;
+  })
+})
+
 app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
   const userId = req.session.userId;
   //console.log('get snippets for user', userId, 'and folder', req.params.folderId)
@@ -293,6 +305,26 @@ async function addFolder(folder: Folder, userId: number) {
     return {success: true};
   } catch(e) {
     console.log('rolling back insert-folder', e)
+    await conn?.rollback();
+    return {success: false};
+  }
+}
+
+async function moveFolders(data: number[][]) {
+  let conn: PoolConnection;
+  try {
+    conn = await promisePool.getConnection();
+    await conn.beginTransaction();
+    //userId is req.session.userId
+    for(const d of data){
+      //todo await needed?
+      conn.query('UPDATE folder SET parent_id = ? WHERE id = ?', d);
+    }
+    await conn.commit();
+    console.log('committed move-folders')
+    return {success: true};
+  } catch(e) {
+    console.log('rolling back move-folders', e)
     await conn?.rollback();
     return {success: false};
   }

@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {Folder} from '../api/folder';
-import {ITreeOptions, TreeComponent, TreeModel, TreeModule, TreeNode} from '@odymaui/angular-tree-component';
+import {ITreeOptions, TreeComponent, TreeModule, TreeNode} from '@odymaui/angular-tree-component';
 import {FormsModule} from '@angular/forms';
 
 @Component({
@@ -22,13 +22,18 @@ export class SidenavComponent implements OnChanges {
   //angular-tree docs: https://angular2-tree.readme.io/docs/drag-drop
   treeOptions: ITreeOptions = {
     childrenField: 'childNodes',
-    allowDrag: (node) => node.data.id === -1,
+    allowDrag: (node) => node.data.id === -1 || this.allowMoveFolders,
   };
 
+  showAddFolderInput = false;
   folderNameToAdd: string;
   folderToAdd: Folder;//folder that will be saved in db
   folderToDrag: Folder;
   folderPlaced: boolean;
+
+  allowMoveFolders = false;
+  navItemsBackupJson: string;
+  movedFoldersMap = new Map<number, Folder>();
 
   @ViewChild(TreeComponent)
   private tree: TreeComponent;
@@ -40,6 +45,8 @@ export class SidenavComponent implements OnChanges {
   @Output() selectedItemChange = new EventEmitter<Folder>();
 
   @Output() newFolder = new EventEmitter<Folder>();
+
+  @Output() movedFolders = new EventEmitter<Map<number, Folder>>();
 
   ngOnChanges(changes: SimpleChanges) {
     if(changes['navItems']?.currentValue && this.firstNavItemsChange){
@@ -88,12 +95,39 @@ export class SidenavComponent implements OnChanges {
     this.navItems.unshift(newFolder)
     this.tree.treeModel.update();
     this.folderPlaced = true;
+    this.showAddFolderInput = false;
   }
 
   saveAddedFolder(){
     const newFolderNode = this.tree.treeModel.getNodeById(-1);
     const parent_id = newFolderNode.parent.data.virtual ? null: newFolderNode.parent.data.id;
     this.newFolder.emit({id: -1, name: newFolderNode.data.name, parent_id});
+  }
+
+  doAllowMoveFolders() {
+    this.allowMoveFolders = true;
+    this.navItemsBackupJson = JSON.stringify(this.navItems);
+  }
+
+  onMoveNode(e){
+    e.node.parent_id = e.to.parent.virtual ? null: e.to.parent.id;
+    e.node.isMoved = true;
+    this.tree.treeModel.update();
+    this.movedFoldersMap.set(e.node.id, e.node);
+  }
+
+  cancelMovingFolders() {
+    this.movedFoldersMap.clear();
+    this.navItems = JSON.parse(this.navItemsBackupJson);
+    this.allowMoveFolders = false;
+    this.tree.treeModel.update();
+  }
+
+  saveMovedFolders() {
+    console.log(this.movedFoldersMap)
+    this.movedFolders.emit(this.movedFoldersMap);
+    this.movedFoldersMap.clear();
+    this.allowMoveFolders = false;
   }
 
 }

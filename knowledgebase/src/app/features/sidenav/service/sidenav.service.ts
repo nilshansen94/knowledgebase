@@ -21,7 +21,10 @@ export class SidenavService {
     {name: 'Nav 2'},
   ]);
 
-  folders$: Observable<Folder[]> = this.httpService.get('folders').pipe(
+  //we pipe from selectedFolder$ to allow a refresh
+  folders$: Observable<Folder[]> = this.appService.selectedFolder$.pipe(
+    startWith(null),
+    switchMap(() => this.httpService.get('folders')),
     shareReplay(),
     map(folders => folders as Folder[]),
     //map(folders => [{id: -1, name: '+'} as Folder, ...folders]),
@@ -32,6 +35,17 @@ export class SidenavService {
     this.httpService.put('addFolder', folder).pipe(
       tap(res => console.log(res)),
       switchMap(() => this.folders$)
+    ).subscribe();
+  }
+
+  moveFolders(map: Map<number, Folder>) {
+    //todo at the moment we can only move folders but not snippets
+    const data = Array.from(map.entries()).map(([k, v]) => [v.parent_id, k]);
+    console.log(data);
+    this.httpService.post('moveFolders', data).pipe(
+      tap(res => {
+        this.appService.refreshSelectedFolder();
+      })
     ).subscribe();
   }
 

@@ -14,6 +14,7 @@ import {AppService} from "../../../services/app/app.service";
       [selectedItemId]="this.appService.selectedFolder$ | async"
       (selectedItemChange)="appService.setSelectedFolder($event)"
       (newFolder)="sidenavService.addFolder($event)"
+      (movedFolders)="sidenavService.moveFolders($event)"
     />
   `,
   styles: [
