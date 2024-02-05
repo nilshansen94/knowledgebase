@@ -7,6 +7,7 @@ import {HeaderComponent} from './features/header/component/header.component';
 import {AppService} from './services/app/app.service';
 import {AuthService} from './services/auth/auth.service';
 import {LoginService} from './features/login/service/login.service';
+import {provideMarkdown} from 'ngx-markdown';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,10 @@ import {LoginService} from './features/login/service/login.service';
     RouterOutlet,
     SidenavComponent,
     SidenavContainerComponent,
-    HeaderComponent
+    HeaderComponent,
+  ],
+  providers: [
+    provideMarkdown({})
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']

@@ -29,10 +29,13 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "font-awesome": "^4.7.0",
+    "marked": "^9.1.6",
     "material-icons": "^1.13.12",
     "material-symbols": "^0.14.6",
     "mysql2": "^3.6.0",
+    "ngx-markdown": "^17.1.1",
     "ngx-markdown-editor": "^5.3.4",
+    "prismjs": "^1.29.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"

@@ -38,3 +38,8 @@ h5 {
     color: #e40000;
   }
 }
+
+.snippet-content ::ng-deep pre {
+  padding: 0.5rem;
+  border-radius: $border-radius;
+}
