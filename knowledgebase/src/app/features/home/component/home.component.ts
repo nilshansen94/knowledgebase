@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {LMarkdownEditorModule} from 'ngx-markdown-editor';
 import {Snippet} from '../../snippets/api/snippet';
 import {SnippetComponent} from '../../snippets/component/snippet.component';
 import {DbResult} from '@kb-rest/shared';
+import {debounceTime, distinctUntilChanged, fromEvent, map, Subscription, tap} from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -13,12 +14,15 @@ import {DbResult} from '@kb-rest/shared';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnChanges {
+export class HomeComponent implements OnChanges, OnInit, OnDestroy {
 
   addSnippet: boolean;
   editingSnippet: Snippet;
   newSnippetTitle: string;
   newSnippetContent: string;
+
+  @ViewChild('searchInput', {static: true}) searchInput: ElementRef;
+  inputSubscription: Subscription;
 
   @Input()
   snippets: Snippet[];
@@ -33,6 +37,17 @@ export class HomeComponent implements OnChanges {
 
   @Output() deleteSnippet = new EventEmitter<Snippet>();
 
+  @Output() search = new EventEmitter<string>();
+
+  ngOnInit() {
+    this.inputSubscription = fromEvent(this.searchInput.nativeElement, 'keyup').pipe(
+      map(event => (event as any).target.value),
+      debounceTime(500),
+      distinctUntilChanged(),
+      tap(r => this.search.emit(r))
+    ).subscribe();
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if(changes['updateResult']?.currentValue) {
       const result: DbResult = changes['updateResult'].currentValue as DbResult;
@@ -40,6 +55,10 @@ export class HomeComponent implements OnChanges {
         this.resetState();
       }
     }
+  }
+
+  ngOnDestroy() {
+    this.inputSubscription.unsubscribe();
   }
 
   saveSnippet() {

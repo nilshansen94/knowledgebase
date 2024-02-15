@@ -16,3 +16,17 @@
   display: flex;
   column-gap: 0.5em;
 }
+
+#add-snippet-btn {
+  position: absolute;
+  top: 3rem;
+  right: 3rem;
+}
+
+.search-container {
+  margin-bottom: 1rem;
+  #search-input {
+    font-size: 1.5em;
+    width: 300px;
+  }
+}

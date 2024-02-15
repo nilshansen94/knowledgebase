@@ -1,5 +1,6 @@
+<button id="add-snippet-btn" *ngIf="!addSnippet && !editingSnippet" (click)="addSnippet = !addSnippet">add Snippet</button>
+
 <div class="editor">
-  <button *ngIf="!addSnippet && !editingSnippet" (click)="addSnippet = !addSnippet">add Snippet</button>
   <input type="text" *ngIf="addSnippet || editingSnippet" placeholder="title" [(ngModel)]="newSnippetTitle">
   <md-editor
     *ngIf="addSnippet || editingSnippet"
@@ -14,6 +15,11 @@
     <button (click)="resetState()">cancel</button>
   </div>
 </div>
+
+<div class="search-container">
+  <input type="text" id="search-input" #searchInput placeholder="search">
+</div>
+
 <div class="snippets-container">
   <app-snippet *ngFor="let snippet of snippets"
                [snippet]="snippet"

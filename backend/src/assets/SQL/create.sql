@@ -10,6 +10,10 @@ create table snippet (
   content text,
   user_id int
 );
+CREATE FULLTEXT INDEX snip_title_content_index
+  ON snippet (title, content);
+CREATE FULLTEXT INDEX snip_title_index
+  ON snippet (title);
 
 create table folder (
   id INT AUTO_INCREMENT PRIMARY KEY,

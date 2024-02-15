@@ -21,7 +21,8 @@ const mysqlConfig = {
   port: 8889,
   user: 'root',
   password: 'root',
-  database: 'kb_rest'
+  database: 'kb_rest',
+  namedPlaceholders: true,
 };
 const connection = mysql.createConnection(mysqlConfig);
 const pool = mysql.createPool(mysqlConfig);
@@ -193,20 +194,31 @@ app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
     //console.log('folders from query', rows)
     const tree = listToTree(rows as Folder[]);
     //console.log('tree',tree)
-    let query = `select snippet.*, usr_fold_snip.folder
+    const searchParam = req.query.search;
+    console.log('searchParam', searchParam);
+    let select = 'select snippet.*, usr_fold_snip.folder';
+    if(searchParam){
+      select += ', match(title, content) against(:search) as r1, match(title) against(:search) as r2';
+    }
+    let query = `${select}
                  from usr_fold_snip
                         join user on user.id = usr_fold_snip.user_id
                         join folder on folder.id = usr_fold_snip.folder
                         join snippet on snippet.id = usr_fold_snip.snip_id
-                 where user.id = ?`;
+                 where user.id = :userId`;
     const folderId = req.params.folderId;
     let folderIds = [];
     if (folderId) {
-      query += ` and usr_fold_snip.folder in (?)`;
+      query += ` and usr_fold_snip.folder in (:folderIds)`;
       folderIds = getSubFolders(tree, +folderId);
       //console.log('folderIds',folderIds)
     }
-    connection.query(query, [userId, folderIds], (err, rows) => {
+    if(searchParam){
+      query += ` and match(title, content) against (:search IN NATURAL LANGUAGE MODE) ORDER BY r1 DESC, r2 DESC`;
+    }
+    //console.log(query)
+    //console.log(JSON.stringify({search: searchParam, folderIds, userId}))
+    connection.execute(query, {search: searchParam, folderIds, userId}, (err, rows) => {
       res.json(rows);
     });
   })

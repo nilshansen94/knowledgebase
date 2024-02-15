@@ -15,6 +15,7 @@ import {SnippetsService} from '../../snippets/service/snippets.service';
       (newSnippet)="snippetsService.addSnippet($event)"
       (editSnippet)="snippetsService.editSnippet($event)"
       (deleteSnippet)="snippetsService.deleteSnippet($event)"
+      (search)="snippetsService.searchSnippet($event)"
     />
   `,
   styles: [

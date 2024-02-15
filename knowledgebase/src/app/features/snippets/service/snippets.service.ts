@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {catchError, map, of, shareReplay, startWith, Subject, switchMap, tap} from 'rxjs';
+import {BehaviorSubject, catchError, combineLatest, map, of, shareReplay, startWith, Subject, switchMap, tap} from 'rxjs';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {Snippet} from '../api/snippet';
 import {AppService} from '../../../services/app/app.service';
@@ -17,10 +17,15 @@ export class SnippetsService {
     private route: ActivatedRoute,
   ) { }
 
-   snippets$ = this.appService.selectedFolder$.pipe(
-    startWith(null),
-    map(folder => folder ? '/'+folder: ''),
-    switchMap(folder => this.httpService.get('snippets' + folder)),
+  private searchQuery = new BehaviorSubject<string>('');
+
+   snippets$ = combineLatest([
+     this.appService.selectedFolder$.pipe(map(folder => folder ? '/'+folder: '')),
+     this.searchQuery.pipe(map(q => this.mapSearchQuery(q)))
+   ]).pipe(
+    //startWith(null),
+    tap(([folder, query]) => console.log('get snippets' + folder + query)),
+    switchMap(([folder, query]) => this.httpService.get('snippets' + folder + query)),
     catchError(e => {
       console.log('Cannot get snippets', e)
       return of([]);
@@ -63,6 +68,14 @@ export class SnippetsService {
         this.appService.refreshSelectedFolder();
       })
     ).subscribe();
+  }
+
+  searchSnippet(searchQuery: string) {
+    this.searchQuery.next(searchQuery);
+  }
+
+  private mapSearchQuery(val) {
+    return val ? '?' + new URLSearchParams({search: val}).toString() : '';
   }
 
 }
