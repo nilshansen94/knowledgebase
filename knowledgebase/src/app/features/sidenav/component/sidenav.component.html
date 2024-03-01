@@ -30,8 +30,8 @@
 <tree-root
   [nodes]="navItems"
   [options]="treeOptions"
-  (activate)="setSelectedItem($event.node)"
-  (deactivate)="setSelectedItem($event.node)"
+  (activate)="setSelectedItem($event)"
+  (deactivate)="setSelectedItem($event)"
   (moveNode)="onMoveNode($event)"
 >
   <ng-template #treeNodeWrapperTemplate let-node let-index="index">

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, catchError, combineLatest, map, of, shareReplay, startWith, Subject, switchMap, tap} from 'rxjs';
+import {BehaviorSubject, catchError, combineLatest, map, of, shareReplay, Subject, switchMap, tap} from 'rxjs';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {Snippet} from '../api/snippet';
 import {AppService} from '../../../services/app/app.service';
@@ -23,16 +23,20 @@ export class SnippetsService {
      this.appService.selectedFolder$.pipe(map(folder => folder ? '/'+folder: '')),
      this.searchQuery.pipe(map(q => this.mapSearchQuery(q)))
    ]).pipe(
-    //startWith(null),
     tap(([folder, query]) => console.log('get snippets' + folder + query)),
-    switchMap(([folder, query]) => this.httpService.get('snippets' + folder + query)),
+    switchMap(([folder, query]) => {
+      if(!folder) {
+        return of([]);
+      }
+      return this.httpService.get('snippets' + folder + query);
+    }),
     catchError(e => {
-      console.log('Cannot get snippets', e)
+      console.error('Cannot get snippets', e)
       return of([]);
     }),
     shareReplay(),
     //todo more db interfaces
-    map(folders => folders as (Snippet & {folder: number})[])
+    map(folders => folders as (Snippet & {folder: number})[]),
   );
 
   private updateResult = new Subject<DbResult>();

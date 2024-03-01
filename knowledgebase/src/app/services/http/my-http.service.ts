@@ -13,7 +13,7 @@ export class MyHttpService {
   constructor(private http: HttpClient) { }
 
   get(path: string) {
-    console.debug('http-get', path)
+    console.debug('http-get', this.baseUrl + path)
     return this.http.get(this.baseUrl + path, this.options);
   }
 

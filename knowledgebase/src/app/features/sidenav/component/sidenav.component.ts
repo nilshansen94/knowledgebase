@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {Folder} from '../api/folder';
-import {ITreeOptions, TreeComponent, TreeModule, TreeNode} from '@odymaui/angular-tree-component';
+import {ITreeOptions, TreeComponent, TreeModel, TreeModule, TreeNode} from '@odymaui/angular-tree-component';
 import {FormsModule} from '@angular/forms';
 import {KbTreeNode} from '../api/kb-tree-node';
 
@@ -41,7 +41,7 @@ export class SidenavComponent implements OnChanges {
   @ViewChild(TreeComponent)
   private tree: TreeComponent;
 
-  @Input() navItems: Folder[];
+  @Input() navItems: KbTreeNode[];
 
   @Input() selectedItemId: number;
 
@@ -54,7 +54,7 @@ export class SidenavComponent implements OnChanges {
   @Output() movedSnippets = new EventEmitter<Map<number, Folder>>();
 
   ngOnChanges(changes: SimpleChanges) {
-    if(changes['navItems']?.currentValue && this.firstNavItemsChange){
+    if(changes['navItems']?.currentValue){
       this.updateTree();
     }
   }
@@ -73,29 +73,31 @@ export class SidenavComponent implements OnChanges {
     this.tree.treeModel.update();
   }
 
-  setSelectedItem(folder: TreeNode&KbTreeNode) {
+  setSelectedItem(event: {eventName: 'activate'|'deactivate', node: TreeNode, treeModel: TreeModel}) {
+    const data = event.node.data;
     if(this.folderPlaced){
       console.log('Ignoring selection of folder item because a new folder is being placed');
       return;
     }
-    if(!folder.data.isFolder){
+    if(!data.isFolder){
       //todo set parent folder as active (and maybe snippet)
-      console.log('Ignore click on snippet so far');
+      console.log('Ignore click on snippet so far', event);
       return;
     }
-    if (this.currentlySelectedItem?.id === folder.id) {
+    if (event.eventName === 'deactivate') {
       this.currentlySelectedItem = undefined;
       this.selectedItemChange.emit(undefined);
       return;
     }
-    folder.expand();
-    this.currentlySelectedItem = folder;
-    this.selectedItemChange.emit(folder);
+    event.node.expand();
+    this.currentlySelectedItem = data;
+    this.selectedItemChange.emit(data);
   }
 
   addFolderDragItem() {
-    const newFolder: Folder = {
+    const newFolder: KbTreeNode = {
       id: -1,
+      isFolder: true,
       name: this.folderNameToAdd,
       parent_id: null,
       user_id: null,

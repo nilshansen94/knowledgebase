@@ -6,7 +6,7 @@
   min-width: 300px;
   border: 1px black solid;
   border-radius: $border-radius;
-  padding: 1rem;
+  padding: 0.5rem;
   &:hover .control-icons {
     display: initial;
   }
@@ -42,4 +42,19 @@ h5 {
 .snippet-content ::ng-deep pre {
   padding: 0.5rem;
   border-radius: $border-radius;
+
+  //hide scrollbar:
+  &::-webkit-scrollbar{
+    display: none; // Safari, Chrome
+  }
+  -ms-overflow-style: none;  // Internet Explorer 10+
+  scrollbar-width: none;  // Firefox
+}
+
+.snippet-content ::ng-deep pre:last-child {
+  border-radius: 0 0 $border-radius $border-radius;
+
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+  margin-bottom: -0.5rem;
 }

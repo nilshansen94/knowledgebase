@@ -218,7 +218,9 @@ app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
     }
     //console.log(query)
     //console.log(JSON.stringify({search: searchParam, folderIds, userId}))
-    connection.execute(query, {search: searchParam, folderIds, userId}, (err, rows) => {
+    connection.execute(query, {search: searchParam, folderIds: folderIds.join(','), userId}, (err, rows) => {
+      //@ts-ignore
+      console.log(`get snippets (folderId ${folderId}) (folderIds ${JSON.stringify(folderIds)}) (search ${searchParam}). Found ${rows?.length} rows`)
       res.json(rows);
     });
   })

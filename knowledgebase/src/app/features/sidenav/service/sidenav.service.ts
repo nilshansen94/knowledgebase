@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {map, Observable, shareReplay, startWith, switchMap, tap, withLatestFrom} from 'rxjs';
+import {map, Observable, startWith, switchMap, tap} from 'rxjs';
 import {Folder} from '../api/folder';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {AppService} from '../../../services/app/app.service';
@@ -19,31 +19,28 @@ export class SidenavService {
     private snippetsService: SnippetsService,
   ) {}
 
-  //we pipe from selectedFolder$ to allow a refresh
-  folders$: Observable<KbTreeNode[]> = this.appService.selectedFolder$.pipe(
-    startWith(null),
-    switchMap(() => this.httpService.get('folders')),
-    shareReplay(),
-    map(folders => folders as Folder[]),
-    //map(folders => [{id: -1, name: '+'} as Folder, ...folders]),
-    tap(f => console.log('folders$', f)),
-    withLatestFrom(this.snippetsService.snippets$),//todo blocks sometimes
-    map(([folders, snippets]) => {
+  folders$: Observable<KbTreeNode[]> = this.snippetsService.snippets$.pipe(
+    startWith([]),
+    switchMap(snippets => this.httpService.get('folders').pipe(
+      map(folders => ([snippets, folders]))
+    )),
+    map(([snippets, folders]: [Snippet[], Folder[]]) => {
       const snippetsByFolder = new Map<number, Snippet[]>();
-      for(const snippet of snippets){
-        if(!snippetsByFolder.has(snippet.folder)){
-          snippetsByFolder.set(snippet.folder, []);
+      if(snippets){
+        for(const snippet of snippets){
+          if(!snippetsByFolder.has(snippet.folder)){
+            snippetsByFolder.set(snippet.folder, []);
+          }
+          snippetsByFolder.get(snippet.folder).push(snippet);
         }
-        snippetsByFolder.get(snippet.folder).push(snippet);
+        this.addSnippetsToFolders(folders as KbTreeNode[], snippetsByFolder);
       }
-      this.addSnippetsToFolders(folders as KbTreeNode[], snippetsByFolder);
       return folders as KbTreeNode[];
-    }),
+    })
   );
 
   addSnippetsToFolders(folders: KbTreeNode[], snippetMap: Map<number, Snippet[]>){
     for(const folder of folders){
-      folder.isFolder = true;
       if(!folder.childNodes){
         folder.childNodes = [];
       }

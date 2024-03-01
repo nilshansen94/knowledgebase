@@ -2,5 +2,6 @@ export interface Snippet {
   id: number;
   title: string;
   content: string;
-  folderId: number;
+  user_id: number;
+  folder: number;
 }
