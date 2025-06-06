@@ -13,7 +13,17 @@ export default {
       },
     ],
   },
-  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$)'],
+  transformIgnorePatterns: [
+    '<rootDir>/node_modules/(?!crypto-hash)'
+  ],
+  modulePaths: [
+    '<rootDir>'
+  ],
+  testPathIgnorePatterns: [
+    //'e2e/tests/*',
+    '/node_modules/',
+    //'src/environments/*'
+  ],
   snapshotSerializers: [
     'jest-preset-angular/build/serializers/no-ng-attributes',
     'jest-preset-angular/build/serializers/ng-snapshot',

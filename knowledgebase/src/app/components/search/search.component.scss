@@ -1,0 +1,32 @@
+@use "knowledgebase/src/variables" as variables;
+
+.search-container {
+  padding: 1rem 0;
+
+  position: sticky;
+  top: calc(0px - 1rem);
+  background: variables.$background-light;
+  z-index: 2;
+
+  .search-input {
+    font-size: 1.5em;
+    width: 300px;
+    height: 42px; //to match with the "add snippet" button
+    border: 1px variables.$border-grey solid;
+    border-radius: variables.$border-radius;
+    padding-right: 1.25em;
+    transition: box-shadow 0.25s ease;
+
+    &:focus {
+      box-shadow: 0 0 10px -1px rgba(163,163,163,0.5);
+    }
+  }
+
+  .clear {
+    margin-left: -1.25em;
+    cursor: pointer;
+    color: #a3a3a3;
+    vertical-align: text-bottom;
+  }
+
+}

@@ -1,10 +1,12 @@
 import type {Meta, StoryObj} from '@storybook/angular';
 import {moduleMetadata} from '@storybook/angular';
 import {CommonModule} from '@angular/common';
-import {SnippetComponent} from "../snippet.component";
+import {SnippetComponent} from '../snippet.component';
+import {ModalModule} from 'ngx-bootstrap/modal';
+import {MarkdownModule} from 'ngx-markdown';
 
 const meta: Meta<SnippetComponent> = {
-  title: 'ccAngularArchitecutre/Snippets',
+  title: 'Knowledgebase/Snippets',
   component: SnippetComponent,
   parameters: {
     // More on how to position stories at: https://storybook.js.org/docs/angular/configure/story-layout
@@ -12,7 +14,7 @@ const meta: Meta<SnippetComponent> = {
   },
   decorators: [
     moduleMetadata({
-      imports: [CommonModule, SnippetComponent],
+      imports: [CommonModule, SnippetComponent, ModalModule, MarkdownModule.forRoot()],
     }),
   ],
 };
@@ -21,10 +23,7 @@ export default meta;
 type Story = StoryObj<SnippetComponent>;
 
 export const Default: Story = {
-  render: (args: SnippetComponent) => ({
-    props: args,
-  }),
-};
-Default.args = {
-  snippet: {title: 'Title', content: 'Lorem ipsum'}
+  args: {
+    snippet: {id:1, title: 'Title', content: 'Lorem ipsum', user_id: 1, folder: null, isOwnSnippet: true, isPinned: false, public: true},
+  }
 };

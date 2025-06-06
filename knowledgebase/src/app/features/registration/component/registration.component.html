@@ -1,0 +1,26 @@
+<div class="registration-container">
+  <h2>Complete Registration</h2>
+  <div class="form-group">
+    <label for="username">Choose a username:</label>
+    <input
+      id="username"
+      type="text"
+      [formControl]="usernameControl"
+      class="form-control"
+      placeholder="Enter username"
+      #usernameInput
+      (keyup)="emitUsername(usernameInput.value)"
+    />
+    @if(errorMessage){
+      <div class="error-message">
+        {{errorMessage}}
+      </div>
+    }
+  </div>
+  <button
+    (click)="onRegister()"
+    [disabled]="!isValid || !usernameControl.value"
+  >
+    Register
+  </button>
+</div>

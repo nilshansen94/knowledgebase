@@ -1,4 +1,17 @@
-<app-header [isLoggedIn]="authService.isLoggedIn$ | async" (logout)="loginService.logout()" />
+@if((notificationService.notifications$ | async)?.length > 0){
+  <app-notification
+    [notifications]="notificationService.notifications$ | async"
+    (close)="notificationService.remove($event)"
+    (clearAll)="notificationService.clear()"
+  />
+}
+
+<app-header
+  [isLoggedIn]="authService.isLoggedIn$ | async"
+  [currentPath]="currentPath$ | async"
+  (logout)="loginService.logout()"
+  (toggleSidenav)="toggleSidenav()"
+/>
 
 <div class="main-wrapper">
   <nav [class.hideNav]="appService.hideNav$ |async">
@@ -9,3 +22,5 @@
     <router-outlet />
   </main>
 </div>
+
+<app-context-menu></app-context-menu>

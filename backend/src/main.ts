@@ -6,117 +6,103 @@
 import express from 'express';
 import session from 'express-session';
 import * as path from 'path';
-import mysql from 'mysql2';
-import {getSubFolders, listToTree, loginByCookie, loginByPw, register} from './utils';
-import {Folder} from './api';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import {PoolConnection} from 'mysql2/promise';
-import {LoginRequest, SALT_ROUNDS} from '@kb-rest/shared';
-import * as bcrypt from 'bcrypt';
-
-// create the connection to database
-const mysqlConfig = {
-  host: 'localhost',
-  port: 8889,
-  user: 'root',
-  password: 'root',
-  database: 'kb_rest',
-  namedPlaceholders: true,
-};
-const connection = mysql.createConnection(mysqlConfig);
-const pool = mysql.createPool(mysqlConfig);
-const promisePool = pool.promise();
+import {addSnippet, deleteSnippet, getSnippets, pinSnippet, toggleSnippetPublic, updateSnippet} from './utils/rest/snippet-utils';
+import {checkUsername, googleCallback, registerUser, userExists, verifyLogin} from './utils/rest/login-utils';
+import {addFolder, deleteFolder, getFolders, moveFolders, moveSnippets, renameFolder} from './utils/rest/folder-utils';
+import {getCommunitySnippets, getUserName, getUsers} from './utils/rest/comunity-utils';
+import {importOldKb} from './utils/rest/import-old-kb';
+import passport from 'passport';
+import {Strategy as GoogleStrategy} from 'passport-google-oauth20';
+import helmet from 'helmet';
 
 const app = express();
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
-app.use(cors({credentials: true, origin: 'http://localhost:4200'}));
+app.use(cors({
+  credentials: true,
+  origin: ['http://localhost:4260', 'http://localhost:8888']
+}));
 app.use(express.json());
 app.use(session({
-  //todo use env variable
-  secret: '573696fb-8612-4f29-988c-062390c72694',
-  resave: true,
-  saveUninitialized: true
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // Only transmit over HTTPS
+    httpOnly: true, // Prevent XSS
+    sameSite: 'strict', // Prevent CSRF
+    maxAge: +process.env.SESSION_MAX_AGE, // 1 day expiry
+  }
+}));
+app.use(helmet({
+  contentSecurityPolicy: true,
+  xssFilter: true,
+  hsts: true,
+  noSniff: true,
+  referrerPolicy: { policy: 'same-origin' }
 }));
 app.use(cookieParser());
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: 'http://localhost:3333/api/auth/callback/google'
+  },
+  async function (accessToken, refreshToken, profile, cb) {
+    const userEmail = profile.emails.find(e => e.verified === true).value;
+    const existingUser = await userExists(userEmail);
+
+    //it seems that what you put in the profile object will be in the session.passport.user object
+    if (existingUser) {
+      return cb(null, {...profile, userId: existingUser.id});
+    }
+
+    return cb(null, {...profile, isRegistered: false});
+  }
+));
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
+
+// https://stackoverflow.com/questions/72002750/req-logout-is-not-a-function
+app.use(passport.initialize())
+app.use(passport.session())
+
+app.get('/auth/google',
+  passport.authenticate('google', {scope: ['profile', 'email']}));
+
+app.get('/api/auth/callback/google',
+  passport.authenticate('google', {
+    failureRedirect: 'http://localhost:4260/login',
+    session: true,
+  }),
+  async function (req: any, res) {
+    await googleCallback(req, res);
+  });
 
 //https://stackoverflow.com/questions/65108033
 declare module 'express-session' {
   export interface SessionData {
     userId: number;
     secret: string;
+    isRegistered: boolean;
+    email: string;
   }
 }
 
-//todo move to file. Is not secure yet.
-//todo remember me (with cookies: https://stackoverflow.com/questions/16209145)
-const verifyLogin = async (req, res, next) => {
-  const conn = await promisePool.getConnection();
-  if (req.session.secret) {
-    const loginResult = await loginByCookie(req.session.userId, req.session.secret, req.headers['user-agent'], conn);
-    conn.release();
-    if(!loginResult){
-      return res.status(403).send({message: 'Login by session denied'});
-    }
-    console.log('login by session');
-    return next();
-  }
-  if(req.cookies && req.cookies['secret']) {
-    console.log('login by cookie')
-    const userId = req.cookies['userId'];
-    const byCookieResult = await loginByCookie(userId, req.cookies['secret'], req.headers['user-agent'], conn);
-    conn.release();
-    if(byCookieResult) {
-      req.session.userId = userId;
-      return next();
-    }
-    conn.release();
-    return res.status(403).send({message: 'Login by cookie denied'});
-  }
-  console.log('not logged in')
-  return res.status(403).send({message: 'No access, you are not logged in'});
-}
+app.get('/check-username/:username', async (req, res) => {
+  return await checkUsername(req, res);
+});
 
-app.post('/register', async (req, res) => {
-  //todo verify email
-  const request = req.body as LoginRequest;
-  try {
-    const conn = await promisePool.getConnection();
-    const userId = await register(request, conn);
-    res.json({userId, success: true});
-    res.end();
-  } catch(e) {
-    //todo return types
-    console.log('error during registration', e)
-    return res.status(403).send({success: false, message: e});
-  }
-})
-
-//see https://codeshack.io/basic-login-system-nodejs-express-mysql/
-//and https://stackoverflow.com/questions/12276046/nodejs-express-how-to-secure-a-url
-//security: https://expressjs.com/en/advanced/best-practice-security.html
-//see how to secure the api calls with express middleware: https://www.bezkoder.com/node-js-express-login-example/
-app.post('/login', async (req, res) => {
-  const loginRequest = req.body as LoginRequest;
-  const conn = await promisePool.getConnection();
-  await conn.beginTransaction();
-  const loginResult = await loginByPw(loginRequest, conn);
-  if(loginResult.success === false) {
-    await conn.commit();
-    return res.status(403).send({success: false});
-  }
-  const secret = await bcrypt.genSalt(SALT_ROUNDS);
-  const secretForDb = await bcrypt.hash(secret + req.headers['user-agent'], SALT_ROUNDS);
-  const query = 'UPDATE `user` SET secret=? WHERE name=?';
-  const result = await conn.query(query, [secretForDb, loginRequest.user]);
-  await conn.commit();
-  res.cookie('secret', secret);
-  res.cookie('userId', loginResult.userId);
-  req.session.secret = secret;
-  req.session.userId = loginResult.userId;
-  res.json({userId: loginResult.userId, success: true});
-  res.end();
+app.put('/register', async (req, res) => {
+  return await registerUser(req, res);
 })
 
 app.get('/checkLogin', [verifyLogin], (req, res) => {
@@ -125,308 +111,81 @@ app.get('/checkLogin', [verifyLogin], (req, res) => {
 });
 
 app.get('/logout', async (req, res) => {
-  const userId = req.session.userId;
-  if(!userId){
-    console.warn('Trying to logout, but no session is set');
-    return;
-  }
-  connection.query('UPDATE user SET secret = NULL WHERE id = ?', [userId], (err, rows) => {
-    if(err){
-      console.error('Could not logout user', userId, err);
-    }
-    if(req.session){
-      req.session.destroy((e) => {
-        console.error('Logout: Could not destroy session')
-        res.end();
-      });
-    }
+  req.logout(() => {
+    req.session.destroy((e) => {
+      console.warn('Logout: Could not destroy session', e);
+    });
+    console.log('logged out');
     res.end();
+    return res;
   });
 })
 
-app.get('/folders', [verifyLogin],  (req, res) => {
-  connection.query('select * from `folder` where user_id = ?', [req.session.userId], (err, rows) => {
-    const tree: Folder[] = listToTree(rows as Folder[]);
-    res.json(tree);
-  })
+app.get('/folders', [verifyLogin], async (req, res) => {
+  return await getFolders(req, res);
 });
 
-app.put('/addFolder', [verifyLogin], (req, res) => {
-  const folder = req.body;
-  const userId = req.session.userId;
-  addFolder(folder, userId).then(r => {
-    res.json(r);
-    res.end();
-    return;
-  });
+app.put('/addFolder', [verifyLogin], async (req, res) => {
+  return await addFolder(req, res);
 })
 
-app.post('/moveFolders', [verifyLogin], (req, res) => {
-  const data = req.body as number[][];
-  console.log('/moveFolder', data)
-  const userId = req.session.userId;
-  //todo check userId?
-  moveFolders(data).then(r => {
-    res.json(r);
-    res.end();
-    return;
-  })
+app.post('/renameFolder', [verifyLogin], async (req, res) => {
+  return await renameFolder(req, res);
 })
 
-app.post('/moveSnippets', [verifyLogin], (req, res) => {
-  const data = req.body as number[][];
-  console.log('/moveSnippets', data)
-  const userId = req.session.userId;
-  //todo check userId?
-  moveSnippets(data).then(r => {
-    res.json(r);
-    res.end();
-    return;
-  })
+app.post('/moveFolders', [verifyLogin], async (req, res) => {
+  return await moveFolders(req, res);
 })
 
-app.get('/snippets/:folderId?', [verifyLogin], (req, res) => {
-  const userId = req.session.userId;
-  //console.log('get snippets for user', userId, 'and folder', req.params.folderId)
-  //https://stackoverflow.com/questions/53945089/nodejs-await-async-with-nested-mysql-query
-  //todo connection.promise().query()
-  connection.query('select * from `folder` where user_id = ?', [userId], (err, rows) => {
-    //console.log('folders from query', rows)
-    const tree = listToTree(rows as Folder[]);
-    //console.log('tree',tree)
-    const searchParam = req.query.search;
-    console.log('searchParam', searchParam);
-    let select = 'select snippet.*, usr_fold_snip.folder';
-    if(searchParam){
-      select += ', match(title, content) against(:search) as r1, match(title) against(:search) as r2';
-    }
-    let query = `${select}
-                 from usr_fold_snip
-                        join user on user.id = usr_fold_snip.user_id
-                        join folder on folder.id = usr_fold_snip.folder
-                        join snippet on snippet.id = usr_fold_snip.snip_id
-                 where user.id = :userId`;
-    const folderId = req.params.folderId;
-    let folderIds = [];
-    if (folderId) {
-      query += ` and usr_fold_snip.folder in (:folderIds)`;
-      folderIds = getSubFolders(tree, +folderId);
-      //console.log('folderIds',folderIds)
-    }
-    if(searchParam){
-      query += ` and match(title, content) against (:search IN NATURAL LANGUAGE MODE) ORDER BY r1 DESC, r2 DESC`;
-    }
-    //console.log(query)
-    //console.log(JSON.stringify({search: searchParam, folderIds, userId}))
-    connection.execute(query, {search: searchParam, folderIds: folderIds.join(','), userId}, (err, rows) => {
-      //@ts-ignore
-      console.log(`get snippets (folderId ${folderId}) (folderIds ${JSON.stringify(folderIds)}) (search ${searchParam}). Found ${rows?.length} rows`)
-      res.json(rows);
-    });
-  })
+app.delete('/folder/:id', [verifyLogin], async (req, res) => {
+  return await deleteFolder(req, res);
 })
 
-app.put('/snippet', [verifyLogin], (req, res) => {
-  const snippet = req.body;
-  const userId = req.session.userId;
-  //console.log('[title, content, user_id]', [snippet.title, snippet.content, req.session.userId])
-  addSnippet(snippet, userId).then(r => {
-    res.json(r);
-    res.end();
-    return;
-  });
+app.post('/moveSnippets', [verifyLogin], async (req, res) => {
+  return await moveSnippets(req, res);
 })
 
-app.post('/snippet', [verifyLogin], (req, res) => {
-  const snippet = req.body;
-  const userId = req.session.userId;
-  updateSnippet(snippet, userId).then(r => {
-    res.json(r);
-    res.end();
-    return;
-  });
+app.get('/snippets/:folderId?', [verifyLogin], async (req, res) => {
+  return await getSnippets(req, res);
 })
 
-app.delete('/snippet/:id', [verifyLogin], (req, res) => {
-  const snippetId = req.params.id;
-  const userId = req.session.userId;
-  deleteSnippet(snippetId, userId).then(r => {
-    res.json(r);
-    res.end();
-    return;
-  })
+app.put('/snippet', [verifyLogin], async (req, res) => {
+  return await addSnippet(req, res);
+})
+
+app.post('/snippet', [verifyLogin], async (req, res) => {
+  return await updateSnippet(req, res);
+})
+
+app.post('/snippet-public', [verifyLogin], async (req, res) => {
+  return await toggleSnippetPublic(req, res);
+})
+
+/** pin or unpin a foreign snippet in your folder */
+app.post('/snippet-pin', [verifyLogin], async (req, res) => {
+  return await pinSnippet(req, res);
+})
+
+app.delete('/snippet/:id', [verifyLogin], async (req, res) => {
+  return await deleteSnippet(req, res);
 })
 
 //todo remove again
-app.get('/import-old-kb', (req, res) => {
-  importOldKb().then(r => {
-    console.log('import-old-kb', r);
-    res.json(r);
-    res.end();
-  })
+app.get('/import-old-kb', async (req, res) => {
+  return await importOldKb(req, res);
 })
 
-async function importOldKb() {
-  let conn: PoolConnection;
-  try {
-    conn = await promisePool.getConnection();
-    await conn.beginTransaction();
-    await conn.query('truncate table folder')
-    await conn.query('truncate table snippet')
-    await conn.query('truncate table usr_fold_snip')
+app.get('/users', [verifyLogin], async (req, res) => {
+  return await getUsers(req, res);
+})
 
-    const [folders] = await conn.query('select * from knowledgebase.kb_folder') as any;
-    for(const folder of folders){
-      await conn.query('insert into kb_rest.folder (id, name, parent_id, user_id) values(?,?,?,?)', [folder.id, folder.name, null, 8])
-      console.log('insert into kb_rest.folder (id, name, parent_id, user_id) values(?,?,?,?)', [folder.id, folder.name, null, 8])
-    }
+app.get('/username/:id', [verifyLogin], async (req, res) => {
+  return await getUserName(req, res);
+})
 
-    const [rows] = await conn.query(`
-        SELECT knowledgebase.kb_folder.id as folder_id,
-               knowledgebase.kb_folder.name as folder_name,
-               knowledgebase.kb_lang.id as lang_id,
-               knowledgebase.kb_lang.name as lang_name,
-               knowledgebase.kb_snippets.*
-        from knowledgebase.kb_folder, knowledgebase.kb_lang, knowledgebase.kb_snippets
-        WHERE kb_snippets.folder = kb_folder.id AND kb_snippets.lang = kb_lang.id
-        `) as any;
-    console.log(rows.length, 'rows');
-    for(const row of rows){
-      const code = row.code ? '\n```' + row.lang_name + '\n' + row.code + '\n```': '';
-      const [insertResult] = await conn.query('insert into kb_rest.snippet (id, title, content, user_id) values(?,?,?,?)', [row.id, row.title, row.description + code, 8]) as any;
-      //console.log('insert into kb_rest.snippet (id, title, content, user_id) values(?,?,?,?)', [row.id, row.title, row.description, 8])
-      console.log('insert id is', insertResult.insertId);
-      await conn.query('insert into usr_fold_snip (user_id, snip_id, folder) values(?,?,?)', [8, insertResult.insertId, row.folder_id])
-      //console.log('insert into usr_fold_snip (user_id, snip_id, folder) values(?,?,?)', [8, insertResult.insertId, row.folder_id])
-    }
-    await conn?.commit();
-    return 1;
-  } catch (e){
-    console.log(e);
-    await conn?.rollback();
-    return 0;
-  }
-}
-
-async function addSnippet(snippet, userId) {
-  let conn: PoolConnection;
-  try {
-    conn = await promisePool.getConnection();
-    await conn.beginTransaction();
-    //userId is req.session.userId
-    const [insertResult] = await conn.query('INSERT INTO snippet (title, content, user_id) VALUES (?,?,?)', [snippet.title, snippet.content, userId]);
-    // @ts-ignore
-    const snippetId = insertResult.insertId;
-    const insert2 = await conn.query('INSERT INTO usr_fold_snip (user_id, snip_id, folder) VALUES (?,?,?)', [userId, snippetId, snippet.folder]);
-    await conn.commit();
-    console.log('committed insert-snip')
-    return {success: true};
-  } catch(e) {
-    console.log('rolling back insert-snip', e)
-    await conn?.rollback();
-    return {success: false};
-  }
-}
-
-async function updateSnippet(snippet, userId) {
-  //todo check user_id?
-  let conn: PoolConnection;
-  try {
-    conn = await promisePool.getConnection();
-    await conn.beginTransaction();
-    //userId is req.session.userId
-    const [result] = await conn.query('UPDATE snippet SET title = ?, content = ? WHERE id = ?', [snippet.title, snippet.content, snippet.id]);
-    // @ts-ignore
-    console.log(result);
-    await conn.commit();
-    console.log('committed update-snip')
-    // @ts-ignore
-    return {success: result?.affectedRows === 1};
-  } catch(e) {
-    console.log('rolling back update-snip', e)
-    await conn?.rollback();
-    return {success: false};
-  }
-}
-
-async function deleteSnippet(snippetId, userId) {
-  //todo check userId?
-  let conn: PoolConnection;
-  try {
-    conn = await promisePool.getConnection();
-    await conn.beginTransaction();
-    //userId is req.session.userId
-    const [result] = await conn.query('DELETE FROM snippet WHERE id = ?', [snippetId]);
-    // @ts-ignore
-    console.log(result);
-    await conn.commit();
-    console.log('committed delete-snip')
-    // @ts-ignore
-    return {success: result?.affectedRows === 1};
-  } catch(e) {
-    console.log('rolling back delete-snip', e)
-    await conn?.rollback();
-    return {success: false};
-  }
-}
-
-async function addFolder(folder: Folder, userId: number) {
-  let conn: PoolConnection;
-  try {
-    conn = await promisePool.getConnection();
-    await conn.beginTransaction();
-    //userId is req.session.userId
-    const [insertResult] = await conn.query('INSERT INTO folder(name, parent_id, user_id) VALUES (?,?,?)', [folder.name, folder.parent_id, userId]);
-    await conn.commit();
-    console.log('committed insert-folder')
-    return {success: true};
-  } catch(e) {
-    console.log('rolling back insert-folder', e)
-    await conn?.rollback();
-    return {success: false};
-  }
-}
-
-async function moveFolders(data: number[][]) {
-  let conn: PoolConnection;
-  try {
-    conn = await promisePool.getConnection();
-    await conn.beginTransaction();
-    //userId is req.session.userId
-    for(const d of data){
-      //todo await needed?
-      conn.query('UPDATE folder SET parent_id = ? WHERE id = ?', d);
-    }
-    await conn.commit();
-    console.log('committed move-folders')
-    return {success: true};
-  } catch(e) {
-    console.log('rolling back move-folders', e)
-    await conn?.rollback();
-    return {success: false};
-  }
-}
-
-async function moveSnippets(data: number[][]) {
-  let conn: PoolConnection;
-  try {
-    conn = await promisePool.getConnection();
-    await conn.beginTransaction();
-    //userId is req.session.userId
-    for(const d of data){
-      console.log('UPDATE usr_fold_snip SET folder = ? WHERE snip_id = ?', JSON.stringify(d))
-      await conn.query('UPDATE usr_fold_snip SET folder = ? WHERE snip_id = ?', d);
-    }
-    await conn.commit();
-    console.log('committed move-snippets')
-    return {success: true};
-  } catch(e) {
-    console.log('rolling back move-snippets', e)
-    await conn?.rollback();
-    return {success: false};
-  }
-}
-
+app.get('/communitySnippets/:search?', [verifyLogin], async (req, res) => {
+  return await getCommunitySnippets(req, res);
+})
 
 const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {

@@ -1,56 +1,145 @@
 /* You can add global styles to this file, and also import other style files */
-@import '../../node_modules/@odymaui/angular-tree-component/css/angular-tree-component.css';
-@import 'material-icons/iconfont/material-icons.scss';
-@import 'material-symbols';
+@use '../../node_modules/@odymaui/angular-tree-component/css/angular-tree-component.css' as angular-tree;
+@use 'material-icons/iconfont/material-icons.scss' as mat-icons;
+@use 'material-symbols' as mat-symbols;
+@use "variables.scss" as variables;
+@use "sass:color";
 
 html, body {
   margin: 0;
   padding: 0;
 }
 
+/*
+This is the material icons font from the web
+You can use it this way:
+<span class="material-symbols-outlined">home</span>
+*/
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 100 700;
+  src: url("assets/fonts/material-icons-outlined-v192.woff2") format('woff2');
+}
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
 //todo use bootstrap-buttons or remove bootstrap
 button {
+  background: color.adjust(variables.$blue-light, $lightness: 10%);
   border: 1px #797979 solid;
+  border-radius: variables.$border-radius !important;
 
   &.primary {
-    background: #3737dd;
+    //background: #3737dd;
+    background: color.adjust(variables.$blue-light, $lightness: -33%);
     color: white;
   }
+  &.secondary {
+    background: color.adjust(variables.$background-light, $lightness: -5%);
+  }
+}
+
+.spin {
+  animation: spin 3s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
 }
 
 input {
   outline: none;
+  padding: 0 0.25em;
 }
 
 //angular tree component
 .node-content-wrapper{
-  background: #ccc;
+  background: transparent;
+  color: white;
+  // border-left: 3px variables.$blue-light solid;
   width: 100%;
   margin-right: 5px;
   padding: 10px 5px;
+  box-sizing: border-box;
 }
 .node-wrapper {
   align-items: center;
 }
+
 .toggle-children-wrapper {
-  padding: 50% 5px;
-  border-radius: 2px;
-  &:hover {
-    background: #acacac80;
+  padding: 50% 5px 50% 10px;
+}
+.toggle-children-placeholder {
+  width: 19px;
+}
+.toggle-children{
+  background-image: none;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 9px solid white;
+  &:hover{
+    border-left-color: variables.$blue-light;
   }
 }
+
 .node-content-wrapper-active,
 .node-content-wrapper.node-content-wrapper-active:hover,
 .node-content-wrapper-active.node-content-wrapper-focused{
-  background: white;
+  //background: white;
+  color: variables.$blue-light;
 }
 .node-content-wrapper.adding {
-  background: #ff8800;
+  //background: #ff8800;
+  border-left: 3px variables.$orange solid;
+  &:hover span{
+    color: variables.$orange;
+  }
 }
 .node-content-wrapper.isMoved {
-  background: #ff8800;
+  //background: #ff8800;
+  border-left: 3px variables.$orange solid;
+  &:hover span{
+    color: variables.$orange;
+  }
 }
+
+.node-content-wrapper.deleting {
+  opacity: 0.5;
+}
+
+.node-content-wrapper.is-dragging-over {
+  background: transparent;
+  border: 1px variables.$blue-light solid;
+  border-left: 3px variables.$blue-light solid;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
 .node-content-wrapper .folder-icon {
   vertical-align: middle;
   margin-right: 0.25em;
+}
+
+.no-scrollbar {
+  &::-webkit-scrollbar{
+    display: none; // Safari, Chrome
+  }
+  -ms-overflow-style: none;  // Internet Explorer 10+
+  scrollbar-width: none;  // Firefox
 }

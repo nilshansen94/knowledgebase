@@ -2,23 +2,6 @@
   <h1>Login</h1>
 
   <div>
-    <form [formGroup]="loginForm" (submit)="submitLogin()">
-      <div class="row">
-        <label for="userName">Username</label>
-        <input type="text" name="username" placeholder="username" id="username" formControlName="username">
-      </div>
-      <div class="row">
-        <label for="password">Password</label>
-        <input type="password" name="password" placeholder="password" id="password" formControlName="password">
-      </div>
-      <div class="row flex-center">
-        <button type="submit" [disabled]="!loginForm.valid">Login</button>
-      </div>
-      <div class="row">
-        <label for="email">Email</label>
-        <input type="text" placeholder="email" id="email" formControlName="email">
-        <button class="btn-sm" (click)="submitRegistration($event)" [disabled]="!loginForm.valid || !loginForm.value.email">register</button>
-      </div>
-    </form>
+    <button (click)="loginByGoogle.emit()">Login by google</button><br>
   </div>
 </div>

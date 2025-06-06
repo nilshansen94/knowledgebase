@@ -18,6 +18,7 @@
         "assets": [
           "knowledgebase/src/favicon.ico",
           "knowledgebase/src/assets",
+          "knowledgebase/src/assets/kg-logo.png",
           {
             "glob": "**/*",
             "input": "node_modules/ace-builds/src-min",
@@ -35,8 +36,16 @@
           "node_modules/ngx-markdown-editor/assets/highlight.js/highlight.min.js",
           "node_modules/ngx-markdown-editor/assets/marked.min.js",
           "node_modules/prismjs/prism.js",
+          "node_modules/prismjs/components/prism-markup-templating.js",
           "node_modules/prismjs/components/prism-css.min.js",
-          "node_modules/prismjs/components/prism-javascript.min.js"
+          "node_modules/prismjs/components/prism-javascript.min.js",
+          "node_modules/prismjs/components/prism-java.min.js",
+          "node_modules/prismjs/components/prism-latex.min.js",
+          "node_modules/prismjs/components/prism-sql.min.js",
+          "node_modules/prismjs/components/prism-php.min.js",
+          "node_modules/prismjs/components/prism-bash.min.js",
+          "node_modules/ace-builds/src-min/ace.js",
+          "node_modules/ace-builds/src-min/mode-markdown.js"
         ]
       },
       "configurations": {
@@ -44,8 +53,8 @@
           "budgets": [
             {
               "type": "initial",
-              "maximumWarning": "500kb",
-              "maximumError": "1mb"
+              "maximumWarning": "3mb",
+              "maximumError": "5mb"
             },
             {
               "type": "anyComponentStyle",
@@ -70,10 +79,11 @@
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
-          "browserTarget": "knowledgebase:build:production"
+          "buildTarget": "knowledgebase:build:production"
         },
         "development": {
-          "browserTarget": "knowledgebase:build:development"
+          "buildTarget": "knowledgebase:build:development",
+          "port": 4260
         }
       },
       "defaultConfiguration": "development"
@@ -81,7 +91,7 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "knowledgebase:build"
+        "buildTarget": "knowledgebase:build"
       }
     },
     "lint": {
@@ -103,6 +113,41 @@
           "ci": true,
           "codeCoverage": true
         }
+      }
+    },
+    "storybook": {
+      "executor": "@storybook/angular:start-storybook",
+      "options": {
+        "port": 4400,
+        "configDir": "knowledgebase/.storybook",
+        "browserTarget": "knowledgebase:build",
+        "compodoc": false
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook": {
+      "executor": "@storybook/angular:build-storybook",
+      "outputs": ["{options.outputDir}"],
+      "options": {
+        "outputDir": "dist/storybook/knowledgebase",
+        "configDir": "knowledgebase/.storybook",
+        "browserTarget": "knowledgebase:build",
+        "compodoc": false
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "test-storybook": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "test-storybook -c knowledgebase/.storybook --url=http://localhost:4400"
       }
     }
   }

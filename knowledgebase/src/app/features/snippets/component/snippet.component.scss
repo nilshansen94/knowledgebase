@@ -1,14 +1,31 @@
-@import "knowledgebase/src/variables";
+@use "knowledgebase/src/variables" as variables;
+@use "sass:color";
+
+:host {
+  scroll-margin-top: 5em;
+}
 
 .snippet-container {
   position: relative;
   max-width: 500px;
   min-width: 300px;
-  border: 1px black solid;
-  border-radius: $border-radius;
+  border: 1px variables.$border-grey solid;
+  border-radius: variables.$border-radius;
   padding: 0.5rem;
-  &:hover .control-icons {
+  &:hover .icons-edit {
     display: initial;
+  }
+  &:hover .icons-status {
+    display: none;
+  }
+  &.foreignSnippet {
+    border: 1px variables.$border-grey dashed;
+  }
+}
+
+@media (max-width: variables.$media-query) {
+  .snippet-container {
+    max-width: 92vw;
   }
 }
 
@@ -17,21 +34,34 @@ h5 {
   margin-bottom: 1em;
 }
 
+.icons-status {
+  padding: 0.25em;
+  color: variables.$border-grey;
+  font-size: 0.75em;
+}
+
 .control-icons {
-  display: none;
   position: absolute;
-  top: 3px;
-  right: 3px;
+  top: -1px;
+  right: -1px;
+
+  .icons-edit {
+    display: none;
+  }
 
   button {
-    background: #ccc;
+    background-color: color.adjust(variables.$border-grey, $lightness: 25%);
     line-height: 1em;
     padding: 3px;
     margin-left: 3px;
-    border-radius: $border-radius;
+    border: 1px variables.$border-grey solid;
 
     span {
       font-size: 1.25rem;
+    }
+
+    &:disabled .delete-snippet {
+      color: color.adjust(#e40000, $lightness: 25%);
     }
   }
   .delete-snippet {
@@ -41,7 +71,8 @@ h5 {
 
 .snippet-content ::ng-deep pre {
   padding: 0.5rem;
-  border-radius: $border-radius;
+  border-radius: variables.$border-radius;
+  max-height: 400px;
 
   //hide scrollbar:
   &::-webkit-scrollbar{
@@ -52,9 +83,31 @@ h5 {
 }
 
 .snippet-content ::ng-deep pre:last-child {
-  border-radius: 0 0 $border-radius $border-radius;
+  border-radius: 0 0 variables.$border-radius variables.$border-radius;
 
   margin-left: -0.5rem;
   margin-right: -0.5rem;
   margin-bottom: -0.5rem;
+}
+
+markdown ::ng-deep p {
+  white-space: pre-wrap;
+  margin-bottom: 0.5rem;
+}
+
+markdown ::ng-deep ul {
+  margin-bottom: 0.5rem;
+}
+
+.user {
+  text-decoration: none;
+  background: #d4e3ff;
+  padding: 0.25em;
+  border-radius: 5px;
+  font-size: 0.75em;
+  .material-icons {
+    vertical-align: sub;
+    font-size: 1.25em;
+    padding-right: 0.25em;
+  }
 }

@@ -1,0 +1,11 @@
+@if (state$ | async; as state) {
+  @if (state.show) {
+    <div class="context-menu" [style.left.px]="state.x" [style.top.px]="state.y">
+      @for (item of state.items; track item.key) {
+        <div class="menu-item" (click)="onItemClick(item)">
+          {{ item.label }}
+        </div>
+      }
+    </div>
+  }
+}

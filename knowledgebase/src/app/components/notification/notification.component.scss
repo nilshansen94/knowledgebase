@@ -1,0 +1,31 @@
+.toast-container {
+  z-index: 1050;
+  padding: 3rem 1rem 1rem;
+  pointer-events: auto;
+}
+
+.clear-all {
+  font-size: 0.875rem;
+  color: var(--bs-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.toast {
+  min-width: 250px;
+  margin-bottom: 0.5rem;
+
+  &.info {
+    background-color: var(--bs-info);
+    color: var(--bs-white);
+  }
+
+  &.warn {
+    background-color: var(--bs-warning);
+  }
+
+  &.error {
+    background-color: var(--bs-danger);
+    color: var(--bs-white);
+  }
+}

@@ -1,12 +1,17 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AppService } from '../app.service';
+import {AppService} from '../app.service';
+import {provideRouter} from '@angular/router';
 
 describe('AppService', () => {
   let service: AppService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([]),
+      ]
+    });
     service = TestBed.inject(AppService);
   });
 

@@ -1,34 +1,75 @@
-import {Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {LMarkdownEditorModule} from 'ngx-markdown-editor';
 import {Snippet} from '../../snippets/api/snippet';
 import {SnippetComponent} from '../../snippets/component/snippet.component';
 import {DbResult} from '@kb-rest/shared';
-import {debounceTime, distinctUntilChanged, fromEvent, map, Subscription, tap} from 'rxjs';
+import {SearchComponent} from '../../../components/search/search.component';
+import {Folder} from '../../sidenav/api/folder';
+import {NgxMasonryModule} from 'ngx-masonry';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, LMarkdownEditorModule, SnippetComponent],
+  imports: [CommonModule, FormsModule, LMarkdownEditorModule, SnippetComponent, SearchComponent, NgxMasonryModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeComponent implements OnChanges, OnInit, OnDestroy {
+export class HomeComponent implements OnChanges, AfterViewInit {
 
   addSnippet: boolean;
   editingSnippet: Snippet;
   newSnippetTitle: string;
   newSnippetContent: string;
+  newSnippetPublic = false;
+  currentSearch = '';
+  loadingSnippets = true;
+
+  public masonryOptions = {
+    animations: {}
+  };
+
+  @Input()
+  loading = false;
+
+  @Input()
+  hasMore = true;
+
+  @Output()
+  loadMore = new EventEmitter<void>();
+
+  @Input()
+  selectedSnippetId: number;
+
+  @ViewChild('scrollSentinel')
+  scrollSentinel: ElementRef;
 
   @ViewChild('searchInput', {static: true}) searchInput: ElementRef;
-  inputSubscription: Subscription;
 
   @Input()
   snippets: Snippet[];
 
   @Input()
   updateResult: DbResult;
+
+  @Input()
+  currentFolder: Folder;
+
+  @Input()
+  communityUser: number;
 
   @Output()
   newSnippet = new EventEmitter<Partial<Snippet>>();
@@ -37,15 +78,36 @@ export class HomeComponent implements OnChanges, OnInit, OnDestroy {
 
   @Output() deleteSnippet = new EventEmitter<Snippet>();
 
+  @Output() togglePublic = new EventEmitter<Snippet>();
+
+  @Output() pinSnippet = new EventEmitter<Snippet>();
+
   @Output() search = new EventEmitter<string>();
 
-  ngOnInit() {
-    this.inputSubscription = fromEvent(this.searchInput.nativeElement, 'keyup').pipe(
-      map(event => (event as any).target.value),
-      debounceTime(500),
-      distinctUntilChanged(),
-      tap(r => this.search.emit(r))
-    ).subscribe();
+  ngAfterViewInit() {
+    this.setupInfiniteScroll();
+  }
+
+  private setupInfiniteScroll() {
+    if (this.scrollSentinel?.nativeElement) {
+      let ignoreFirstIntersection = false;//2 api calls when only a few snippets (page not full)
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const lastEntry = entries[entries.length - 1];
+          if (lastEntry.isIntersecting && this.hasMore && !this.loading) {
+            if(ignoreFirstIntersection){
+              ignoreFirstIntersection = false;
+              return;
+            }
+            this.loading = true;
+            this.loadMore.emit();
+          }
+        },
+        { threshold: 0.5 }
+      );
+
+      observer.observe(this.scrollSentinel.nativeElement);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -54,16 +116,26 @@ export class HomeComponent implements OnChanges, OnInit, OnDestroy {
       if(result.success){
         this.resetState();
       }
+      if(!result.success){
+        console.warn('Update result has success=false');
+      }
+    }
+    if(changes['snippets'] && !changes['snippets']?.firstChange){
+      this.loadingSnippets = false;
+    }
+    if(
+      changes['currentFolder'] && changes['currentFolder'].previousValue
+      && changes['currentFolder'].previousValue?.id != changes['currentFolder'].currentValue?.id){
+      this.loadingSnippets = true;
     }
   }
 
-  ngOnDestroy() {
-    this.inputSubscription.unsubscribe();
-  }
-
   saveSnippet() {
-    console.log(this.newSnippetContent)
-    this.newSnippet.emit({title: this.newSnippetTitle, content: this.newSnippetContent});
+    this.newSnippet.emit({
+      title: this.newSnippetTitle,
+      content: this.newSnippetContent,
+      public: this.newSnippetPublic,
+    });
   }
 
   resetState() {
@@ -71,20 +143,28 @@ export class HomeComponent implements OnChanges, OnInit, OnDestroy {
     this.editingSnippet = null;
     this.newSnippetTitle = '';
     this.newSnippetContent = '';
+    this.newSnippetPublic = false;
   }
 
   startEditingSnippet(snippet: Snippet) {
-    this.editingSnippet = snippet;
+    this.editingSnippet = {...snippet};
     this.newSnippetContent = snippet.content;
     this.newSnippetTitle = snippet.title;
+    this.newSnippetPublic = Boolean(snippet.public);
   }
 
   doEditSnippet() {
     this.editSnippet.emit({
       ...this.editingSnippet,
       title: this.newSnippetTitle,
-      content: this.newSnippetContent
+      content: this.newSnippetContent,
+      public: this.newSnippetPublic,
     })
+  }
+
+  searchSnippets(search: string) {
+    this.search.emit(search);
+    this.currentSearch = search;
   }
 
 }

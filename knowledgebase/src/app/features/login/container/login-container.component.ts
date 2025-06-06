@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {LoginPageComponent} from "../component/login-page/login-page.component";
-import {LoginService} from "../service/login.service";
+import {Component} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {LoginPageComponent} from '../component/login-page/login-page.component';
+import {AuthService} from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-login-container',
@@ -9,8 +9,7 @@ import {LoginService} from "../service/login.service";
   imports: [CommonModule, LoginPageComponent],
   template: `
     <app-login-page
-      (login)="loginService.login($event)"
-      (registration)="loginService.registration($event)"
+      (loginByGoogle)="oauth()"
     />
   `,
   styles: [
@@ -18,6 +17,11 @@ import {LoginService} from "../service/login.service";
 })
 export class LoginContainerComponent {
 
-  constructor(public loginService: LoginService) {}
+  constructor(
+    public authService: AuthService,
+  ) { }
 
+  public async oauth(){
+    await this.authService.loginWithGoogle();
+  }
 }

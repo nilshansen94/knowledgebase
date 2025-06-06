@@ -1,45 +1,22 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {LoginRequest, RegistrationRequest} from '@kb-rest/shared';
+import {ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-login-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login-page.component.html',
-  styleUrls: ['./login-page.component.scss']
+  styleUrls: ['./login-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginPageComponent {
 
-  @Output()
-  login = new EventEmitter<LoginRequest>();
+  //https://console.cloud.google.com
 
   @Output()
-  registration = new EventEmitter<RegistrationRequest>();
+  loginByGoogle = new EventEmitter<void>();
 
-  constructor(private fb: FormBuilder) {}
-
-  loginForm = this.fb.group({
-    username: ['', Validators.required],
-    password: ['', Validators.required],
-    email: ['']
-  });
-
-  submitLogin() {
-    this.login.emit({
-      user: this.loginForm.value.username,
-      password: this.loginForm.value.password,
-    });
-  }
-
-  submitRegistration(e) {
-    this.registration.emit({
-      user: this.loginForm.value.username,
-      password: this.loginForm.value.password,
-      email: this.loginForm.value.email,
-    });
-    e.preventDefault();
-  }
+  constructor() {}
 
 }

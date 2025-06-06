@@ -1,11 +1,11 @@
 insert into `user` (name) values ('nils'), ('other_user');
 
-insert into snippet (id, title, user_id) values
-(0, 'Akros-snip',0),
-(1, 'Akros-snip2',0),
-(3, 'A-snip2',0),
-(4, 'snip-other-user',1),
-(2, 'A-snip',0);
+insert into snippet (id, title, user_id, public) values
+(0, 'Akros-snip',0, false),
+(1, 'Akros-snip2',0, false),
+(3, 'A-snip2',0, false),
+(4, 'snip-other-user',1, false),
+(2, 'A-snip',0, false);
 
 insert into folder (name, parent_id, user_id) values
 ('Akros', null, 1),

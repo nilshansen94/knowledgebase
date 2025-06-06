@@ -1,0 +1,28 @@
+<div class="toast-container position-fixed top-0 end-0">
+  @if (showClearAll()) {
+    <div class="text-end mb-2">
+      <a href="#" class="clear-all" (click)="clearAllNotifications()">clear all</a>
+    </div>
+  }
+  @for (notification of notifications(); track notification.id) {
+    <div
+      class="toast show"
+      [ngClass]="notification.type"
+      (click)="handleNotificationClick($event, notification.id)"
+      (mousedown)="handleMouseDown($event)">
+      <div class="toast-header">
+        <strong class="me-auto">{{ notification.title }}</strong>
+        <small>{{ notification.timestamp | date:'HH:mm:ss' }}</small>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeNotification(notification.id)"
+          aria-label="Close">
+        </button>
+      </div>
+      <div class="toast-body">
+        {{ notification.message }}
+      </div>
+    </div>
+  }
+</div>

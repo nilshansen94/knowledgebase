@@ -1,10 +1,28 @@
-<div class="snippet-container" *ngIf="snippet">
+<div class="snippet-container" *ngIf="snippet" [class.foreignSnippet]="!canEdit">
   <div class="control-icons">
-    <button (click)="doEditSnippet()"><span class="material-icons edit-snippet">edit</span></button>
-    <button (click)="doDeleteSnippet()" (mouseleave)="confirmDelete = false">
-      <span *ngIf="!confirmDelete" class="material-icons delete-snippet">delete</span>
-      <span *ngIf="confirmDelete" class="material-icons delete-snippet">question_mark</span>
-    </button>
+    <div class="icons-status">
+      <span class="material-icons" *ngIf="canEdit">{{snippet.public ? 'public': 'lock'}}</span>
+      <span class="material-symbols-outlined" *ngIf="snippet.isPinned">keep</span>
+    </div>
+    <div class="icons-edit">
+      <ng-container *ngIf="canEdit">
+        <button (click)="togglePublicSnippet()" title="Make snippet {{snippet.public ? 'private':'public'}}">
+          <span class="material-icons">{{snippet.public ? 'lock': 'public'}}</span>
+        </button>
+        <button (click)="doEditSnippet()" title="Edit snippet">
+          <span class="material-icons edit-snippet">edit</span>
+        </button>
+        <button (click)="doDeleteSnippet()" (mouseleave)="confirmDelete = false" title="Delete snippet" [disabled]="pendingRequest">
+          <span *ngIf="!confirmDelete" class="material-icons delete-snippet">delete</span>
+          <span *ngIf="confirmDelete" class="material-icons delete-snippet">question_mark</span>
+        </button>
+      </ng-container>
+      <ng-container *ngIf="!canEdit">
+        <button [disabled]="pendingRequest">
+          <span class="material-symbols-outlined" (click)="doPinSnippet()">{{snippet.isPinned ? 'keep_off':'keep'}}</span>
+        </button>
+      </ng-container>
+    </div>
   </div>
   <h5>{{snippet.title}}</h5>
   <div class="snippet-content">
@@ -12,4 +30,10 @@
       [data]="snippet.content"
     />
   </div>
+  <div class="footer">
+    @if(!snippet.isOwnSnippet){
+      <a class="user" [routerLink]="[]" [queryParams]="{user: snippet.user_id}"><span class="material-icons">account_circle</span>{{snippet.user_name}}</a>
+    }
+  </div>
+  <!--<span style="font-size: 0.5em;position: absolute;top: -2px;left: 0;">id {{snippet.id}}, user {{snippet.user_id}}, folder {{snippet.folder}}</span>-->
 </div>

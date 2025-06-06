@@ -1,13 +1,18 @@
 import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {RouterOutlet} from '@angular/router';
-import {SidenavComponent} from './features/sidenav/component/sidenav.component';
+import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {SidenavContainerComponent} from './features/sidenav/container/sidenav-container.component';
 import {HeaderComponent} from './features/header/component/header.component';
 import {AppService} from './services/app/app.service';
 import {AuthService} from './services/auth/auth.service';
 import {LoginService} from './features/login/service/login.service';
 import {provideMarkdown} from 'ngx-markdown';
+import {filter, map} from 'rxjs';
+import {PATH} from './utils/paths';
+import {NotificationComponent} from './components/notification/notification.component';
+import {NotificationService} from './services/navigation/notification.service';
+import {ContextMenuComponent} from './components/context-menu/context-menu.component';
+import {SidenavService} from './features/sidenav/service/sidenav.service';
 
 @Component({
   selector: 'app-root',
@@ -15,9 +20,10 @@ import {provideMarkdown} from 'ngx-markdown';
   imports: [
     CommonModule,
     RouterOutlet,
-    SidenavComponent,
     SidenavContainerComponent,
     HeaderComponent,
+    NotificationComponent,
+    ContextMenuComponent,
   ],
   providers: [
     provideMarkdown({})
@@ -31,6 +37,26 @@ export class AppComponent {
     public appService: AppService,
     public loginService: LoginService,
     public authService: AuthService,
+    private router: Router,
+    public notificationService: NotificationService,
+    private sidenavService: SidenavService,
   ) {}
+
+  currentPath$ = this.router.events.pipe(
+    filter(e => e instanceof NavigationEnd),
+    map((e: NavigationEnd) => {
+      if(e.url.startsWith('/' + PATH.COMMUNITY)){
+        return PATH.COMMUNITY;
+      }
+      if(e.url.startsWith('/' + PATH.LOGIN)){
+        return PATH.LOGIN;
+      }
+      return PATH.HOME;
+    })
+  );
+
+  toggleSidenav() {
+    this.sidenavService.toggleSidenav();
+  }
 
 }

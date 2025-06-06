@@ -1,0 +1,10 @@
+<div class="search-container">
+  <input type="text"
+         class="search-input"
+         #searchInput
+         placeholder="search"
+         [(ngModel)]="currentSearch">
+  @if (currentSearch) {
+    <span class="material-icons clear" (click)="clear()">close</span>
+  }
+</div>

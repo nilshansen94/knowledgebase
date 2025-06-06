@@ -1,0 +1,21 @@
+<h2>Users</h2>
+<app-search />
+<div class="users">
+  <span *ngIf="!users" class="loading-icon spin material-symbols-outlined">sync</span>
+  <div *ngFor="let user of users" class="user">
+    <a [routerLink]="['']" [queryParams]="{user: user.id}">{{user.name}}</a>
+  </div>
+</div>
+
+<h2>Snippets</h2>
+<app-search (search)="searchForCommunitySnippets($event)" />
+<div class="snippets-container">
+  <span *ngIf="(!communitySnippets || communitySnippets.length === 0) && currentSearch === ''">Search for something to get started.</span>
+  <app-snippet *ngFor="let snippet of communitySnippets"
+               [snippet]="snippet"
+               [attr.id]="'snippet'+snippet.id"
+               [canEdit]="false"
+               [pinWithModal]="true"
+               (pinSnippet)="doPinSnippet(snippet)"
+  />
+</div>

@@ -1,3 +1,5 @@
+@use "../variables" as variables;
+
 .main-wrapper {
   position: absolute;
   top: 50px;
@@ -9,7 +11,7 @@
 }
 
 nav {
-  background: grey;
+  background: variables.$background-dark;
   //min-width: 200px;
   transition: min-width 0.5s, max-width 0.5s;
   &.hideNav {
@@ -35,7 +37,7 @@ nav {
 }*/
 
 main {
-  background: darkgrey;
+  background: variables.$background-light;
   flex-grow: 1;
   padding: 1rem;
   h1 {

@@ -1,8 +1,19 @@
 <header>
-  <span id="logo">Logo</span>
+  <button class="burger-menu" (click)="toggleSidenav.emit()">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+  <div id="logo">
+    <img src="assets/kb-logo.png"alt="logo, https://www.flaticon.com/free-icons/brain" [routerLink]="[PATH.HOME]" />
+  </div>
+  <!--<span id="logo">Logo</span>-->
   <div class="justify-between">
-    <a [routerLink]="['']">Snippets</a>
-    <a *ngIf="!isLoggedIn" [routerLink]="['login']">Login</a>
-    <a *ngIf="isLoggedIn" (click)="emitLogout()" [routerLink]="[]">Logout</a>
+    <div class="nav-items">
+      <a [routerLink]="[PATH.HOME]" [class.active]="currentPath === PATH.HOME">Snippets</a>
+      <a [routerLink]="[PATH.COMMUNITY]" [class.active]="currentPath === PATH.COMMUNITY">Community</a>
+    </div>
+    <div class="header-right">
+      <a *ngIf="!isLoggedIn" [routerLink]="[PATH.LOGIN]" [class.active]="currentPath === PATH.LOGIN">Login</a>
+      <a *ngIf="isLoggedIn" (click)="emitLogout()" [routerLink]="[]">Logout</a>
+    </div>
   </div>
 </header>

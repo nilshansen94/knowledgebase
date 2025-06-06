@@ -1,4 +1,4 @@
-import { Folder } from "../api";
+import {Folder} from '../api';
 
 /**
  * Get array of ids of the subFolders, including the searched id
@@ -6,6 +6,10 @@ import { Folder } from "../api";
  * */
 export const getSubFolders = (tree: Folder[], id: number): number[] => {
   const folder = findInTree(tree, id);
+  if(!folder){
+    //return impossible value so sql doesn't throw (https://stackoverflow.com/questions/13210233)
+    return [-1];
+  }
   return [folder.id, ...getChildrenOf(folder).map(f => f.id)];
 }
 

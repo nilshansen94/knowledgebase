@@ -1,9 +1,12 @@
 <button id="add-snippet-btn" *ngIf="!addSnippet && !editingSnippet" (click)="addSnippet = !addSnippet">add Snippet</button>
 
-<div class="editor">
-  <input type="text" *ngIf="addSnippet || editingSnippet" placeholder="title" [(ngModel)]="newSnippetTitle">
+<div class="editor" *ngIf="addSnippet || editingSnippet">
+  <input type="text" placeholder="title" [(ngModel)]="newSnippetTitle">
+  <button class="secondary snippet-public" (click)="newSnippetPublic = !newSnippetPublic">
+    <span class="material-icons">{{newSnippetPublic ? 'public': 'lock'}}</span>
+  </button>
+  <!-- todo maybe use ngx-editor (based on ProseMirror) -->
   <md-editor
-    *ngIf="addSnippet || editingSnippet"
     [(ngModel)]="newSnippetContent"
   />
   <div class="action-bar" *ngIf="addSnippet">
@@ -16,14 +19,27 @@
   </div>
 </div>
 
-<div class="search-container">
-  <input type="text" id="search-input" #searchInput placeholder="search">
-</div>
+<app-search (search)="searchSnippets($event)"/>
 
-<div class="snippets-container">
+<span *ngIf="snippets?.length === 0 && !currentSearch && !currentFolder">Select a folder or search for a snippet to get started.</span>
+<span *ngIf="!loadingSnippets && snippets?.length === 0 && (currentSearch || currentFolder)">No snippets found</span>
+<span *ngIf="loadingSnippets && (currentSearch || currentFolder)">Loading snippets...</span>
+
+<ngx-masonry [options]="masonryOptions">
   <app-snippet *ngFor="let snippet of snippets"
+               ngxMasonryItem
+               class="masonry-item"
+               [class.loading]="loadingSnippets"
+               [class.active]="selectedSnippetId === snippet.id"
                [snippet]="snippet"
+               [attr.id]="'snippet'+snippet.id"
+               [pinWithModal]="communityUser > -1"
+               [canEdit]="snippet.isOwnSnippet"
                (editSnippet)="startEditingSnippet($event)"
                (deleteSnippet)="this.deleteSnippet.emit($event)"
+               (togglePublic)="togglePublic.emit($event)"
+               (pinSnippet)="pinSnippet.emit($event)"
   />
-</div>
+</ngx-masonry>
+<div #scrollSentinel class="scroll-sentinel"></div>
+<div *ngIf="loading" class="loading-more">Loading more snippets...</div>

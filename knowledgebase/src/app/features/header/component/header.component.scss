@@ -1,7 +1,30 @@
+@use "../../../../variables" as variables;
+
+.burger-menu {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+  margin-right: 8px;
+  font-size: 24px;
+
+  &:hover {
+    background: variables.$background-dark-hover;
+  }
+}
+
+@media (max-width: variables.$media-query) {
+  .burger-menu {
+    display: block;
+  }
+}
+
 header {
   height: 50px;
   padding: 0;
-  background: #0000b7;
+  background: variables.$background-dark;
   color: white;
   display: flex;
   flex-direction: row;
@@ -10,9 +33,18 @@ header {
 }
 
 #logo {
-  width: 200px;
-  padding: 0 1rem;
+  width: 250px;
+  padding: 0;// 1rem;
   box-sizing: border-box;
+}
+
+img {
+  height: 50px;
+  background: white;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 4px;
+  margin-left: 3px;
 }
 
 .justify-between {
@@ -21,9 +53,24 @@ header {
   justify-content: space-between;
 }
 
+.nav-items {
+  display: flex;
+  column-gap: 5px;
+}
+
 a {
-  background: white;
+  color: white;
   padding: 1em;
-  color: black;
   text-decoration: none;
+  &.active {
+    color: variables.$blue-light;
+    // todo border-bottom
+  }
+  &:hover {
+    background: variables.$background-dark-hover;
+  }
+}
+
+.header-right {
+  display: flex;
 }

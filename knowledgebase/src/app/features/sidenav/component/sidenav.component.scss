@@ -1,22 +1,98 @@
-ul {
-  padding: 0;
-  li {
-    list-style: none;
-    padding: 1em;
-    margin-bottom: -1px;
-    background: #ccc;
-    border-top: 1px black solid;
-    border-bottom: 1px black solid;
-    cursor: pointer;
-    white-space: nowrap;
-    &:hover {
-      background: #a6a6a6;
+@use "knowledgebase/src/variables" as variables;
+
+p {
+  color: white;
+}
+
+@media (max-width: variables.$media-query) {
+  .sidenav-container {
+    .sidenav-left,
+    .sidenav-left-2 {
+      position: fixed;
+      top: 50px;
+      left: -250px;
+      height: calc(100vh - 50px);
+      transition: transform 0.3s ease;
+      background: variables.$background-dark;
+      z-index: 1000;
     }
-    &.active {
-      background: #0000b7;
-      color: white;
+
+    &.show-sidenav {
+      .sidenav-left {
+        transform: translateX(250px);
+      }
+      .sidenav-left-2 {
+        //transform: translateX(500px);
+      }
     }
   }
+}
+
+.sidenav-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.add-folder button:not(:last-of-type){
+  margin-right: 0.25em;
+}
+
+.sidenav-left, .sidenav-left-2 {
+  overflow: auto;
+  border-top: 1px variables.$border-grey solid;
+}
+
+.sidenav-left {
+  border-right: 1px variables.$border-grey solid;
+  width: 250px;
+
+  &.adding-folder-in-progress {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}
+
+.sidenav-snippet-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
+.sidebar-snippet {
+  background: transparent;
+  margin-bottom: 2px;
+  padding: 2px 0.25em;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  cursor: pointer;
+  color: white;
+  //border-left: 3px variables.$blue-light solid;
+  &:hover {
+    //color: variables.$blue-light;
+    background: variables.$background-dark-hover;
+  }
+}
+
+.node-content-wrapper {
+  white-space: nowrap;
+  &.isSnippet{
+    background: #2d2d2d;
+    color: white;
+    padding: 5px 5px;
+  }
+  &:hover {
+    //color: variables.$blue-light;
+    background: variables.$background-dark-hover;
+    box-shadow: none;
+  }
+}
+
+.node-content-wrapper-active {
+  background: transparent;
+  color: variables.$blue-light;
+  box-shadow: none;
 }
 
 .add-folder {
@@ -33,4 +109,42 @@ ul {
 .new-folder {
   margin: 0.25rem;
   background: #ff8800;
+}
+
+.rename-input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: inherit;
+  outline: none;
+  background: transparent;
+  color: white;
+
+  &:focus {
+    border-color: variables.$blue-light;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+}
+
+.loading-icon {
+  margin-left: 0.5em;
+  font-size: 1.25em;
+  vertical-align: text-bottom;
+  color: variables.$blue-light;
+}
+
+.user {
+  color: white;
+  padding: 0.5em;
+  border: 1px #a3a3a3 solid;
+  border-radius: 26px;
+  margin: 1em 1em 0 1em;
+  background: #d4e3ff;
+  color: rgba(var(--bs-link-color-rgb));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  .material-icons {
+    vertical-align: middle;
+  }
 }

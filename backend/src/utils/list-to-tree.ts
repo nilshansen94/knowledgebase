@@ -11,7 +11,8 @@ export const listToTree = (
   const dataTree = [];
   list.forEach(item => {
     if(item[parentKey]) {
-      map.get(item[parentKey]).childNodes.push(map.get(item[idKey]));
+      const child = {...map.get(item[idKey]), parent_id: item[parentKey]};
+      map.get(item[parentKey]).childNodes.push(child);
     } else {
       dataTree.push(map.get(item[idKey]));
     }
