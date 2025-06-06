@@ -5,7 +5,8 @@
   "scripts": {
     "all:serve": "nx run-many --target=serve --projects=knowledgebase,backend --parallel",
     "kb:serve": "nx serve knowledgebase",
-    "kb:build": "nx build knowledgebase --base-href='' --output-path='/Applications/MAMP/htdocs/kb-rest-build/'",
+    "kb:build:local": "nx build knowledgebase --base-href='' --output-path='/Applications/MAMP/htdocs/kb-rest-build/'",
+    "kb:build": "nx build knowledgebase",
     "kb:test": "nx test knowledgebase",
     "backend:serve": "nx serve backend",
     "kb:storybook:start": "nx run knowledgebase:storybook",

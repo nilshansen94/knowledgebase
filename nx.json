@@ -19,7 +19,6 @@
   },
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
     "test": {
