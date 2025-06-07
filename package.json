@@ -8,6 +8,7 @@
     "kb:serve": "nx serve knowledgebase",
     "kb:build:local": "nx build knowledgebase --base-href='' --output-path='/Applications/MAMP/htdocs/kb-rest-build/'",
     "kb:build": "nx build knowledgebase",
+    "kb:build:prod": "nx build knowledgebase --prod",
     "kb:test": "nx test knowledgebase",
     "backend:build:ci": "npx nx build backend",
     "backend:serve": "nx serve backend",

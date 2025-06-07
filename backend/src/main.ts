@@ -192,8 +192,9 @@ app.get('/communitySnippets/:search?', [verifyLogin], async (req, res) => {
   return await getCommunitySnippets(req, res);
 })
 
-const port = process.env.PORT || 3333;
-const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api`);
+const port = +(process.env.PORT);
+const host = process.env.HOST;
+const server = app.listen(port, host, () => {
+  console.log(`Listening at ${host}:${port}/api`);
 });
 server.on('error', console.error);
