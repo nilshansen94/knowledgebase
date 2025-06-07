@@ -9,8 +9,9 @@
     "kb:build:local": "nx build knowledgebase --base-href='' --output-path='/Applications/MAMP/htdocs/kb-rest-build/'",
     "kb:build": "nx build knowledgebase",
     "kb:test": "nx test knowledgebase",
+    "backend:build:ci": "npx nx build backend",
     "backend:serve": "nx serve backend",
-    "backend:serve:ci": "npx nx serve backend",
+    "backend:serve:ci": "node ./dist/backend/main.js",
     "kb:storybook:start": "nx run knowledgebase:storybook",
     "kb:storybook:build": "nx run knowledgebase:build-storybook",
     "kb:storybook:test": "nx run knowledgebase:test-storybook"
