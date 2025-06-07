@@ -20,9 +20,9 @@ export async function googleCallback(req: any, res: Response) {
   if (existingUser) {
     req.session.userId = user.userId;
     req.session.isRegistered = true;
-    res.redirect('http://localhost:4260');
+    res.redirect(process.env['UI_URL']);
   } else {
-    res.redirect('http://localhost:4260/register');
+    res.redirect(process.env['UI_URL'] + '/register');
   }
 }
 

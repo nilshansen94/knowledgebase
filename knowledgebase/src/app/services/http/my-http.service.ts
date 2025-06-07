@@ -1,12 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {environment} from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MyHttpService {
 
-  baseUrl = 'http://localhost:3333/';
+  baseUrl = environment.baseUrl;
 
   options = {withCredentials: true};
 

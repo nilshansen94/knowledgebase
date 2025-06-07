@@ -22,7 +22,7 @@ const app = express();
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use(cors({
   credentials: true,
-  origin: ['http://localhost:4260', 'http://localhost:8888']
+  origin: process.env.CORS_ORIGINS.split(',')
 }));
 app.use(express.json());
 app.use(session({
@@ -48,7 +48,7 @@ app.use(cookieParser());
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://localhost:3333/api/auth/callback/google'
+    callbackURL: process.env.OAUTH_CALLBACK_URL
   },
   async function (accessToken, refreshToken, profile, cb) {
     const userEmail = profile.emails.find(e => e.verified === true).value;
@@ -80,7 +80,7 @@ app.get('/auth/google',
 
 app.get('/api/auth/callback/google',
   passport.authenticate('google', {
-    failureRedirect: 'http://localhost:4260/login',
+    failureRedirect: process.env['UI_URL'] + '/login',
     session: true,
   }),
   async function (req: any, res) {
@@ -96,6 +96,11 @@ declare module 'express-session' {
     email: string;
   }
 }
+
+//index.html
+app.get('/', function(req, res) {
+  res.json('{"success: "true"}')
+});
 
 app.get('/check-username/:username', async (req, res) => {
   return await checkUsername(req, res);

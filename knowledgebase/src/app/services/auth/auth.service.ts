@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {MyHttpService} from '../http/my-http.service';
 import {catchError, map, Observable, of, ReplaySubject, take, tap} from 'rxjs';
+import {environment} from '../../../environments/environment';
 
 
 @Injectable({
@@ -40,7 +41,7 @@ export class AuthService {
   }
 
   async loginWithGoogle() {
-    window.location.href = `http://localhost:3333/auth/google`;
+    window.location.href = environment.OAUTH_CALLBACK_URL;
   }
 
   checkLoginOauth(){
