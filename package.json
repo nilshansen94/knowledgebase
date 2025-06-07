@@ -10,6 +10,7 @@
     "kb:build": "nx build knowledgebase",
     "kb:test": "nx test knowledgebase",
     "backend:serve": "nx serve backend",
+    "backend:serve:ci": "npx nx serve backend",
     "kb:storybook:start": "nx run knowledgebase:storybook",
     "kb:storybook:build": "nx run knowledgebase:build-storybook",
     "kb:storybook:test": "nx run knowledgebase:test-storybook"
