@@ -1,7 +1,7 @@
-import {promisePool} from '../db/db-config';
 import {Request, Response} from 'express';
 import {DbUser} from '../../api';
-import {ResultSetHeader, RowDataPacket} from 'mysql2';
+import {select} from '../db/db-config';
+import {User} from '../db/db-models';
 
 export const verifyLogin = async (req, res, next) => {
   if(req.isAuthenticated() && req.session.isRegistered) {
@@ -27,37 +27,27 @@ export async function googleCallback(req: any, res: Response) {
 }
 
 export async function userExists(email: string): Promise<DbUser | null> {
-  const conn = await promisePool.getConnection();
-  try {
-    const [rows] = await conn.query<RowDataPacket[]>('SELECT * FROM user WHERE email = ?', [email]);
-    return rows[0] ? rows[0] as DbUser : null;
-  } finally {
-    conn.release();
-  }
+  const rows = await select('SELECT * FROM user WHERE email = $email', {email});
+  return rows[0] ? rows[0] as DbUser : null;
 }
 
 export async function addUser(name: string, email: string): Promise<DbUser> {
-  const conn = await promisePool.getConnection();
   try {
-    const [result] = await conn.query<ResultSetHeader>('INSERT INTO `user` (name, email) VALUES (?, ?)', [name, email]);
-    return { id: result.insertId, name, email, password: null, salt: null, secret: null };
+    const newUser = new User({name, email});
+    await newUser.save();
+    return { id: newUser.id, name, email, password: null, salt: null, secret: null };
   } catch (e) {
     console.error(e);
-  } finally {
-    conn.release();
   }
 }
 
 export async function checkUsername(req: Request, res: Response) {
   const username = req.params.username;
-  const conn = await promisePool.getConnection();
   try {
-    const [rows] = await conn.query<RowDataPacket[]>('SELECT * FROM `user` WHERE name = :name', {name: username});
+    const rows = await select('SELECT * FROM `user` WHERE name = $name', {name: username});
     res.json({available: rows.length === 0});
   } catch (e) {
     console.error(e);
-  } finally {
-    conn.release();
   }
 }
 

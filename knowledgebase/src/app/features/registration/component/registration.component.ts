@@ -19,7 +19,7 @@ export class RegistrationComponent {
 
   usernameControl = new FormControl('', [
     Validators.required,
-    //Validators.minLength(3)
+    Validators.minLength(5)
   ]);
 
   constructor() {}

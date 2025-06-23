@@ -26,9 +26,9 @@ export const buildSelectSnippetQuery = (
   let selectMatch = `,match(title, content) against(:search) as r1,
        match(title) against(:search)          as r2`;
   const from = `from usr_fold_snip
-         join user on user.id = usr_fold_snip.user_id
          join folder on folder.id = usr_fold_snip.folder
-         join snippet on snippet.id = usr_fold_snip.snip_id`;
+         join snippet on snippet.id = usr_fold_snip.snip_id
+         join user on user.id = snippet.user_id`;
   const where = `WHERE 1 = 1
       and usr_fold_snip.user_id = :userParam`;
   let whereFolder = `AND usr_fold_snip.folder in (:folderIds)`;

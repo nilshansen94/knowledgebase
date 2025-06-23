@@ -16,6 +16,7 @@ import {importOldKb} from './utils/rest/import-old-kb';
 import passport from 'passport';
 import {Strategy as GoogleStrategy} from 'passport-google-oauth20';
 import helmet from 'helmet';
+import {setupDb} from './utils/db/db-setup';
 
 const app = express();
 
@@ -44,6 +45,12 @@ app.use(helmet({
   referrerPolicy: { policy: 'same-origin' }
 }));
 app.use(cookieParser());
+
+setupDb().then(res => {
+  console.log('DB setup successful', res)
+}).catch(e => {
+  console.log('DB setup not necessary,', e.stack.split('\n')[0]);
+});
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,

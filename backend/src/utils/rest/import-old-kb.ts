@@ -1,4 +1,4 @@
-import {promisePool} from '../db/db-config';
+import {getClient} from '../db/db-config';
 import {Request, Response} from 'express';
 
 export async function importOldKb(req: Request, res: Response) {
@@ -9,7 +9,7 @@ export async function importOldKb(req: Request, res: Response) {
 
     TODO: get lang as well
   */
-  const conn = await promisePool.getConnection();
+  const conn = await getClient();
   try {
     await conn.beginTransaction();
     await conn.query('truncate table folder')
