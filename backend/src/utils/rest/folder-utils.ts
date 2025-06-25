@@ -13,7 +13,7 @@ export async function getFolders(req: Request, res: Response){
     order by folder.name;
   */
   const userParam = req.query.user as string;
-  const rows = await select('select * from `folder` where user_id = $id order by name', {id: userParam ? userParam: req.session.userId});
+  const rows = await select('select * from folder where user_id = $id order by name', {id: userParam ? userParam: req.session.userId});
   const tree: Folder[] = listToTree(rows as Folder[]);
   res.json(tree);
   return res;

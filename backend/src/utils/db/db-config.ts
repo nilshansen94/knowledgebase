@@ -1,7 +1,8 @@
 import mysql from 'mysql2';
-import {QueryTypes} from 'sequelize';
+import {Dialect, QueryTypes} from 'sequelize';
 import {Sequelize} from 'sequelize-typescript';
-import {Snippet, User} from './db-models';
+import {Folder, KbUser, Snippet, UsrFoldSnip} from './db-models';
+import * as process from 'node:process';
 
 const mysqlConfig = {
   host: process.env.DB_HOST,
@@ -29,13 +30,13 @@ const sequelize = new Sequelize(
   process.env.DB_PASSWORD, {
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT),
-    dialect: 'mysql',
+    dialect: process.env.DB_DIALECT as Dialect,
     logging: false,
     define: {
       timestamps: false,//if true, it always writes createdAt and updatedAt columns
       freezeTableName: true,//keep table names
     },
-    models: [User, Snippet],
+    models: [KbUser, Snippet, Folder, UsrFoldSnip],
   });
 
 /*export function getSequelize(){

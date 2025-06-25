@@ -12,7 +12,6 @@ import {addSnippet, deleteSnippet, getSnippets, pinSnippet, toggleSnippetPublic,
 import {checkUsername, googleCallback, registerUser, userExists, verifyLogin} from './utils/rest/login-utils';
 import {addFolder, deleteFolder, getFolders, moveFolders, moveSnippets, renameFolder} from './utils/rest/folder-utils';
 import {getCommunitySnippets, getUserName, getUsers} from './utils/rest/comunity-utils';
-import {importOldKb} from './utils/rest/import-old-kb';
 import passport from 'passport';
 import {Strategy as GoogleStrategy} from 'passport-google-oauth20';
 import helmet from 'helmet';
@@ -180,11 +179,6 @@ app.post('/snippet-pin', [verifyLogin], async (req, res) => {
 
 app.delete('/snippet/:id', [verifyLogin], async (req, res) => {
   return await deleteSnippet(req, res);
-})
-
-//todo remove again
-app.get('/import-old-kb', async (req, res) => {
-  return await importOldKb(req, res);
 })
 
 app.get('/users', [verifyLogin], async (req, res) => {

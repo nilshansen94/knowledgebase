@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {DbUser} from '../../api';
 import {select} from '../db/db-config';
-import {User} from '../db/db-models';
+import {KbUser} from '../db/db-models';
 
 export const verifyLogin = async (req, res, next) => {
   if(req.isAuthenticated() && req.session.isRegistered) {
@@ -27,13 +27,13 @@ export async function googleCallback(req: any, res: Response) {
 }
 
 export async function userExists(email: string): Promise<DbUser | null> {
-  const rows = await select('SELECT * FROM user WHERE email = $email', {email});
+  const rows = await select('SELECT * FROM kb_user WHERE email = $email', {email});
   return rows[0] ? rows[0] as DbUser : null;
 }
 
 export async function addUser(name: string, email: string): Promise<DbUser> {
   try {
-    const newUser = new User({name, email});
+    const newUser = new KbUser({name, email});
     await newUser.save();
     return { id: newUser.id, name, email, password: null, salt: null, secret: null };
   } catch (e) {
@@ -44,7 +44,7 @@ export async function addUser(name: string, email: string): Promise<DbUser> {
 export async function checkUsername(req: Request, res: Response) {
   const username = req.params.username;
   try {
-    const rows = await select('SELECT * FROM `user` WHERE name = $name', {name: username});
+    const rows = await select('SELECT * FROM kb_user WHERE name = $name', {name: username});
     res.json({available: rows.length === 0});
   } catch (e) {
     console.error(e);

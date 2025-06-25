@@ -1,7 +1,7 @@
-import {Column, DataType, Model, Table} from 'sequelize-typescript';
+import {Column, DataType, Model, PrimaryKey, Table} from 'sequelize-typescript';
 
-@Table
-export class User extends Model {
+@Table({tableName: 'kb_user'})
+export class KbUser extends Model {
   //id is already there by default
 
   @Column(DataType.STRING(200))
@@ -34,4 +34,32 @@ export class Snippet extends Model {
 
   @Column(DataType.BOOLEAN)
   public: string;
+}
+
+@Table
+export class Folder extends Model {
+
+  @Column(DataType.STRING(200))
+  name: string;
+
+  @Column(DataType.INTEGER)
+  parent_id: number;
+
+  @Column(DataType.INTEGER)
+  user_id: number;
+}
+
+@Table({tableName: 'usr_fold_snip'})
+export class UsrFoldSnip extends Model {
+
+  @PrimaryKey
+  @Column(DataType.INTEGER)
+  user_id: number;
+
+  @PrimaryKey
+  @Column(DataType.INTEGER)
+  snip_id: number;
+
+  @Column(DataType.INTEGER)
+  folder: number;
 }

@@ -1,23 +1,23 @@
 import {listToTree} from '../list-to-tree';
 import {Folder} from '../../api';
 import {getSubFolders} from '../get-sub-folders';
-import {buildSelectSnippetQuery} from '../build-query/build-query';
 import {Request, Response} from 'express';
 import {SnippetPinRequest} from '@kb-rest/shared';
-import {deleteFrom, getClient, getTransaction, insert, select, seqCreateTables} from '../db/db-config';
-import {Snippet, User} from '../db/db-models';
+import {deleteFrom, getTransaction, insert, select, seqCreateTables} from '../db/db-config';
+import {KbUser, Snippet} from '../db/db-models';
+import {buildSelectSnippetQueryPostgres} from '../build-query/build-query-pg';
 
 
 async function testSequelize() {
   await seqCreateTables();
-  const res = await select('select id, name from user');
+  const res = await select('select id, name from kb_user');
   console.log(res);
   const name = 'seq';
   const email = 'a@b.c';
-  const newUser = new User({name, email});
+  const newUser = new KbUser({name, email});
   await newUser.save();
   console.log(newUser)
-  const deleted = await deleteFrom(`delete from user where name = $name`,
+  const deleted = await deleteFrom(`delete from kb_user where name = $name`,
     {name: 'seq'});
   console.log(deleted);
 }
@@ -26,25 +26,28 @@ export async function getSnippets(req: Request, res: Response) {
   // await testSequelize();
   const loggedInUserId = +req.session.userId;
   const userParam = +req.query.user;
-  const conn = await getClient();
   //console.log('get snippets for user', userId, 'and folder', req.params.folderId)
   //https://stackoverflow.com/questions/53945089/nodejs-await-async-with-nested-mysql-query
-  const [rows] = await conn.query('select * from `folder` where user_id = ?', [userParam ? userParam: loggedInUserId]);
+  const rows = await select('select * from folder where user_id = $1', [userParam ? userParam: loggedInUserId]);
   //console.log('folders from query', rows)
   const tree = listToTree(rows as Folder[]);
   //console.log('tree',tree)
   const searchParam = req.query.search as string;
-  const folderId = +req.params.folderId;
-  let folderIds = [];
+  const folderId: number = +req.params.folderId;
+  let folderIds: number[] = [];
   if (folderId) {
     folderIds = getSubFolders(tree, +folderId);
     //console.log('folderIds',folderIds)
   }
   const page = +(req.query.page || 0);
-  const query = buildSelectSnippetQuery(searchParam, folderId, userParam, page);
+  //const query = buildSelectSnippetQuery(searchParam, folderId, userParam, page);
+  const query = buildSelectSnippetQueryPostgres(searchParam, folderId, userParam, page);
 
   //console.log(query.replace(/:search/g, `"${searchParam}"`).replace(/:userId/g, loggedInUserId.toString()).replace(/:folderIds/g, folderIds.join(',')).replace(/:userParam/g, userParam.toString()));
-  const [rows2] = await conn.query(query, {search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId});
+  //console.log(query.replace(/\$search/g, `'${searchParam}'`).replace(/\$userId/g, loggedInUserId.toString()).replace(/\$folderIds/g, folderIds.join(',')).replace(/\$userParam/g, userParam.toString()));
+  //console.log(JSON.stringify({search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId}));
+  console.log(JSON.stringify(searchParam? {folderIds}: {folderId}));
+  const rows2 = await select(query, {search: searchParam, folderIds: searchParam ? folderIds.join(','): folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId});
   //console.log(query);
   //console.log({search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId});
 
@@ -52,7 +55,6 @@ export async function getSnippets(req: Request, res: Response) {
   //console.log('sql params', {search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId})
   //@ts-ignore
   //console.log(`get snippets (folderId ${folderId}) (folderIds ${JSON.stringify(folderIds)}) (search ${searchParam}). Found ${rows?.length} rows`)
-  conn.release();
   res.json(rows2);
   res.end();
   return res;
