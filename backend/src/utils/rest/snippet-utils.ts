@@ -6,6 +6,8 @@ import {SnippetPinRequest} from '@kb-rest/shared';
 import {deleteFrom, getTransaction, insert, select, seqCreateTables} from '../db/db-config';
 import {KbUser, Snippet, UsrFoldSnip} from '../db/db-models';
 import {buildSelectSnippetQueryPostgres} from '../build-query/build-query-pg';
+import process from 'node:process';
+import {buildSelectSnippetQuery} from '../build-query/build-query';
 
 
 async function testSequelize() {
@@ -40,8 +42,12 @@ export async function getSnippets(req: Request, res: Response) {
     //console.log('folderIds',folderIds)
   }
   const page = +(req.query.page || 0);
-  //const query = buildSelectSnippetQuery(searchParam, folderId, userParam, page);
-  const query = buildSelectSnippetQueryPostgres(searchParam, folderId, userParam, page);
+  let query;
+  if(process.env.DB_TYPE === 'postgres'){
+    query = buildSelectSnippetQueryPostgres(searchParam, folderId, userParam, page);
+  } else {
+    query = buildSelectSnippetQuery(searchParam, folderId, userParam, page);
+  }
 
   //console.log(query.replace(/:search/g, `"${searchParam}"`).replace(/:userId/g, loggedInUserId.toString()).replace(/:folderIds/g, folderIds.join(',')).replace(/:userParam/g, userParam.toString()));
   //console.log(query.replace(/\$search/g, `'${searchParam}'`).replace(/\$userId/g, loggedInUserId.toString()).replace(/\$folderIds/g, folderIds.join(',')).replace(/\$userParam/g, userParam.toString()));
