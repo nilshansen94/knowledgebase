@@ -10,7 +10,7 @@
     "kb:build": "nx build knowledgebase",
     "kb:build:prod": "nx build knowledgebase --prod",
     "kb:test": "nx test knowledgebase",
-    "backend:build:ci": "npx nx build backend",
+    "backend:build:ci": "nx build backend",
     "backend:serve": "nx serve backend",
     "backend:serve:ci": "node ./dist/backend/main.js",
     "kb:storybook:start": "nx run knowledgebase:storybook",
