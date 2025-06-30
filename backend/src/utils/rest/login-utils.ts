@@ -59,7 +59,7 @@ export async function registerUser(req: Request, res: Response){
 
   const {username} = req.body;
   console.log('register', username, req.body)
-  if (!username || username.length < 3) {
+  if (!username || username.length < 5) { // || ! /^\w+$/.test(username)
     console.log('register: invalid username')
     return res.status(400).json({success: false, message: 'Invalid username'});
   }

@@ -19,11 +19,11 @@ export class KbUser extends Model {
   secret: string;
 }
 
-@Table
-export class Snippet extends Model {
+@Table({tableName: 'snippet'})
+  export class Snippet extends Model {
   //id is already there by default
 
-  @Column(DataType.STRING(500))
+  @Column(DataType.STRING(255))
   title: string;
 
   @Column(DataType.TEXT)
@@ -33,10 +33,10 @@ export class Snippet extends Model {
   user_id: number;
 
   @Column(DataType.BOOLEAN)
-  public: string;
+  public: boolean;
 }
 
-@Table
+@Table({tableName: 'folder'})
 export class Folder extends Model {
 
   @Column(DataType.STRING(200))

@@ -5,7 +5,7 @@ import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
   selector: 'app-registration',
   standalone: true,
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   templateUrl: './registration.component.html',
   styleUrl: './registration.component.scss',
@@ -19,7 +19,8 @@ export class RegistrationComponent {
 
   usernameControl = new FormControl('', [
     Validators.required,
-    Validators.minLength(5)
+    Validators.minLength(5),
+    Validators.pattern('^[a-zA-Z0-9_]+$'),
   ]);
 
   constructor() {}

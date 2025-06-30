@@ -1,4 +1,4 @@
-<button id="add-snippet-btn" *ngIf="!addSnippet && !editingSnippet" (click)="addSnippet = !addSnippet">add Snippet</button>
+<button id="add-snippet-btn" *ngIf="!addSnippet && !editingSnippet" (click)="addSnippet = !addSnippet" [disabled]="!hasFolders">add Snippet</button>
 
 <div class="editor" *ngIf="addSnippet || editingSnippet">
   <input type="text" placeholder="title" [(ngModel)]="newSnippetTitle">
@@ -21,7 +21,8 @@
 
 <app-search (search)="searchSnippets($event)"/>
 
-<span *ngIf="snippets?.length === 0 && !currentSearch && !currentFolder">Select a folder or search for a snippet to get started.</span>
+<span *ngIf="hasFolders && snippets?.length === 0 && !currentSearch && !currentFolder">Select a folder or search for a snippet to get started.</span>
+<span *ngIf="!hasFolders">Create a folder to get started! A snippet needs to be placed inside a folder.</span>
 <span *ngIf="!loadingSnippets && snippets?.length === 0 && (currentSearch || currentFolder)">No snippets found</span>
 <span *ngIf="loadingSnippets && (currentSearch || currentFolder)">Loading snippets...</span>
 
@@ -34,7 +35,7 @@
                [snippet]="snippet"
                [attr.id]="'snippet'+snippet.id"
                [pinWithModal]="communityUser > -1"
-               [canEdit]="snippet.isOwnSnippet"
+               [canEdit]="snippet.is_own_snippet"
                (editSnippet)="startEditingSnippet($event)"
                (deleteSnippet)="this.deleteSnippet.emit($event)"
                (togglePublic)="togglePublic.emit($event)"

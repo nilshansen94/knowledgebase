@@ -21,8 +21,8 @@ export const buildSelectSnippetQuery = (
        usr_fold_snip.folder,
        usr_fold_snip.user_id                 as ufs_user,
        kb_user.name as user_name,
-       if(snippet.user_id = $userId, 1, 0)         as isOwnSnippet,
-       if(snippet.user_id <> usr_fold_snip.user_id, 1, 0)  as isPinned`;
+       if(snippet.user_id = $userId, 1, 0)         as is_own_snippet,
+       if(snippet.user_id <> usr_fold_snip.user_id, 1, 0)  as is_pinned`;
   let selectMatch = `,match(title, content) against($search) as r1,
        match(title) against($search)          as r2`;
   const from = `from usr_fold_snip
@@ -38,8 +38,8 @@ export const buildSelectSnippetQuery = (
   let withCteEnd = ')';
   let selectUnion = `select * from cte
         union
-        select snippet.*, -1 as folder, -1 as ufs_user, kb_user.name as user_name, 0 as isOwnSnippet,
-               EXISTS (SELECT 1 FROM usr_fold_snip ufs WHERE ufs.snip_id = snippet.id AND ufs.user_id = $userId) as isPinned`;
+        select snippet.*, -1 as folder, -1 as ufs_user, kb_user.name as user_name, 0 as is_own_snippet,
+               EXISTS (SELECT 1 FROM usr_fold_snip ufs WHERE ufs.snip_id = snippet.id AND ufs.user_id = $userId) as is_pinned`;
   let selectUnionMatch = ', -1 as r1, -1 as r2';
   let unionFromWhere = `from snippet
       join kb_user on kb_user.id = snippet.user_id

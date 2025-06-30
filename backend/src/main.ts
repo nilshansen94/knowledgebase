@@ -48,7 +48,7 @@ app.use(cookieParser());
 setupDb().then(res => {
   console.log('DB setup successful', res)
 }).catch(e => {
-  console.log('DB setup not necessary,', e.stack.split('\n')[0]);
+  console.log('DB setup failed,', e.stack.split('\n')[0]);
 });
 
 passport.use(new GoogleStrategy({

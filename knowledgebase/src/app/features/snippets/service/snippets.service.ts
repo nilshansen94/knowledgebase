@@ -72,7 +72,7 @@ export class SnippetsService {
        const mappedSnippets = snippets?.map(s => ({
        ...s,
        public: s.public === 1,
-       isPinned: s.isPinned === 1
+       is_pinned: s.is_pinned === 1 || s.is_pinned === true,
      }));
        if (mappedSnippets) {
          this.snippetsStore.set(this.pagingService.getCurrentPage(), mappedSnippets);

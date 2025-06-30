@@ -44,6 +44,7 @@ export class CommunityComponent {
   }
 
   async doPinSnippet(snippet: Snippet) {
+    //TODO disallow "add folder" and "move folders"
     const folder = await this.modalService.openSelectFolderModal({folders: this.folders});
     if(!folder){
       console.log('No folder selected');

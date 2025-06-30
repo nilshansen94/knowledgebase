@@ -1,21 +1,9 @@
-import {createSql} from './create';
-import {PoolConnection} from 'mysql2/promise';
-import {getClient} from './db-config';
-
-const executeSqlStatements = async (sql: string, conn: PoolConnection) => {
-  // Split by semicolon and filter out empty statements
-  const statements = sql
-  .split(';')
-  .map(stmt => stmt.trim())
-  .filter(stmt => stmt.length > 0);
-
-  // Execute each statement
-  for (const statement of statements) {
-    await conn.query(statement);
-  }
-};
+import {Folder, KbUser, Snippet, UsrFoldSnip} from './db-models';
 
 export async function setupDb(): Promise<void> {
-  const conn = await getClient();
-  await executeSqlStatements(createSql, conn);
+  // todo use sequelize.sync();
+  await KbUser.sync();
+  await Snippet.sync();
+  await Folder.sync();
+  await UsrFoldSnip.sync();
 }

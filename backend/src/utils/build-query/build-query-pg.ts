@@ -21,8 +21,8 @@ export const buildSelectSnippetQueryPostgres = (
        usr_fold_snip.folder,
        usr_fold_snip.user_id                 as ufs_user,
        kb_user.name as user_name,
-       CASE WHEN snippet.user_id = $userId THEN true ELSE false END as isOwnSnippet,
-       CASE WHEN snippet.user_id <> usr_fold_snip.user_id THEN true ELSE false END as isPinned`;
+       CASE WHEN snippet.user_id = $userId THEN true ELSE false END as is_own_snippet,
+       CASE WHEN snippet.user_id <> usr_fold_snip.user_id THEN true ELSE false END as is_pinned`;
   let selectMatch = `
       ,CASE
       WHEN to_tsvector(title || ' ' || content) @@ to_tsquery($search) THEN true ELSE false
@@ -49,8 +49,8 @@ export const buildSelectSnippetQueryPostgres = (
   let withCteEnd = ')';
   let selectUnion = `select * from cte
         union
-        select snippet.*, -1 as folder, -1 as ufs_user, kb_user.name as user_name, false as isOwnSnippet,
-               EXISTS (SELECT true FROM usr_fold_snip ufs WHERE ufs.snip_id = snippet.id AND ufs.user_id = $userId) as isPinned`;
+        select snippet.*, -1 as folder, -1 as ufs_user, kb_user.name as user_name, false as is_own_snippet,
+               EXISTS (SELECT true FROM usr_fold_snip ufs WHERE ufs.snip_id = snippet.id AND ufs.user_id = $userId) as is_pinned`;
   let selectUnionMatch = ', false as r1, false as r2';
   let unionFromWhere = `from snippet
       join kb_user on kb_user.id = snippet.user_id

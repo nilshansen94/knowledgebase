@@ -5,8 +5,8 @@ export interface Snippet {
   user_id: number;
   user_name: string;
   folder: number;
-  isOwnSnippet: boolean;
-  isPinned: boolean|number;//mysql returns 0 or 1
+  is_own_snippet: boolean;
+  is_pinned: boolean|number;//mysql returns 0 or 1
   public: boolean|number;//mysql returns 0 or 1
   isActive?: boolean;
 }

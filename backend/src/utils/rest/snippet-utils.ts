@@ -4,7 +4,7 @@ import {getSubFolders} from '../get-sub-folders';
 import {Request, Response} from 'express';
 import {SnippetPinRequest} from '@kb-rest/shared';
 import {deleteFrom, getTransaction, insert, select, seqCreateTables} from '../db/db-config';
-import {KbUser, Snippet} from '../db/db-models';
+import {KbUser, Snippet, UsrFoldSnip} from '../db/db-models';
 import {buildSelectSnippetQueryPostgres} from '../build-query/build-query-pg';
 
 
@@ -46,7 +46,6 @@ export async function getSnippets(req: Request, res: Response) {
   //console.log(query.replace(/:search/g, `"${searchParam}"`).replace(/:userId/g, loggedInUserId.toString()).replace(/:folderIds/g, folderIds.join(',')).replace(/:userParam/g, userParam.toString()));
   //console.log(query.replace(/\$search/g, `'${searchParam}'`).replace(/\$userId/g, loggedInUserId.toString()).replace(/\$folderIds/g, folderIds.join(',')).replace(/\$userParam/g, userParam.toString()));
   //console.log(JSON.stringify({search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId}));
-  console.log(JSON.stringify(searchParam? {folderIds}: {folderId}));
   const rows2 = await select(query, {search: searchParam, folderIds: searchParam ? folderIds.join(','): folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId});
   //console.log(query);
   //console.log({search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId});
@@ -70,10 +69,16 @@ export async function addSnippet(req: Request, res: Response) {
     //userId is req.session.userId
     //const [insertResult] = await conn.query('INSERT INTO snippet (title, content, user_id, public) VALUES (?,?,?, ?)', [snippet.title, snippet.content, userId, snippet.public]);
     const newSnip = new Snippet({title: snippet.title, content: snippet.content, user_id: userId, public: snippet.public});
-    await newSnip.save();
+    const r = await newSnip.save({transaction: trx});
+    //console.log('insert snip res', r)
+    //console.log('saving snippet', JSON.stringify(newSnip))
     // @ts-ignore
     //const snippetId = insertResult.insertId;
-    await insert('INSERT INTO usr_fold_snip (user_id, snip_id, folder) VALUES ($1,$2,$3)', [userId, newSnip.id, snippet.folder]);
+    const newUsrFoldSnip = new UsrFoldSnip({user_id: userId, snip_id: newSnip.id, folder: snippet.folder});
+    const r2 = await newUsrFoldSnip.save({transaction: trx});
+    //console.log('insert usr_fold_snip res', r2);
+    //const resIns = await insert('INSERT INTO usr_fold_snip (user_id, snip_id, folder) VALUES ($1,$2,$3)', [userId, newSnip.id, snippet.folder], trx);
+    //console.log('inserted into usr_fold_snip', [userId, newSnip.id, snippet.folder], resIns);
     await trx.commit();
     console.log('committed insert-snip')
     res.json({success: true});

@@ -2,7 +2,7 @@
   <div class="control-icons">
     <div class="icons-status">
       <span class="material-icons" *ngIf="canEdit">{{snippet.public ? 'public': 'lock'}}</span>
-      <span class="material-symbols-outlined" *ngIf="snippet.isPinned">keep</span>
+      <span class="material-symbols-outlined" *ngIf="snippet.is_pinned">keep</span>
     </div>
     <div class="icons-edit">
       <ng-container *ngIf="canEdit">
@@ -19,7 +19,7 @@
       </ng-container>
       <ng-container *ngIf="!canEdit">
         <button [disabled]="pendingRequest">
-          <span class="material-symbols-outlined" (click)="doPinSnippet()">{{snippet.isPinned ? 'keep_off':'keep'}}</span>
+          <span class="material-symbols-outlined" (click)="doPinSnippet()">{{snippet.is_pinned ? 'keep_off':'keep'}}</span>
         </button>
       </ng-container>
     </div>
@@ -31,7 +31,7 @@
     />
   </div>
   <div class="footer">
-    @if(!snippet.isOwnSnippet){
+    @if(!snippet.is_own_snippet){
       <a class="user" [routerLink]="[]" [queryParams]="{user: snippet.user_id}"><span class="material-icons">account_circle</span>{{snippet.user_name}}</a>
     }
   </div>
