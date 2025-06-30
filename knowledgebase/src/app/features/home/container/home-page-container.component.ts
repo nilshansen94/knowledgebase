@@ -22,6 +22,7 @@ import {PagingService} from '../../snippets/service/paging.service';
         [loading]="pagingService.loading$ | async"
         [hasMore]="pagingService.hasMore$ | async"
         [selectedSnippetId]="snippetsService.selectedSnippet$ | async"
+        [hasFolders]="sidenavService.hasFolders$ | async"
         (loadMore)="snippetsService.loadMore()"
         (newSnippet)="snippetsService.addSnippet($event)"
         (editSnippet)="snippetsService.editSnippet($event)"

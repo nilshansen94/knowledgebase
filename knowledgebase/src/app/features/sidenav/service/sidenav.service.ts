@@ -88,6 +88,10 @@ export class SidenavService {
     })*/
   );
 
+  hasFolders$ = this.folders$.pipe(
+    map(folders => folders?.length > 0),
+  );
+
   currentFolder$: Observable<KbTreeNode> = combineLatest([
     this.appService.selectedFolder$.pipe(
       filter(selectedFolder => !isNaN(selectedFolder)),
@@ -203,7 +207,7 @@ export class SidenavService {
     const request: SnippetPinRequest = {
       snippetId: snippet.id,
       folder: folderId,
-      remove: Boolean(snippet.isPinned)
+      remove: Boolean(snippet.is_pinned)
     };
     this.httpService.post('snippet-pin', request).pipe(
       tap(() => this.appService.refreshSelectedFolder()),

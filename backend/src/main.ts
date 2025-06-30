@@ -12,10 +12,10 @@ import {addSnippet, deleteSnippet, getSnippets, pinSnippet, toggleSnippetPublic,
 import {checkUsername, googleCallback, registerUser, userExists, verifyLogin} from './utils/rest/login-utils';
 import {addFolder, deleteFolder, getFolders, moveFolders, moveSnippets, renameFolder} from './utils/rest/folder-utils';
 import {getCommunitySnippets, getUserName, getUsers} from './utils/rest/comunity-utils';
-import {importOldKb} from './utils/rest/import-old-kb';
 import passport from 'passport';
 import {Strategy as GoogleStrategy} from 'passport-google-oauth20';
 import helmet from 'helmet';
+import {setupDb} from './utils/db/db-setup';
 
 const app = express();
 
@@ -44,6 +44,12 @@ app.use(helmet({
   referrerPolicy: { policy: 'same-origin' }
 }));
 app.use(cookieParser());
+
+setupDb().then(res => {
+  console.log('DB setup successful', res)
+}).catch(e => {
+  console.log('DB setup failed,', e.stack.split('\n')[0]);
+});
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -173,11 +179,6 @@ app.post('/snippet-pin', [verifyLogin], async (req, res) => {
 
 app.delete('/snippet/:id', [verifyLogin], async (req, res) => {
   return await deleteSnippet(req, res);
-})
-
-//todo remove again
-app.get('/import-old-kb', async (req, res) => {
-  return await importOldKb(req, res);
 })
 
 app.get('/users', [verifyLogin], async (req, res) => {

@@ -42,6 +42,10 @@ export class HomeComponent implements OnChanges, AfterViewInit {
     animations: {}
   };
 
+  /** Whether the user has folders*/
+  @Input()
+  hasFolders = false;
+
   @Input()
   loading = false;
 
@@ -56,8 +60,6 @@ export class HomeComponent implements OnChanges, AfterViewInit {
 
   @ViewChild('scrollSentinel')
   scrollSentinel: ElementRef;
-
-  @ViewChild('searchInput', {static: true}) searchInput: ElementRef;
 
   @Input()
   snippets: Snippet[];

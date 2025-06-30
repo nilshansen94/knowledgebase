@@ -78,15 +78,15 @@ describe('buildSelectSnippetQuery', () => {
     console.log(query);
     expect(rows.length).toBe(3);
     expect(rows[0].title).toBe('A1 folder1');
-    expect(rows[0].isOwnSnippet).toBe(1);
-    expect(rows[0].isPinned).toBe(0);
+    expect(rows[0].is_own_snippet).toBe(1);
+    expect(rows[0].is_pinned).toBe(0);
     expect(rows[1].title).toBe('B2 folder1 public');
-    expect(rows[1].isOwnSnippet).toBe(0);
-    expect(rows[1].isPinned).toBe(1);
+    expect(rows[1].is_own_snippet).toBe(0);
+    expect(rows[1].is_pinned).toBe(1);
     expect(rows[1].public).toBe(1);
     expect(rows[2].title).toBe('B3 folder1 public');
-    expect(rows[2].isOwnSnippet).toBe(0);
-    expect(rows[2].isPinned).toBe(0);
+    expect(rows[2].is_own_snippet).toBe(0);
+    expect(rows[2].is_pinned).toBe(0);
     expect(rows[2].public).toBe(1);
   });
 
