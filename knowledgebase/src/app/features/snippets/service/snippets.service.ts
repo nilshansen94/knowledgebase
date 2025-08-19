@@ -71,7 +71,7 @@ export class SnippetsService {
      map(snippets => {
        const mappedSnippets = snippets?.map(s => ({
        ...s,
-       public: s.public === 1,
+       public: s.public === 1 || s.public === true,
        is_pinned: s.is_pinned === 1 || s.is_pinned === true,
      }));
        if (mappedSnippets) {

@@ -16,7 +16,10 @@ import passport from 'passport';
 import {Strategy as GoogleStrategy} from 'passport-google-oauth20';
 import helmet from 'helmet';
 import {setupDb} from './utils/db/db-setup';
+import {configDotenv} from 'dotenv';
+import {logger} from './utils/logger';
 
+configDotenv();
 const app = express();
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
@@ -193,9 +196,16 @@ app.get('/communitySnippets/:search?', [verifyLogin], async (req, res) => {
   return await getCommunitySnippets(req, res);
 })
 
+app.get('/version', (req, res) => {
+  console.log('get version', {version: process.env.npm_package_version});
+  res.json({version: process.env.npm_package_version});
+  res.end();
+})
+
 const port = +(process.env.PORT);
 const host = process.env.HOST;
 const server = app.listen(port, host, () => {
   console.log(`Listening at ${host}:${port}/api`);
+  logger.info(`Listening at ${host}:${port}/api`);
 });
 server.on('error', console.error);
