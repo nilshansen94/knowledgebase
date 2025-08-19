@@ -43,7 +43,7 @@ export async function getSnippets(req: Request, res: Response) {
   }
   const page = +(req.query.page || 0);
   let query;
-  if(process.env.DB_TYPE === 'postgres'){
+  if(process.env.DB_DIALECT === 'postgres'){
     query = buildSelectSnippetQueryPostgres(searchParam, folderId, userParam, page);
   } else {
     query = buildSelectSnippetQuery(searchParam, folderId, userParam, page);
@@ -107,8 +107,7 @@ export async function updateSnippet(req: Request, res: Response) {
     const snip = await Snippet.findByPk(snippet.id);
     const updateResult = await snip.update({title: snippet.title, content: snippet.content, public: snippet.public});
     console.log('committed update-snip')
-    // @ts-ignore
-    res.json({success: updateResult.dataValues.length === 1});
+    res.json({success: !!updateResult});
     res.end();
     return;
   } catch(e) {

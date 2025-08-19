@@ -10,12 +10,14 @@
     "kb:build": "nx build knowledgebase",
     "kb:build:prod": "nx build knowledgebase --prod",
     "kb:test": "nx test knowledgebase",
-    "backend:build:ci": "nx build backend",
+    "backend:build:prod": "nx build backend --prod",
     "backend:serve": "nx serve backend",
     "backend:serve:ci": "node ./dist/backend/main.js",
     "kb:storybook:start": "nx run knowledgebase:storybook",
     "kb:storybook:build": "nx run knowledgebase:build-storybook",
-    "kb:storybook:test": "nx run knowledgebase:test-storybook"
+    "kb:storybook:test": "nx run knowledgebase:test-storybook",
+    "docker:build": "docker compose build --no-cache",
+    "docker:up":  "docker compose up"
   },
   "private": true,
   "dependencies": {
@@ -37,6 +39,7 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "crypto-hash": "^3.0.0",
+    "dotenv": "^17.0.1",
     "express": "4.21.2",
     "express-session": "^1.17.3",
     "font-awesome": "^4.7.0",
@@ -59,6 +62,7 @@
     "sequelize": "^6.37.7",
     "sequelize-typescript": "^2.1.6",
     "tslib": "^2.3.0",
+    "winston": "^3.17.0",
     "zone.js": "0.15.0"
   },
   "devDependencies": {

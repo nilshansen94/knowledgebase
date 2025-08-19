@@ -3,6 +3,7 @@ import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {BehaviorSubject, distinctUntilChanged, filter, map, tap} from 'rxjs';
 import {Folder} from '../../features/sidenav/api/folder';
 import {PATH} from '../../utils/paths';
+import {MyHttpService} from '../http/my-http.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,9 +30,12 @@ export class AppService {
     distinctUntilChanged()
   );
 
+  public version$ = this.httpClient.get2<{version: string}>('version');
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private httpClient: MyHttpService,
   ) {
     this.activatedRoute.queryParams.pipe(
       filter(params => !!params),

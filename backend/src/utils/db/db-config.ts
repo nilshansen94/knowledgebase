@@ -3,6 +3,9 @@ import {Dialect, QueryTypes} from 'sequelize';
 import {Sequelize} from 'sequelize-typescript';
 import {Folder, KbUser, Snippet, UsrFoldSnip} from './db-models';
 import * as process from 'node:process';
+import {configDotenv} from 'dotenv';
+
+configDotenv();
 
 const mysqlConfig = {
   host: process.env.DB_HOST,

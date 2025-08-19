@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,11 @@ export class MyHttpService {
   get(path: string) {
     console.debug('http-get', this.baseUrl + path)
     return this.http.get(this.baseUrl + path, this.options);
+  }
+
+  get2<T>(path: string): Observable<T> {
+    console.debug('http-get', this.baseUrl + path)
+    return this.http.get<T>(this.baseUrl + path, this.options);
   }
 
   post(path: string, data: any) {
