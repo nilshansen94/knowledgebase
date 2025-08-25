@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
-import {PATH} from 'knowledgebase/src/app/utils/paths';
+import {PATHS} from 'knowledgebase/src/app/utils/paths';
 
 @Component({
   selector: 'app-header',
@@ -13,7 +13,7 @@ import {PATH} from 'knowledgebase/src/app/utils/paths';
 })
 export class HeaderComponent {
 
-  PATH = PATH;
+  PATH = PATHS;
 
   @Input()
   currentPath: string;

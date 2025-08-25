@@ -1,0 +1,96 @@
+@use "../../../variables" as variables;
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 2rem;
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 8rem;
+}
+
+.welcome-logo {
+  width: 160px;
+  height: 160px;
+  margin-bottom: 1.5rem;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 1rem;
+}
+
+.welcome-lead {
+  font-size: 1.5rem;
+  color: #444;
+  text-align: center;
+  max-width: 700px;
+  margin-bottom: 2rem;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 600px;
+  width: 100%;
+  padding: 0;
+
+  > div {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 0;
+    padding: 1.5rem;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    background: #fff;
+
+    > div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  p {
+    margin: 0;
+  }
+  strong {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.feature-icon {
+  font-size: 3.2rem;
+  color: variables.$blue-light;
+  vertical-align: middle;
+  margin-right: 1.2rem;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.cta-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cta-button {
+  background: variables.$blue-light;
+  color: #fff;
+  padding: 0.9rem 2.2rem;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
+  transition: background 0.2s;
+}
+
+.cta-button:hover {
+  background: variables.$blue-dark-20;
+}

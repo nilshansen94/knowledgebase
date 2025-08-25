@@ -1,9 +1,10 @@
 /**
  * routing paths
  */
-export const PATH = {
+export const PATHS = {
   HOME: '',
   COMMUNITY: 'community',
   LOGIN: 'login',
+  WELCOME: 'welcome',
   REGISTER: 'register',
 }
