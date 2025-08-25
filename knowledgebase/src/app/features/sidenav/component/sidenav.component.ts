@@ -1,15 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  model,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, model, Output, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {Folder} from '../api/folder';
 import {ITreeOptions, TreeComponent, TreeModel, TreeModule, TreeNode} from '@odymaui/angular-tree-component';
@@ -28,7 +17,7 @@ import {ContextMenuDirective} from '../../../components/context-menu/context-men
   //todo onPush in all pure components !!
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SidenavComponent implements OnChanges {
+export class SidenavComponent {
 
   currentlySelectedItem: Folder;
   renamingNode: TreeNode | null = null;
@@ -60,13 +49,23 @@ export class SidenavComponent implements OnChanges {
   /** mapping movedSnippet -> targetFolderId */
   movedSnippetsMap = new Map<number, number>();
 
+  public _navItems: KbTreeNode[] = [];
+
   @ViewChild(TreeComponent)
   private tree: TreeComponent;
 
   @ViewChild('renameInput')
   private renameInput: ElementRef<HTMLInputElement>;
 
-  @Input() navItems: KbTreeNode[];
+  @Input() set navItems(items: KbTreeNode[]) {
+    if(this.allowMoveFolders) {
+      return;
+    }
+    this._navItems = items;
+    if(items) {
+      this.updateTree();
+    }
+  }
 
   @Input() selectedItemId: number;
 
@@ -93,7 +92,7 @@ export class SidenavComponent implements OnChanges {
     }
   }
 
-  @Input() set addingFolderinProgress(value: boolean) {
+  @Input() set addingFolderInProgress(value: boolean) {
     if (!value) {
       this.cancelAddingFolder();
     }
@@ -162,18 +161,12 @@ export class SidenavComponent implements OnChanges {
     this.renamingNode = null;
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['navItems']?.currentValue) {
-      this.updateTree();
-    }
-  }
-
   updateTree() {
     if (!this.tree) {
       return;
     }
     const folderId = new URLSearchParams(window.location.search).get('folder');
-    this.tree.treeModel.setData({nodes: this.navItems, options: this.treeOptions, events: null});
+    this.tree.treeModel.setData({nodes: this._navItems, options: this.treeOptions, events: null});
     if (!folderId) {
       this.tree.treeModel.getActiveNode()?.setIsActive(false);
       this.tree.treeModel.update();
@@ -210,7 +203,7 @@ export class SidenavComponent implements OnChanges {
     event.node.expand();
     this.currentlySelectedItem = data;
     this.selectedItemChange.emit(data);
-    this.showSidenav.set(false);
+    //this.showSidenav.set(false);
   }
 
   addFolderDragItem() {
@@ -223,7 +216,7 @@ export class SidenavComponent implements OnChanges {
       childNodes: null,
     };
     this.newFolderNode = newFolder;
-    this.navItems.unshift(this.newFolderNode);
+    this._navItems.unshift(this.newFolderNode);
     this.tree.treeModel.update();
     this.folderPlaced = true;
     this.showAddFolderInput = false;
@@ -256,11 +249,11 @@ export class SidenavComponent implements OnChanges {
   }
 
   backupNavItems() {
-    this.navItemsBackupJson = JSON.stringify(this.navItems);
+    this.navItemsBackupJson = JSON.stringify(this._navItems);
   }
 
   restoreNavItems() {
-    this.navItems = JSON.parse(this.navItemsBackupJson);
+    this._navItems = JSON.parse(this.navItemsBackupJson);
     this.updateTree();
   }
 
@@ -285,7 +278,7 @@ export class SidenavComponent implements OnChanges {
       }
 
       console.log('removeNode', itemToMove)
-      console.log('removeNode', this.navItems.findIndex(n => n.id === itemToMove.id))
+      console.log('removeNode', this._navItems.findIndex(n => n.id === itemToMove.id))
       const copy = {...itemToMove};
       if (copy.id === target.id) {
         console.log('Cancelling this move, you are trying to add a folder to itself.');
@@ -301,6 +294,10 @@ export class SidenavComponent implements OnChanges {
     //add snippet from snippet list
     const snippet = e.element;
     const targetFolder = node.data as Folder;
+    if(node.data.childNodes.find(e => e.id === snippet.id)){
+      console.log('ignore dropping a snippet again');
+      return;
+    }
     node.data.childNodes.push({...snippet, name: snippet.title, parent_id: targetFolder.id});
     this.tree.treeModel.update();
     this.tree.treeModel.getNodeById(targetFolder.id).expand();
@@ -309,9 +306,9 @@ export class SidenavComponent implements OnChanges {
 
   removeNode(node: Folder) {
     if (node.parent_id === null) {
-      const index = this.navItems.findIndex(n => n.id === node.id);
+      const index = this._navItems.findIndex(n => n.id === node.id);
       if (index >= 0) {
-        this.navItems.splice(index, 1);
+        this._navItems.splice(index, 1);
       }
     } else {
       const parent: Folder = this.tree.treeModel.getNodeById(node.parent_id).data;

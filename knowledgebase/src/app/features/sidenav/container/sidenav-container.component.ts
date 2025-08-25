@@ -21,7 +21,7 @@ import {NotificationService} from '../../../services/navigation/notification.ser
       [selectedUserName]="sidenavService.selectedUserName$ | async"
       [renameComplete]="renameComplete"
       [deleteComplete]="deleteComplete"
-      [addingFolderinProgress]="sidenavService.addingFolderInProgress$ | async"
+      [addingFolderInProgress]="sidenavService.addingFolderInProgress$ | async"
       [showSidenav]="sidenavService.showSidenav$ | async"
       (showSidenavChange)="sidenavService.toggleSidenav()"
       (selectedItemChange)="appService.setSelectedFolder($event)"

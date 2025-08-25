@@ -8,8 +8,12 @@
     }
     <div class="add-folder">
       <div *ngIf="!showAddFolderInput && !allowMoveFolders && !selectedUserId">
-        <button (click)="showAddFolderInput = true" [disabled]="folderPlaced">Add folder</button>
-        <button (click)="doAllowMoveFolders()" [disabled]="folderPlaced">Move folders</button>
+        <button (click)="showAddFolderInput = true" [disabled]="folderPlaced" class="folder-mini-btn">
+          <span class="folder-icon material-icons-outlined">create_new_folder</span>
+        </button>
+        <button (click)="doAllowMoveFolders()" [disabled]="folderPlaced" class="folder-mini-btn">
+          <span class="folder-icon material-symbols-outlined">drag_pan</span>
+        </button>
       </div>
       <ng-container *ngIf="showAddFolderInput">
         <input type="text"
@@ -40,7 +44,7 @@
 
     <div class="tree-root-wrapper">
       <tree-root
-        [nodes]="navItems"
+        [nodes]="_navItems"
         [options]="treeOptions"
         (activate)="setSelectedItem($event)"
         (deactivate)="setSelectedItem($event)"
@@ -70,6 +74,7 @@
               <!-- *ngIf on node.id or sth like that and switch between tree-node-content and own stuff -->
               <span *ngIf="node.data.isFolder && node.isCollapsed" class="folder-icon material-icons-outlined">folder</span>
               <span *ngIf="node.data.isFolder && !node.isCollapsed" class="folder-icon material-symbols-outlined">folder_open</span>
+              <span *ngIf="!node.data.isFolder" class="folder-icon material-symbols-outlined">description</span>
               @if (renamingNode?.id === node.id) {
                 <input
                   type="text"

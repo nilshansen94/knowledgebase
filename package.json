@@ -45,7 +45,7 @@
     "font-awesome": "^4.7.0",
     "helmet": "^8.1.0",
     "marked": "^15.0.7",
-    "material-icons": "^1.13.12",
+    "material-icons": "^1.13.14",
     "material-symbols": "^0.14.6",
     "mysql2": "^3.6.0",
     "ngx-bootstrap": "^19.0.2",
