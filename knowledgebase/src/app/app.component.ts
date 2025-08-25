@@ -8,7 +8,7 @@ import {AuthService} from './services/auth/auth.service';
 import {LoginService} from './features/login/service/login.service';
 import {provideMarkdown} from 'ngx-markdown';
 import {filter, map} from 'rxjs';
-import {PATH} from './utils/paths';
+import {PATHS} from './utils/paths';
 import {NotificationComponent} from './components/notification/notification.component';
 import {NotificationService} from './services/navigation/notification.service';
 import {ContextMenuComponent} from './components/context-menu/context-menu.component';
@@ -45,13 +45,16 @@ export class AppComponent {
   currentPath$ = this.router.events.pipe(
     filter(e => e instanceof NavigationEnd),
     map((e: NavigationEnd) => {
-      if(e.url.startsWith('/' + PATH.COMMUNITY)){
-        return PATH.COMMUNITY;
+      if(e.url.startsWith('/' + PATHS.COMMUNITY)){
+        return PATHS.COMMUNITY;
       }
-      if(e.url.startsWith('/' + PATH.LOGIN)){
-        return PATH.LOGIN;
+      if(e.url.startsWith('/' + PATHS.LOGIN)){
+        return PATHS.LOGIN;
       }
-      return PATH.HOME;
+      if(e.url.startsWith('/' + PATHS.WELCOME)){
+        return PATHS.WELCOME;
+      }
+      return PATHS.HOME;
     })
   );
 

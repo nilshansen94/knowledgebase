@@ -1,0 +1,66 @@
+<div class="welcome">
+  <img src="assets/kb-logo.png" alt="Knowledgebase Logo" class="welcome-logo">
+  <h1 class="handwritten">Knowledgebase</h1>
+
+  <p class="welcome-lead">
+    Welcome to your personal knowledgebase!<br>
+    Organize your notes, ideas, and code snippets the way you need.<br>
+    Tired of struggling to find your organisation's documentation?<br>
+    With Knowledgebase, you structure your company's knowledge your way, making information retrieval a breeze.
+  </p>
+
+  <div class="features-list">
+    <div>
+      <span class="material-icons-outlined feature-icon">folder_open</span>
+      <div>
+        <strong>Personalized Organization:</strong>
+        <p>
+          Create unlimited folders and subfolders to structure your notes exactly the way you want.
+          Whether you’re managing project documentation, personal ideas, or code snippets, you have full control over your knowledge
+          structure.
+          Seamlessly integrate shared knowledge into your space, next to your personal notes.
+        </p>
+      </div>
+    </div>
+    <div>
+      <span class="material-icons-outlined feature-icon">travel_explore</span>
+      <div>
+        <strong>Discover Community Wisdom:</strong>
+        <p>Instantly see relevant notes and code snippets from other users when you search.
+          Browse the collective knowledge of the community and find inspiration, solutions,
+          and best practices that you might have missed on your own.
+          Expand your perspective and learn from others, all seamlessly integrated into your personal knowledgebase.
+        </p>
+      </div>
+    </div>
+    <div>
+      <span class="material-icons-outlined feature-icon">push_pin</span>
+      <div>
+        <strong>Pin What Matters:</strong>
+        <p>
+          Found something useful? Pin notes or code snippets from other users directly into your own folders with a single click.
+          No more endless searching or losing track of valuable information —
+          keep everything important at your fingertips, perfectly organized in your personal space.
+        </p>
+      </div>
+    </div>
+    <div>
+      <span class="material-icons-outlined feature-icon">bolt</span>
+      <div>
+        <strong>Find Information Fast:</strong>
+        <p>
+          Organize and retrieve what’s important to you, your way.
+          Decide what information to share with the world and what to keep private.
+          Stop wasting time searching through clutter—your knowledgebase puts you in control,
+          so you always find exactly what you need, when you need it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  @if(!loggedIn()){
+    <div class="cta-container">
+      <a href="/login" class="cta-button">Get Started Now</a>
+    </div>
+  }
+</div>
