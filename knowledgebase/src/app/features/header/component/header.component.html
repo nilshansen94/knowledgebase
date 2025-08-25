@@ -3,13 +3,15 @@
     <span class="material-symbols-outlined">menu</span>
   </button>
   <div id="logo">
-    <img src="assets/kb-logo.png"alt="logo, https://www.flaticon.com/free-icons/brain" [routerLink]="[PATH.HOME]" />
+    <img src="assets/kb-logo.png" alt="logo, https://www.flaticon.com/free-icons/brain" [routerLink]="[PATH.HOME]"/>
   </div>
-  <!--<span id="logo">Logo</span>-->
   <div class="justify-between">
     <div class="nav-items">
-      <a [routerLink]="[PATH.HOME]" [class.active]="currentPath === PATH.HOME">Snippets</a>
-      <a [routerLink]="[PATH.COMMUNITY]" [class.active]="currentPath === PATH.COMMUNITY">Community</a>
+      <a [routerLink]="[PATH.WELCOME]" [class.active]="currentPath === PATH.WELCOME">Home</a>
+      @if (isLoggedIn) {
+        <a [routerLink]="[PATH.HOME]" [class.active]="currentPath === PATH.HOME">Snippets</a>
+        <a [routerLink]="[PATH.COMMUNITY]" [class.active]="currentPath === PATH.COMMUNITY">Community</a>
+      }
     </div>
     <div class="header-right">
       <a *ngIf="!isLoggedIn" [routerLink]="[PATH.LOGIN]" [class.active]="currentPath === PATH.LOGIN">Login</a>

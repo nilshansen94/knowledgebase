@@ -13,7 +13,6 @@ import {SnippetsService} from '../../snippets/service/snippets.service';
   standalone: true,
   imports: [CommonModule, CommunityComponent],
   template: `
-    <h1>Community</h1>
     <app-community
       [users]="users$ | async"
       [communitySnippets]="communitySnippets$ | async"
@@ -33,7 +32,7 @@ export class CommunityContainerComponent {
     public snippetService: SnippetsService,
   ) {}
 
-  private searchCommunitySnippet = new BehaviorSubject<string>('');
+  private readonly searchCommunitySnippet = new BehaviorSubject<string>('');
 
   users$ = this.httpService.get('users').pipe(
     map(users => users as DbUser[])
