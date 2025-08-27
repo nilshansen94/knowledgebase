@@ -13,7 +13,7 @@ import {PagingService} from '../../snippets/service/paging.service';
   standalone: true,
   imports: [CommonModule, HomeComponent],
   template: `
-    <h1>{{ (sidenavService.currentFolder$ | async)?.name || 'My Snippets' }}</h1>
+    <h1>{{ (sidenavService.currentFolder$ | async)?.name || 'My knowledgebase' }}</h1>
     <app-home
         [snippets]="snippetsService.snippets$ | async"
         [updateResult]="snippetsService.updateResult$ | async"

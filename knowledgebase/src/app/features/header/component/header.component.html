@@ -9,7 +9,7 @@
     <div class="nav-items">
       <a [routerLink]="[PATH.WELCOME]" [class.active]="currentPath === PATH.WELCOME">Home</a>
       @if (isLoggedIn) {
-        <a [routerLink]="[PATH.HOME]" [class.active]="currentPath === PATH.HOME">Snippets</a>
+        <a [routerLink]="[PATH.HOME]" [class.active]="currentPath === PATH.HOME">Knowledgebase</a>
         <a [routerLink]="[PATH.COMMUNITY]" [class.active]="currentPath === PATH.COMMUNITY">Community</a>
       }
     </div>

@@ -8,10 +8,10 @@
     }
     <div class="add-folder">
       <div *ngIf="!showAddFolderInput && !allowMoveFolders && !selectedUserId">
-        <button (click)="showAddFolderInput = true" [disabled]="folderPlaced" class="folder-mini-btn">
+        <button (click)="showAddFolderInput = true" [disabled]="folderPlaced" class="folder-mini-btn" tooltip="Create a new folder" placement="bottom" [delay]="300">
           <span class="folder-icon material-icons-outlined">create_new_folder</span>
         </button>
-        <button (click)="doAllowMoveFolders()" [disabled]="folderPlaced" class="folder-mini-btn">
+        <button (click)="doAllowMoveFolders()" [disabled]="folderPlaced" class="folder-mini-btn" tooltip="Move folders and snippets" placement="bottom" [delay]="300">
           <span class="folder-icon material-symbols-outlined">drag_pan</span>
         </button>
       </div>

@@ -7,11 +7,12 @@ import {KbTreeNode} from '../api/kb-tree-node';
 import {Snippet} from '../../snippets/api/snippet';
 import {ContextMenuItem} from '../../../components/context-menu/context-menu.component';
 import {ContextMenuDirective} from '../../../components/context-menu/context-menu.directive';
+import {TooltipDirective} from 'ngx-bootstrap/tooltip';
 
 @Component({
   selector: 'app-sidenav',
   standalone: true,
-  imports: [CommonModule, FormsModule, TreeModule, ContextMenuDirective],
+  imports: [CommonModule, FormsModule, TreeModule, ContextMenuDirective, TooltipDirective],
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
   //todo onPush in all pure components !!
