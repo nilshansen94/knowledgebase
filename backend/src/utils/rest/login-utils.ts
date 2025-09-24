@@ -7,6 +7,7 @@ export const verifyLogin = async (req, res, next) => {
   if(req.isAuthenticated() && req.session.isRegistered) {
     return next();
   }
+  console.log('verifyLogin denied', req.isAuthenticated(), req.session.isRegistered);
   return res.status(403).send({message: 'Login by oauth denied'});
   // await verifyByDb(req, res, next);
 }
@@ -14,12 +15,15 @@ export const verifyLogin = async (req, res, next) => {
 export async function googleCallback(req: any, res: Response) {
   console.log('verify in callback')
   const user = req.user;
+  console.log('login google callback: user emails ', user.emails);
   const userEmail = req.user.emails.find(e => e.verified === true).value;
   req.session.email = userEmail;
   const existingUser = await userExists(userEmail);
+  console.log('user exists ' + JSON.stringify(existingUser))
   if (existingUser) {
     req.session.userId = user.userId;
     req.session.isRegistered = true;
+    console.log('session after login ' + JSON.stringify(req.session));
     res.redirect(process.env['UI_URL']);
   } else {
     res.redirect(process.env['UI_URL'] + '/register');
@@ -52,7 +56,8 @@ export async function checkUsername(req: Request, res: Response) {
 }
 
 export async function registerUser(req: Request, res: Response){
-  console.log('register request', req.session.email)
+  console.log('register request', req.session.email);
+  console.log('register, session is ', req.session);
   if (!req.session.email || req.session.isRegistered) {
     return res.status(400).json({success: false, message: 'Invalid registration attempt'});
   }
@@ -71,7 +76,6 @@ export async function registerUser(req: Request, res: Response){
     req.session.isRegistered = true;
     return res.json({success: true});
   } catch (error) {
-
     return res.status(400).json({success: false, message: 'Registration failed'});
   }
 }

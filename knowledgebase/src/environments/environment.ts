@@ -4,8 +4,10 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://localhost:3333/',
-  OAUTH_CALLBACK_URL: 'http://localhost:3333/auth/google',
+  baseUrl: 'http://localhost:3333/api/',
+  //baseUrl: 'https://localhost:8443/api/',
+  OAUTH_CALLBACK_URL: 'http://localhost:3333/api/auth/google',
+  //OAUTH_CALLBACK_URL: 'https://localhost:8443/api/auth/google',
 };
 
 /*

@@ -12,7 +12,9 @@ export class MyHttpService {
 
   options = {withCredentials: true};
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    console.log('myHttpService baseUrl: ' + this.baseUrl);
+  }
 
   get(path: string) {
     console.debug('http-get', this.baseUrl + path)
