@@ -7,15 +7,33 @@
   </div>
   <div class="justify-between">
     <div class="nav-items">
-      <a [routerLink]="[PATH.WELCOME]" [class.active]="currentPath === PATH.WELCOME">Home</a>
+      <div class="nav-item" [class.active]="currentPath === PATH.WELCOME">
+        <a [routerLink]="[PATH.WELCOME]" class="material-symbols-outlined mobile">home</a>
+        <a [routerLink]="[PATH.WELCOME]" class="desktop">Home</a>
+      </div>
       @if (isLoggedIn) {
-        <a [routerLink]="[PATH.HOME]" [class.active]="currentPath === PATH.HOME">Knowledgebase</a>
-        <a [routerLink]="[PATH.COMMUNITY]" [class.active]="currentPath === PATH.COMMUNITY">Community</a>
+        <div class="nav-item" [class.active]="currentPath === PATH.HOME">
+          <a [routerLink]="[PATH.HOME]" class="material-symbols-outlined mobile" style="transform: scaleX(-1)">clarify</a>
+          <a [routerLink]="[PATH.HOME]" class="desktop">Knowledgebase</a>
+        </div>
+        <div class="nav-item" [class.active]="currentPath === PATH.COMMUNITY">
+          <a [routerLink]="[PATH.COMMUNITY]" class="material-symbols-outlined mobile">groups</a>
+          <a [routerLink]="[PATH.COMMUNITY]" class="desktop">Community</a>
+        </div>
       }
     </div>
     <div class="header-right">
-      <a *ngIf="!isLoggedIn" [routerLink]="[PATH.LOGIN]" [class.active]="currentPath === PATH.LOGIN">Login</a>
-      <a *ngIf="isLoggedIn" (click)="emitLogout()" [routerLink]="[]">Logout</a>
+      @if(!isLoggedIn) {
+        <div class="nav-item" [class.active]="currentPath === PATH.LOGIN">
+          <a [routerLink]="[PATH.LOGIN]" class="material-symbols-outlined mobile">login</a>
+          <a [routerLink]="[PATH.LOGIN]" class="desktop">Login</a>
+        </div>
+      } @else {
+        <div class="nav-item">
+          <a (click)="emitLogout()" [routerLink]="[]" class="desktop">Logout</a>
+          <a (click)="emitLogout()" [routerLink]="[]" class="material-symbols-outlined mobile">logout</a>
+        </div>
+      }
     </div>
   </div>
 </header>

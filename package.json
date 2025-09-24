@@ -8,7 +8,7 @@
     "kb:serve": "nx serve knowledgebase",
     "kb:build:local": "nx build knowledgebase --base-href='' --output-path='/Applications/MAMP/htdocs/kb-rest-build/'",
     "kb:build": "nx build knowledgebase",
-    "kb:build:prod": "nx build knowledgebase --prod",
+    "kb:build:prod": "nx build knowledgebase --prod --skip-nx-cache",
     "kb:test": "nx test knowledgebase",
     "backend:build:prod": "nx build backend --prod",
     "backend:serve": "nx serve backend",
@@ -16,8 +16,9 @@
     "kb:storybook:start": "nx run knowledgebase:storybook",
     "kb:storybook:build": "nx run knowledgebase:build-storybook",
     "kb:storybook:test": "nx run knowledgebase:test-storybook",
+    "http-server": "http-server dist/knowledgebase -p 4262 --tls -C https2/cert.pem -K https2/key.pem",
     "docker:build": "docker compose build --no-cache",
-    "docker:up":  "docker compose up"
+    "docker:up": "docker compose up"
   },
   "private": true,
   "dependencies": {
@@ -116,6 +117,7 @@
     "jsonc-eslint-parser": "^2.1.0",
     "nodemon": "^3.0.1",
     "nx": "20.4.6",
+    "pm2": "^6.0.8",
     "prettier": "^2.6.2",
     "storybook": "^8.4.6",
     "ts-jest": "^29.1.0",

@@ -18,6 +18,8 @@ import helmet from 'helmet';
 import {setupDb} from './utils/db/db-setup';
 import {configDotenv} from 'dotenv';
 import {logger} from './utils/logger';
+import * as https from 'https';
+import * as fs from 'fs';
 
 configDotenv();
 const app = express();
@@ -33,9 +35,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // Only transmit over HTTPS
-    httpOnly: true, // Prevent XSS
-    sameSite: 'strict', // Prevent CSRF
+    secure: process.env.NODE_ENV === 'production',// Only transmit over HTTPS
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none': 'strict', // Prevent CSRF
     maxAge: +process.env.SESSION_MAX_AGE, // 1 day expiry
   }
 }));
@@ -49,15 +51,18 @@ app.use(helmet({
 app.use(cookieParser());
 
 setupDb().then(res => {
+  logger.info('DB setup successful', res);
   console.log('DB setup successful', res)
 }).catch(e => {
+  logger.info('DB setup failed,', e.stack.split('\n')[0]);
   console.log('DB setup failed,', e.stack.split('\n')[0]);
 });
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.OAUTH_CALLBACK_URL
+    callbackURL: process.env.OAUTH_CALLBACK_URL,
+    verbose: true,
   },
   async function (accessToken, refreshToken, profile, cb) {
     const userEmail = profile.emails.find(e => e.verified === true).value;
@@ -84,7 +89,7 @@ passport.deserializeUser((user, done) => {
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.get('/auth/google',
+app.get('/api/auth/google',
   passport.authenticate('google', {scope: ['profile', 'email']}));
 
 app.get('/api/auth/callback/google',
@@ -106,25 +111,20 @@ declare module 'express-session' {
   }
 }
 
-//index.html
-app.get('/', function(req, res) {
-  res.json('{"success: "true"}')
-});
-
-app.get('/check-username/:username', async (req, res) => {
+app.get('/api/check-username/:username', async (req, res) => {
   return await checkUsername(req, res);
 });
 
-app.put('/register', async (req, res) => {
+app.put('/api/register', async (req, res) => {
   return await registerUser(req, res);
 })
 
-app.get('/checkLogin', [verifyLogin], (req, res) => {
+app.get('/api/checkLogin', [verifyLogin], (req, res) => {
   res.json({success: true});
   res.end();
 });
 
-app.get('/logout', async (req, res) => {
+app.get('/api/logout', async (req, res) => {
   req.logout(() => {
     req.session.destroy((e) => {
       console.warn('Logout: Could not destroy session', e);
@@ -135,72 +135,85 @@ app.get('/logout', async (req, res) => {
   });
 })
 
-app.get('/folders', [verifyLogin], async (req, res) => {
+app.get('/api/folders', [verifyLogin], async (req, res) => {
   return await getFolders(req, res);
 });
 
-app.put('/addFolder', [verifyLogin], async (req, res) => {
+app.put('/api/addFolder', [verifyLogin], async (req, res) => {
   return await addFolder(req, res);
 })
 
-app.post('/renameFolder', [verifyLogin], async (req, res) => {
+app.post('/api/renameFolder', [verifyLogin], async (req, res) => {
   return await renameFolder(req, res);
 })
 
-app.post('/moveFolders', [verifyLogin], async (req, res) => {
+app.post('/api/moveFolders', [verifyLogin], async (req, res) => {
   return await moveFolders(req, res);
 })
 
-app.delete('/folder/:id', [verifyLogin], async (req, res) => {
+app.delete('/api/folder/:id', [verifyLogin], async (req, res) => {
   return await deleteFolder(req, res);
 })
 
-app.post('/moveSnippets', [verifyLogin], async (req, res) => {
+app.post('/api/moveSnippets', [verifyLogin], async (req, res) => {
   return await moveSnippets(req, res);
 })
 
-app.get('/snippets/:folderId?', [verifyLogin], async (req, res) => {
+app.get('/api/snippets/:folderId?', [verifyLogin], async (req, res) => {
   return await getSnippets(req, res);
 })
 
-app.put('/snippet', [verifyLogin], async (req, res) => {
+app.put('/api/snippet', [verifyLogin], async (req, res) => {
   return await addSnippet(req, res);
 })
 
-app.post('/snippet', [verifyLogin], async (req, res) => {
+app.post('/api/snippet', [verifyLogin], async (req, res) => {
   return await updateSnippet(req, res);
 })
 
-app.post('/snippet-public', [verifyLogin], async (req, res) => {
+app.post('/api/snippet-public', [verifyLogin], async (req, res) => {
   return await toggleSnippetPublic(req, res);
 })
 
 /** pin or unpin a foreign snippet in your folder */
-app.post('/snippet-pin', [verifyLogin], async (req, res) => {
+app.post('/api/snippet-pin', [verifyLogin], async (req, res) => {
   return await pinSnippet(req, res);
 })
 
-app.delete('/snippet/:id', [verifyLogin], async (req, res) => {
+app.delete('/api/snippet/:id', [verifyLogin], async (req, res) => {
   return await deleteSnippet(req, res);
 })
 
-app.get('/users', [verifyLogin], async (req, res) => {
+app.get('/api/users', [verifyLogin], async (req, res) => {
   return await getUsers(req, res);
 })
 
-app.get('/username/:id', [verifyLogin], async (req, res) => {
+app.get('/api/username/:id', [verifyLogin], async (req, res) => {
   return await getUserName(req, res);
 })
 
-app.get('/communitySnippets/:search?', [verifyLogin], async (req, res) => {
+app.get('/api/communitySnippets/:search?', [verifyLogin], async (req, res) => {
   return await getCommunitySnippets(req, res);
 })
 
-app.get('/version', (req, res) => {
+app.get('/api/version', (req, res) => {
   console.log('get version', {version: process.env.npm_package_version});
   res.json({version: process.env.npm_package_version});
   res.end();
 })
+
+const certificate = fs.readFileSync(process.env.SSH_CERTIFICATE, 'utf8');
+const privateKey  = fs.readFileSync(process.env.SSH_PRIVATE_KEY, 'utf8');
+const credentials = {key: privateKey, cert: certificate};// passphrase: 'asdf'
+const httpsServer = https.createServer(credentials, app);
+httpsServer.listen(8443, () => {
+  console.log(`https server listening on port 8443`);
+  logger.info('https server listening on port 8443');
+});
+httpsServer.on('error', e => {
+  console.log('https server error', e);
+  logger.info('https server error' + JSON.stringify(e));
+});
 
 const port = +(process.env.PORT);
 const host = process.env.HOST;
@@ -208,4 +221,7 @@ const server = app.listen(port, host, () => {
   console.log(`Listening at ${host}:${port}/api`);
   logger.info(`Listening at ${host}:${port}/api`);
 });
-server.on('error', console.error);
+server.on('error', e => {
+  console.error(e);
+  logger.error(e);
+});

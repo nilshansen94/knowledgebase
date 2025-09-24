@@ -1,4 +1,11 @@
-<button id="add-snippet-btn" *ngIf="!addSnippet && !editingSnippet" (click)="addSnippet = !addSnippet" [disabled]="!hasFolders">add Snippet</button>
+<button id="add-snippet-btn"
+        class="material-symbols-outlined"
+        *ngIf="!addSnippet && !editingSnippet" (click)="addSnippet = !addSnippet"
+        [disabled]="!hasFolders"
+        tooltip="add item"
+        placement="bottom"
+        [delay]="300"
+>add_notes</button>
 
 <div class="editor" *ngIf="addSnippet || editingSnippet">
   <input type="text" placeholder="title" [(ngModel)]="newSnippetTitle">

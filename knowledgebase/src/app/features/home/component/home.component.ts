@@ -19,11 +19,12 @@ import {DbResult} from '@kb-rest/shared';
 import {SearchComponent} from '../../../components/search/search.component';
 import {Folder} from '../../sidenav/api/folder';
 import {NgxMasonryModule} from 'ngx-masonry';
+import {TooltipDirective} from 'ngx-bootstrap/tooltip';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, LMarkdownEditorModule, SnippetComponent, SearchComponent, NgxMasonryModule],
+  imports: [CommonModule, FormsModule, LMarkdownEditorModule, SnippetComponent, SearchComponent, NgxMasonryModule, TooltipDirective],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

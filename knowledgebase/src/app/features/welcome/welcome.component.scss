@@ -94,3 +94,12 @@ h1 {
 .cta-button:hover {
   background: variables.$blue-dark-20;
 }
+
+@media (max-width: variables.$media-query) {
+  h1 {
+    font-size: 4rem;
+  }
+  .features-list > div {
+    flex-direction: column;
+  }
+}
