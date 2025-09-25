@@ -68,6 +68,8 @@ export class SidenavComponent {
     }
   }
 
+  @Input() isMobile: boolean;
+
   @Input() selectedItemId: number;
 
   @Input()

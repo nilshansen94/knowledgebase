@@ -47,6 +47,10 @@ export class SidenavService {
     this.showSidenav.next(!this.showSidenav.getValue());
   }
 
+  hideSidenav() {
+    this.showSidenav.next(false);
+  }
+
   private foldersRefresh = new BehaviorSubject<void>(undefined);
 
   private addingFolderInProgress = new BehaviorSubject<boolean>(false);

@@ -63,6 +63,7 @@
             }
           ],
           "outputHashing": "all",
+          "outputPath": "dist/ui-aws",
           "fileReplacements": [
             {
               "replace": "knowledgebase/src/environments/environment.ts",
@@ -77,6 +78,16 @@
           "extractLicenses": false,
           "sourceMap": true,
           "namedChunks": true
+        },
+        "local-tls": {
+          "sourceMap": true,
+          "outputPath": "dist/ui-local-tls",
+          "fileReplacements": [
+            {
+              "replace": "knowledgebase/src/environments/environment.ts",
+              "with": "knowledgebase/src/environments/environment.local-tls.ts"
+            }
+          ]
         }
       },
       "defaultConfiguration": "production"
@@ -88,8 +99,11 @@
           "buildTarget": "knowledgebase:build:production"
         },
         "development": {
-          "buildTarget": "knowledgebase:build:development",
-          "port": 4260
+          "buildTarget": "knowledgebase:build:local-tls",
+          "port": 4262,
+          "host": "127.0.0.1",
+          "sslKey": "https2/key.pem",
+          "sslCert": "https2/cert.pem"
         }
       },
       "defaultConfiguration": "development"

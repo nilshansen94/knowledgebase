@@ -20,8 +20,12 @@
         "webpackConfig": "backend/webpack.config.js"
       },
       "configurations": {
-        "development": {},
-        "production": {}
+        "development": {
+          "outputPath": "dist/backend-local"
+        },
+        "production": {
+          "outputPath": "dist/backend-aws"
+        }
       }
     },
     "serve": {

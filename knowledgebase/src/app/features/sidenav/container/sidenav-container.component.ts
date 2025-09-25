@@ -24,7 +24,7 @@ import {NotificationService} from '../../../services/navigation/notification.ser
       [addingFolderInProgress]="sidenavService.addingFolderInProgress$ | async"
       [showSidenav]="sidenavService.showSidenav$ | async"
       (showSidenavChange)="sidenavService.toggleSidenav()"
-      (selectedItemChange)="appService.setSelectedFolder($event)"
+      (selectedItemChange)="selectedItemChange($event)"
       (newFolder)="addFolder($event)"
       (movedFolders)="sidenavService.moveFolders($event)"
       (movedSnippets)="sidenavService.moveSnippets($event)"
@@ -38,13 +38,24 @@ import {NotificationService} from '../../../services/navigation/notification.ser
 export class SidenavContainerComponent {
   renameComplete = false;
   deleteComplete = false;
+  public isMobile: boolean;
 
   constructor(
     public sidenavService: SidenavService,
     public appService: AppService,
     public snippetService: SnippetsService,
     private notificationService: NotificationService,
-  ) {}
+  ) {
+    // todo replace with breakpointObserver
+    this.isMobile = window.innerWidth < 768;
+  }
+
+  public selectedItemChange(folder: Folder) {
+    this.appService.setSelectedFolder(folder);
+    if(this.isMobile) {
+      this.sidenavService.hideSidenav();
+    }
+  }
 
   public renameFolder(folder: Folder) {
     this.renameComplete = false;

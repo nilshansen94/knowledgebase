@@ -214,14 +214,3 @@ httpsServer.on('error', e => {
   console.log('https server error', e);
   logger.info('https server error' + JSON.stringify(e));
 });
-
-const port = +(process.env.PORT);
-const host = process.env.HOST;
-const server = app.listen(port, host, () => {
-  console.log(`Listening at ${host}:${port}/api`);
-  logger.info(`Listening at ${host}:${port}/api`);
-});
-server.on('error', e => {
-  console.error(e);
-  logger.error(e);
-});
