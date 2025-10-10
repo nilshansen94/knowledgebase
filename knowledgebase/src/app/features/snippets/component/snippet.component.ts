@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {Snippet} from '../api/snippet';
+import {Snippet} from '@kb-rest/shared';
 import {MarkdownComponent} from 'ngx-markdown';
 import {RouterLink} from '@angular/router';
 
@@ -18,6 +18,8 @@ export class SnippetComponent {
   pendingRequest = false;
 
   @Input() canEdit: boolean;
+
+  @Input() canPin: boolean;
 
   @Input() pinWithModal: boolean;
 

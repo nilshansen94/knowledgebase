@@ -1,4 +1,4 @@
-import {Folder} from './folder';
+import {Folder} from '@kb-rest/shared';
 
 export interface KbTreeNode extends Folder{
   isFolder: boolean;

@@ -2,9 +2,9 @@ import {Component, DestroyRef, EventEmitter, Input, OnInit, Output} from '@angul
 import {BsModalRef} from 'ngx-bootstrap/modal';
 import {KbTreeNode} from '../../features/sidenav/api/kb-tree-node';
 import {SidenavComponent} from '../../features/sidenav/component/sidenav.component';
-import {Folder} from '../../features/sidenav/api/folder';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {tap} from 'rxjs';
+import {Folder} from '@kb-rest/shared';
 
 @Component({
   selector: 'kb-rest-modal-folder-selection',

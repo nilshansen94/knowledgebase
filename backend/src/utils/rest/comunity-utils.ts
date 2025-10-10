@@ -29,7 +29,7 @@ export async function getCommunitySnippets(req: Request, res: Response) {
     res.end();
     return;
   }
-  const query = `SELECT snippet.*, kb_user.name,
+  const query = `SELECT snippet.*, kb_user.name as user_name,
        MATCH(title, content) against($search) as r1, match(title) against($search) as r2
        FROM usr_fold_snip
               join kb_user on kb_user.id = usr_fold_snip.user_id

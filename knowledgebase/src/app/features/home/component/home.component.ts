@@ -13,11 +13,9 @@ import {
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {LMarkdownEditorModule} from 'ngx-markdown-editor';
-import {Snippet} from '../../snippets/api/snippet';
+import {DbResult, Folder, Snippet} from '@kb-rest/shared';
 import {SnippetComponent} from '../../snippets/component/snippet.component';
-import {DbResult} from '@kb-rest/shared';
 import {SearchComponent} from '../../../components/search/search.component';
-import {Folder} from '../../sidenav/api/folder';
 import {NgxMasonryModule} from 'ngx-masonry';
 import {TooltipDirective} from 'ngx-bootstrap/tooltip';
 

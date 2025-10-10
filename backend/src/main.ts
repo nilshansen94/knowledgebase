@@ -20,6 +20,10 @@ import {configDotenv} from 'dotenv';
 import {logger} from './utils/logger';
 import * as https from 'https';
 import * as fs from 'fs';
+import multer from 'multer';
+import {exportData, getMyUsername, importData} from './utils/rest/profile-utils';
+
+const myMulter = multer({ storage: multer.memoryStorage() });
 
 configDotenv();
 const app = express();
@@ -136,7 +140,9 @@ app.get('/api/logout', async (req, res) => {
 })
 
 app.get('/api/folders', [verifyLogin], async (req, res) => {
-  return await getFolders(req, res);
+  const folders = await getFolders(req, res);
+  res.json(folders);
+  return res;
 });
 
 app.put('/api/addFolder', [verifyLogin], async (req, res) => {
@@ -192,6 +198,10 @@ app.get('/api/username/:id', [verifyLogin], async (req, res) => {
   return await getUserName(req, res);
 })
 
+app.get('/api/my-username', [verifyLogin], async (req, res) => {
+  return await getMyUsername(req, res);
+})
+
 app.get('/api/communitySnippets/:search?', [verifyLogin], async (req, res) => {
   return await getCommunitySnippets(req, res);
 })
@@ -201,6 +211,19 @@ app.get('/api/version', (req, res) => {
   res.json({version: process.env.npm_package_version});
   res.end();
 })
+
+app.get('/api/export', [verifyLogin], async (req, res ) => {
+  console.log('exportData starting');
+  const data = await exportData(req, res);
+  const jsonString = JSON.stringify(data, null, 2);
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="export.json"');
+  res.send(jsonString);
+})
+
+app.post('/api/import', [verifyLogin, myMulter.single('importData')], async (req, res) => {
+  await importData(req, res);
+});
 
 const certificate = fs.readFileSync(process.env.SSH_CERTIFICATE, 'utf8');
 const privateKey  = fs.readFileSync(process.env.SSH_PRIVATE_KEY, 'utf8');

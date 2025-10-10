@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
-import {Folder} from '../../api';
 import {listToTree} from '../list-to-tree';
 import {deleteFrom, getTransaction, insert, select, update} from '../db/db-config';
+import {Folder} from '@kb-rest/shared';
 
 export async function getFolders(req: Request, res: Response){
   /*
@@ -12,11 +12,20 @@ export async function getFolders(req: Request, res: Response){
     group by folder
     order by folder.name;
   */
+  const loggedInUser = req.session.userId;
   const userParam = req.query.user as string;
-  const rows = await select('select * from folder where user_id = $id order by name', {id: userParam ? userParam: req.session.userId});
+  let query = 'select * from folder where user_id = $id order by name';
+  if(userParam && +userParam !== loggedInUser) {
+    query = `SELECT folder.* FROM folder
+        JOIN usr_fold_snip ON usr_fold_snip.folder = folder.id
+        JOIN snippet ON snippet.id = usr_fold_snip.snip_id
+        WHERE snippet.public = true
+        AND usr_fold_snip.user_id = $id
+        GROUP BY folder.id`;
+  }
+  const rows = await select(query, {id: userParam ? userParam: req.session.userId});
   const tree: Folder[] = listToTree(rows as Folder[]);
-  res.json(tree);
-  return res;
+  return tree;
 }
 
 export async function addFolder(req: Request, res: Response) {

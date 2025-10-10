@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {BehaviorSubject, distinctUntilChanged, filter, map, tap} from 'rxjs';
-import {Folder} from '../../features/sidenav/api/folder';
+import {Folder} from '@kb-rest/shared';
 import {PATHS} from '../../utils/paths';
 import {MyHttpService} from '../http/my-http.service';
 
@@ -13,7 +13,7 @@ export class AppService {
   //todo move all to sidenavService ?
   hideNav$ = this.router.events.pipe(
     filter(e => e instanceof NavigationEnd),
-    map((e: NavigationEnd) => [PATHS.LOGIN, PATHS.COMMUNITY, PATHS.WELCOME].map(p => '/' + p).includes(e.url)),
+    map((e: NavigationEnd) => [PATHS.LOGIN, PATHS.COMMUNITY, PATHS.WELCOME, PATHS.PROFILE].map(p => '/' + p).includes(e.url)),
   );
 
   private selectedFolder = new BehaviorSubject<number>(undefined);

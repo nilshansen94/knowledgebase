@@ -14,13 +14,11 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs';
-import {Folder} from '../api/folder';
+import {Folder, Snippet, SnippetPinRequest} from '@kb-rest/shared';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {AppService} from '../../../services/app/app.service';
 import {SnippetsService} from '../../snippets/service/snippets.service';
 import {KbTreeNode} from '../api/kb-tree-node';
-import {Snippet} from '../../snippets/api/snippet';
-import {SnippetPinRequest} from '@kb-rest/shared';
 import {ActivatedRoute} from '@angular/router';
 import {ModalService} from '../../../services/modal/modal.service';
 import {AuthService} from '../../../services/auth/auth.service';

@@ -4,7 +4,7 @@ import {CommunityComponent} from '../component/community.component';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {BehaviorSubject, map, switchMap} from 'rxjs';
 import {DbUser} from '../../../../../../backend/src/api';
-import {Snippet} from '../../snippets/api/snippet';
+import {Snippet} from '@kb-rest/shared';
 import {SidenavService} from '../../sidenav/service/sidenav.service';
 import {SnippetsService} from '../../snippets/service/snippets.service';
 

@@ -54,6 +54,9 @@ export class AppComponent {
       if(e.url.startsWith('/' + PATHS.WELCOME)){
         return PATHS.WELCOME;
       }
+      if(e.url.startsWith('/' + PATHS.PROFILE)){
+        return PATHS.PROFILE;
+      }
       return PATHS.HOME;
     })
   );

@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, catchError, combineLatest, map, Observable, of, shareReplay, Subject, switchMap, take, tap} from 'rxjs';
 import {MyHttpService} from '../../../services/http/my-http.service';
-import {Snippet} from '../api/snippet';
+import {DbResult, Snippet, SnippetPinRequest} from '@kb-rest/shared';
 import {AppService} from '../../../services/app/app.service';
 import {ActivatedRoute} from '@angular/router';
-import {DbResult, SnippetPinRequest} from '@kb-rest/shared';
 import {PagingService} from './paging.service';
 
 @Injectable({
@@ -77,6 +76,7 @@ export class SnippetsService {
        if (mappedSnippets) {
          this.snippetsStore.set(this.pagingService.getCurrentPage(), mappedSnippets);
        }
+       //console.log(Array.from(this.snippetsStore.values()));
 
        // Get all snippets from the store, ordered by page
        return Array.from(this.snippetsStore.entries())

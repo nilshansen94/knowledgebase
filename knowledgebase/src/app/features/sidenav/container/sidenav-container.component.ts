@@ -4,7 +4,7 @@ import {SidenavComponent} from '../component/sidenav.component';
 import {SidenavService} from '../service/sidenav.service';
 import {AppService} from '../../../services/app/app.service';
 import {SnippetsService} from '../../snippets/service/snippets.service';
-import {Folder} from '../api/folder';
+import {Folder} from '@kb-rest/shared';
 import {catchError, tap} from 'rxjs/operators';
 import {NotificationService} from '../../../services/navigation/notification.service';
 
