@@ -110,6 +110,10 @@ p {
   gap: 0.25rem;
 }
 
+::ng-deep .hideNav .add-folder {
+  display: none;
+}
+
 .folder-mini-btn {
   border-radius: 100% !important;
   padding: 0 3px;
