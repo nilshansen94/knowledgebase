@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
 
@@ -12,7 +12,8 @@ import {ReactiveFormsModule} from '@angular/forms';
 })
 export class LoginPageComponent {
 
-  //https://console.cloud.google.com
+  @Input()
+  redirectedFromRegistration: boolean;
 
   @Output()
   loginByGoogle = new EventEmitter<void>();

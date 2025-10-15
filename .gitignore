@@ -41,6 +41,8 @@ testem.log
 .env
 .env*
 main.log
+/https
+/https2
 
 # System Files
 .DS_Store

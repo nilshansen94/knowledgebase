@@ -41,7 +41,7 @@ export class RegistrationContainerComponent {
       this.registrationService.register(username).pipe(
         map((response: RegistrationResponse) => {
           if (response.success) {
-            this.router.navigate(['/']);
+            this.router.navigate(['/login'], {queryParams: {redirectedFromRegistration: true}});
           }
           return response;
         }),
