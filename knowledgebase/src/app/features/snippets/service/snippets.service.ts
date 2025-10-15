@@ -48,7 +48,7 @@ export class SnippetsService {
          return of(null);
        }
        this.pagingService.setLoading(true);
-       console.log('get snippets' + folder + params);
+       //console.log('get snippets' + folder + params);
        return this.httpService.get('snippets' + folder + params);
      }),
      catchError(e => {
@@ -76,7 +76,6 @@ export class SnippetsService {
        if (mappedSnippets) {
          this.snippetsStore.set(this.pagingService.getCurrentPage(), mappedSnippets);
        }
-       //console.log(Array.from(this.snippetsStore.values()));
 
        // Get all snippets from the store, ordered by page
        return Array.from(this.snippetsStore.entries())
