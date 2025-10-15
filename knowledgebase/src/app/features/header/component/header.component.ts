@@ -27,6 +27,8 @@ export class HeaderComponent {
   @Output()
   toggleSidenav = new EventEmitter<void>();
 
+  @Input() communityUserName: string;
+
   emitLogout() {
     this.logout.emit();
   }

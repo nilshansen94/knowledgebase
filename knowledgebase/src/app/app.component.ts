@@ -1,18 +1,19 @@
 import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {SidenavContainerComponent} from './features/sidenav/container/sidenav-container.component';
 import {HeaderComponent} from './features/header/component/header.component';
 import {AppService} from './services/app/app.service';
 import {AuthService} from './services/auth/auth.service';
 import {LoginService} from './features/login/service/login.service';
 import {provideMarkdown} from 'ngx-markdown';
-import {filter, map} from 'rxjs';
+import {combineLatestWith, filter, map, of, switchMap} from 'rxjs';
 import {PATHS} from './utils/paths';
 import {NotificationComponent} from './components/notification/notification.component';
 import {NotificationService} from './services/navigation/notification.service';
 import {ContextMenuComponent} from './components/context-menu/context-menu.component';
 import {SidenavService} from './features/sidenav/service/sidenav.service';
+import {MyHttpService} from './services/http/my-http.service';
 
 @Component({
   selector: 'app-root',
@@ -40,6 +41,8 @@ export class AppComponent {
     private router: Router,
     public notificationService: NotificationService,
     private sidenavService: SidenavService,
+    private activatedRoute: ActivatedRoute,
+    private http: MyHttpService,
   ) {}
 
   currentPath$ = this.router.events.pipe(
@@ -59,6 +62,23 @@ export class AppComponent {
       }
       return PATHS.HOME;
     })
+  );
+
+  communityUserName$ = this.currentPath$.pipe(
+    combineLatestWith(this.activatedRoute.queryParamMap),
+    map(([path, params]) => {
+      if(path === PATHS.HOME && params.has('user')) {
+        return + params.get('user');
+      }
+      return -1;
+    }),
+    switchMap(userId => {
+      if(userId < 0) {
+        return of(null);
+      }
+      return this.http.get2<{name: string}>('username/' + userId);
+    }),
+    map(res => res?.name),
   );
 
   toggleSidenav() {
