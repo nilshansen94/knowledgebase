@@ -14,7 +14,8 @@ export class ModalService {
   openSelectFolderModal(state: {folders: KbTreeNode[]}): Promise<Folder>{
     const initialState: ModalOptions = {
       initialState: {
-        ...state
+        ...state,
+        allowAddFolder: false,
       }
     };
     const bsModalRef = this.modalService.show(ModalFolderSelectionComponent, initialState);

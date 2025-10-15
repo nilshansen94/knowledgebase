@@ -75,7 +75,7 @@ export class SidenavComponent {
   snippets: Snippet[];
 
   @Input()
-  selectedUserId: number;
+  allowAddFolder: boolean;
 
   @Input()
   selectedUserName: string;
