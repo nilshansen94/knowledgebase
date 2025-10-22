@@ -29,7 +29,7 @@ export async function getSnippets(req: Request, res: Response) {
   const userParam = +req.query.user;
   //console.log('get snippets for user', userId, 'and folder', req.params.folderId)
   //https://stackoverflow.com/questions/53945089/nodejs-await-async-with-nested-mysql-query
-  const rows = await select('select * from folder where user_id = $1', [userParam ? userParam: loggedInUserId]);
+  const rows = await select('select * from folder where user_id = $1', [Number.isNaN(userParam) ? loggedInUserId:userParam]);
   //console.log('folders from query', rows)
   const tree = listToTree(rows as Folder[]);
   //console.log('tree',tree)
@@ -46,12 +46,21 @@ export async function getSnippets(req: Request, res: Response) {
     query = buildSelectSnippetQueryPostgres(searchParam, folderId, userParam, page);
   } else {
     query = buildSelectSnippetQuery(searchParam, folderId, userParam, page);
+    if (!Array.isArray(folderIds) || !folderIds.every(id => Number.isInteger(id) && id >= 0)) {
+      throw new Error('Invalid folderIds');
+    }
+    query = query.replace('$folderIds', folderIds.join(','));
   }
 
   //console.log(query.replace(/:search/g, `"${searchParam}"`).replace(/:userId/g, loggedInUserId.toString()).replace(/:folderIds/g, folderIds.join(',')).replace(/:userParam/g, userParam.toString()));
   //console.log(query.replace(/\$search/g, `'${searchParam}'`).replace(/\$userId/g, loggedInUserId.toString()).replace(/\$folderIds/g, folderIds.join(',')).replace(/\$userParam/g, userParam.toString()));
   //console.log(JSON.stringify({search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId}));
-  const rows2 = await select(query, {search: searchParam, folderIds: searchParam ? folderIds.join(','): folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId});
+  const rows2 = await select(query, {
+    search: searchParam,
+    userId: loggedInUserId,
+    folderIds: searchParam ? folderIds.join(','): folderId,
+    userParam: Number.isNaN(userParam) ? loggedInUserId:userParam
+  });
   //console.log(query);
   //console.log({search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId});
 

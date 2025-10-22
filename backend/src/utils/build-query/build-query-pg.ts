@@ -38,9 +38,9 @@ export const buildSelectSnippetQueryPostgres = (
          join kb_user on kb_user.id = snippet.user_id`;
   const where = `WHERE 1 = 1
       and usr_fold_snip.user_id = $userParam`;
-  let whereFolder = `AND usr_fold_snip.folder = any(string_to_array($folderIds, ','))`;
+  let whereFolder = `AND usr_fold_snip.folder = any(string_to_array($folderIds, ',')::int[])`;
   //@ts-ignore
-  if(!isNaN(folderId)){
+  if(!searchParam){
     whereFolder = `AND usr_fold_snip.folder = $folderIds`;
   }
   let wherePublic = `AND snippet.public IS TRUE`;

@@ -20,6 +20,7 @@ import {configDotenv} from 'dotenv';
 import {logger} from './utils/logger';
 import * as https from 'https';
 import * as fs from 'fs';
+import fileStoreFactory from 'session-file-store';
 import multer from 'multer';
 import {exportData, getMyUsername, importData} from './utils/rest/profile-utils';
 
@@ -27,6 +28,8 @@ const myMulter = multer({ storage: multer.memoryStorage() });
 
 configDotenv();
 const app = express();
+
+const FileStore = fileStoreFactory(session);
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use(cors({
@@ -38,6 +41,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  store: new FileStore(),
   cookie: {
     secure: process.env.NODE_ENV === 'production',// Only transmit over HTTPS
     httpOnly: true,
