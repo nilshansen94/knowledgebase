@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {CommunityComponent} from '../component/community.component';
 import {MyHttpService} from '../../../services/http/my-http.service';
@@ -22,7 +22,8 @@ import {SnippetsService} from '../../snippets/service/snippets.service';
     />
   `,
   styles: [
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommunityContainerComponent {
 

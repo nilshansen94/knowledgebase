@@ -239,7 +239,7 @@ export class SidenavComponent {
     // todo does not work for nested folders!
     if (this.newFolderNode) {
       const newFolderNode: TreeNode = this.tree.treeModel.getNodeById(-1);
-      this.removeNode(newFolderNode.data);
+      this.removeNode(newFolderNode?.data);
       this.updateTree();
     }
     this.newFolderNode = null;
@@ -307,6 +307,9 @@ export class SidenavComponent {
   }
 
   removeNode(node: Folder) {
+    if(!node) {
+      return;
+    }
     if (node.parent_id === null) {
       const index = this._navItems.findIndex(n => n.id === node.id);
       if (index >= 0) {

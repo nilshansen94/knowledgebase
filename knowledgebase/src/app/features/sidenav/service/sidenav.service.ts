@@ -54,12 +54,21 @@ export class SidenavService {
   private addingFolderInProgress = new BehaviorSubject<boolean>(false);
   public addingFolderInProgress$ = this.addingFolderInProgress.asObservable();
 
+  private ownFolders$ = this.foldersRefresh.pipe(
+    switchMap(() => this.httpService.get('folders')),
+    map(folders => folders as KbTreeNode[]),
+    catchError(error => {
+      console.error('Error loading folders:', error);
+      return of([]);
+    }),
+    shareReplay(),
+  );
+
+
   folders$: Observable<KbTreeNode[]> = combineLatest([
     this.foldersRefresh,
     this.appService.selectedUserId$,
-    //this.authService.isLoggedIn$,
   ]).pipe(
-    //filter(([_, loggedIn]: [void, boolean]) => loggedIn === true),
     switchMap(() => this.snippetsService.snippets$.pipe(
       withLatestFrom(this.appService.selectedUserId$),
       switchMap(([snippets, user]) => this.httpService.get('folders' + this.mapUrlParams(user)).pipe(
@@ -199,7 +208,7 @@ export class SidenavService {
     const user = this.route.snapshot.queryParamMap.get('user');
     let folderId = this.appService.getSelectedFolder();
     if (user) {
-      const folders = await firstValueFrom(this.folders$);
+      const folders = await firstValueFrom(this.ownFolders$);
       const selectedFolder = await this.modalService.openSelectFolderModal({folders});
       if (!selectedFolder) {
         return;
