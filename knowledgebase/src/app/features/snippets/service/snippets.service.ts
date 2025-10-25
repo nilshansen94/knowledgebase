@@ -23,6 +23,7 @@ export class SnippetsService {
   private readonly selectedSnippet = new BehaviorSubject<number | null>(null);
   public readonly selectedSnippet$ = this.selectedSnippet.asObservable();
   private selectedSnippetTimeout: any;
+  private refreshSnippets = new BehaviorSubject<void>(null);
 
   private readonly snippetsStore = new Map<number, Snippet[]>();
 
@@ -34,12 +35,13 @@ export class SnippetsService {
   );
 
   snippets$: Observable<Snippet[]> = combineLatest([
-     this.selectedFolder$,
-     this.searchQuery,
-     this.appService.selectedUserId$,
-     this.pagingService.currentPage$,
-   ]).pipe(
-     map(([folder, query, user, page]) => [folder, this.mapUrlParams(query, user, page)]),
+    this.refreshSnippets,
+    this.selectedFolder$,
+    this.searchQuery,
+    this.appService.selectedUserId$,
+    this.pagingService.currentPage$,
+  ]).pipe(
+     map(([_,folder, query, user, page]) => [folder, this.mapUrlParams(query, user, page)]),
      switchMap(([folder, params]) => {
        if (!folder && !params) {
          this.snippetsStore.clear();
@@ -103,14 +105,35 @@ export class SnippetsService {
     ).subscribe();
   }
 
-  editSnippet(snippet: Snippet) {
-    this.httpService.post('snippet', snippet).pipe(
-      tap(res => {
-        this.appService.refreshSelectedFolder();
-        this.updateResult.next(res as DbResult);
+  editSnippet$(snippet: Snippet) {
+    return this.httpService.post('snippet', snippet).pipe(
+      tap((edited: DbResult) => {
+        if(edited) {
+          this.updateStore(edited.data);
+        }
+        this.updateResult.next(edited);
       }),
       take(1),
-    ).subscribe();
+    );
+  }
+
+  updateStore(updatedSnippet: Snippet) {
+    for(const [page, snippets] of this.snippetsStore.entries()) {
+      let i = 0;
+      for(const snippet of snippets) {
+        if(snippet.id === updatedSnippet.id) {
+          const copy = {...snippet};
+          copy.title = updatedSnippet.title;
+          copy.content = updatedSnippet.content;
+          copy.public = updatedSnippet.public;
+          snippets[i] = copy;
+          this.snippetsStore.set(page, [...snippets]);
+          this.refreshSnippets.next();
+          return;
+        }
+        i++;
+      }
+    }
   }
 
   deleteSnippet(snippet: any) {

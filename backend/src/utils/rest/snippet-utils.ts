@@ -115,7 +115,7 @@ export async function updateSnippet(req: Request, res: Response) {
     const snip = await Snippet.findByPk(snippet.id);
     const updateResult = await snip.update({title: snippet.title, content: snippet.content, public: snippet.public});
     console.log('committed update-snip')
-    res.json({success: !!updateResult});
+    res.json({success: !!updateResult, data: updateResult});
     res.end();
     return;
   } catch(e) {

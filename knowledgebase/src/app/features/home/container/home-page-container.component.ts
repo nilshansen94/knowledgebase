@@ -5,8 +5,10 @@ import {SnippetsService} from '../../snippets/service/snippets.service';
 import {SidenavService} from '../../sidenav/service/sidenav.service';
 import {AppService} from '../../../services/app/app.service';
 import {ActivatedRoute} from '@angular/router';
-import {map, tap} from 'rxjs/operators';
+import {delay, map, tap} from 'rxjs/operators';
 import {PagingService} from '../../snippets/service/paging.service';
+import {Snippet} from '@kb-rest/shared';
+import {take} from 'rxjs';
 
 @Component({
   selector: 'app-home-page',
@@ -25,7 +27,7 @@ import {PagingService} from '../../snippets/service/paging.service';
         [hasFolders]="sidenavService.hasFolders$ | async"
         (loadMore)="snippetsService.loadMore()"
         (newSnippet)="snippetsService.addSnippet($event)"
-        (editSnippet)="snippetsService.editSnippet($event)"
+        (editSnippet)="editSnippet($event)"
         (deleteSnippet)="snippetsService.deleteSnippet($event)"
         (togglePublic)="snippetsService.togglePublicSnippet($event)"
         (pinSnippet)="sidenavService.pinSnippet($event)"
@@ -64,6 +66,19 @@ export class HomePageContainerComponent implements OnInit, OnDestroy {
     this.snippetsService.searchSnippet(null);
   }
 
-
+  editSnippet(snippet: Snippet) {
+    this.snippetsService.editSnippet$(snippet).subscribe();
+    this.snippetsService.updateResult$.pipe(
+      take(1),
+      delay(300),
+    ).subscribe(() => {
+      const ele = document.getElementById('snippet' + snippet.id);
+      ele.scrollIntoView({behavior: 'smooth'});
+      ele.classList.add('active');
+      setTimeout(() => {
+        ele.classList.remove('active');
+      }, 1500)
+    });
+  }
 
 }
