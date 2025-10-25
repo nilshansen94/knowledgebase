@@ -29,7 +29,7 @@ import {take} from 'rxjs';
         (newSnippet)="snippetsService.addSnippet($event)"
         (editSnippet)="editSnippet($event)"
         (deleteSnippet)="snippetsService.deleteSnippet($event)"
-        (togglePublic)="snippetsService.togglePublicSnippet($event)"
+        (togglePublic)="togglePublicSnippet($event)"
         (pinSnippet)="sidenavService.pinSnippet($event)"
         (search)="snippetsService.searchSnippet($event)"
     />
@@ -68,11 +68,20 @@ export class HomePageContainerComponent implements OnInit, OnDestroy {
 
   editSnippet(snippet: Snippet) {
     this.snippetsService.editSnippet$(snippet).subscribe();
+    this.animateUpdatedSnippet(snippet.id);
+  }
+
+  togglePublicSnippet(snippet: Snippet) {
+    this.snippetsService.togglePublicSnippet$(snippet).subscribe();
+    this.animateUpdatedSnippet(snippet.id);
+  }
+
+  private animateUpdatedSnippet(snippetId: number) {
     this.snippetsService.updateResult$.pipe(
       take(1),
       delay(300),
     ).subscribe(() => {
-      const ele = document.getElementById('snippet' + snippet.id);
+      const ele = document.getElementById('snippet' + snippetId);
       ele.scrollIntoView({behavior: 'smooth'});
       ele.classList.add('active');
       setTimeout(() => {

@@ -130,10 +130,9 @@ export async function toggleSnippetPublic(req: Request, res: Response){
   const snippet = req.body;
   try {
     const snip = await Snippet.findByPk(snippet.id);
-    await snip.update({public: !snippet.public});
+    const updatedSnippet = await snip.update({public: !snippet.public});
     console.log('committed snippet-public');
-    // todo get affected rows
-    const out = {success: true};
+    const out = {success: true, data: updatedSnippet};
     res.json(out);
   } catch(e) {
     console.log('could not toggle snippet-public', e)

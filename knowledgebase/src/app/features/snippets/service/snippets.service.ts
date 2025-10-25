@@ -179,11 +179,14 @@ export class SnippetsService {
     this.snippetsStore.clear();
   }
 
-  togglePublicSnippet(snippet: Snippet) {
-    this.httpService.post('snippet-public', snippet).pipe(
-      tap(() => this.appService.refreshSelectedFolder()),
+  togglePublicSnippet$(snippet: Snippet) {
+    return this.httpService.post('snippet-public', snippet).pipe(
+      tap((res: DbResult) => {
+        this.updateStore(res.data);
+        this.updateResult.next(res);
+      }),
       take(1),
-    ).subscribe();
+    );
   }
 
   setSelectedSnippet(id: number | null) {
