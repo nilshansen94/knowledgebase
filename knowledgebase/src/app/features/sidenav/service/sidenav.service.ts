@@ -14,14 +14,14 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs';
-import {Folder, Snippet, SnippetPinRequest} from '@kb-rest/shared';
+import {DbResult, Folder, Snippet, SnippetPinRequest} from '@kb-rest/shared';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {AppService} from '../../../services/app/app.service';
 import {SnippetsService} from '../../snippets/service/snippets.service';
 import {KbTreeNode} from '../api/kb-tree-node';
 import {ActivatedRoute} from '@angular/router';
 import {ModalService} from '../../../services/modal/modal.service';
-import {AuthService} from '../../../services/auth/auth.service';
+import {NotificationService} from '../../../services/navigation/notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +38,7 @@ export class SidenavService {
     private readonly appService: AppService,
     private readonly snippetsService: SnippetsService,
     private readonly modalService: ModalService,
-    private readonly authService: AuthService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   toggleSidenav() {
@@ -223,7 +223,12 @@ export class SidenavService {
     this.httpService.post('snippet-pin', request).pipe(
       tap(() => this.appService.refreshSelectedFolder()),
       take(1)
-    ).subscribe(r => console.log('snippet-pin request and result', request, r));
+    ).subscribe((res: DbResult) => {
+      console.log('snippet-pin request and result', request, res);
+      if (!res.success) {
+        this.notificationService.error('Error', 'Could not pin snippet.' + res?.error);
+      }
+    });
   }
 
 }

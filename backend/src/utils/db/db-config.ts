@@ -117,16 +117,16 @@ export async function select(sql: string, data?: any, transaction?: any): Promis
  * @param transaction transaction for this query
  */
 export async function insert(sql: string, data: any, transaction?: any) {
-  try {
+  //try {
     const created = await sequelize.query(sql, {
       bind: data,
       type: QueryTypes.INSERT,
       transaction,
     });
     return created[1];//return number of affected rows
-  } catch (e) {
-    console.log('cannot insert', e);
-  }
+  //} catch (e) {
+  //  console.log('cannot insert', e);
+  //}
 }
 
 /**

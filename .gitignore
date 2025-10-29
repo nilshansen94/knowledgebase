@@ -43,6 +43,7 @@ testem.log
 main.log
 /https
 /https2
+/documentation
 
 # System Files
 .DS_Store

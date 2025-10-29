@@ -167,9 +167,10 @@ export async function pinSnippet(req: Request, res: Response) {
     res.end();
     return res;
   } catch(e) {
-    console.log('could not (un)pin snippet', e)
+    console.log('could not (un)pin snippet', e);
     await trx.rollback();
-    const out = {success: false};
+    const errorMsg = e?.original?.code === '23505' ? ' Snippet is already pinned elsewhere.': '';
+    const out = {success: false, error: errorMsg};
     res.json(out);
     res.end();
     return res;
