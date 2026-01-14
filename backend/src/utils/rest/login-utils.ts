@@ -5,6 +5,7 @@ import {KbUser} from '../db/db-models';
 
 export const verifyLogin = async (req, res, next) => {
   if(req.isAuthenticated() && req.session.isRegistered) {
+    console.log('verifyLogin accepted')
     return next();
   }
   console.log('verifyLogin denied', req.isAuthenticated(), req.session.isRegistered);

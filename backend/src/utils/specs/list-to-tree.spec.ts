@@ -1,4 +1,4 @@
-import {listToTree} from "../list-to-tree";
+import {listToTree} from '../list-to-tree';
 
 describe('list-to-tree', () => {
 
@@ -16,6 +16,17 @@ describe('list-to-tree', () => {
     const tree = listToTree(list);
     expect(tree.find(i => i.name === 'SQL').childNodes[0].childNodes.length).toBe(2);
     expect(tree.length).toBe(4);
+  })
+
+  test('bug on aws-host', () => {
+    const list = [
+      {id: 48, name: 'abc', parent_id: null, user_id: 3},
+      {id: 49, name: 'def', parent_id: 50, user_id: 3},
+      {id: 50, name: 'ghi', parent_id: null, user_id: 3},
+    ];
+    const tree = listToTree(list);
+    expect(tree.find(i => i.name === 'ghi').childNodes.length).toBe(1);
+    expect(tree.length).toBe(2);
   })
 
 });

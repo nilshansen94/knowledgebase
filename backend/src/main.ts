@@ -18,8 +18,6 @@ import helmet from 'helmet';
 import {setupDb} from './utils/db/db-setup';
 import {configDotenv} from 'dotenv';
 import {logger} from './utils/logger';
-import * as https from 'https';
-import * as fs from 'fs';
 import fileStoreFactory from 'session-file-store';
 import multer from 'multer';
 import {exportData, getMyUsername, importData} from './utils/rest/profile-utils';
@@ -43,16 +41,16 @@ app.use(session({
   saveUninitialized: false,
   store: new FileStore(),
   cookie: {
-    secure: process.env.NODE_ENV === 'production',// Only transmit over HTTPS
+    secure: false,//process.env.NODE_ENV === 'production',// Only transmit over HTTPS
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none': 'strict', // Prevent CSRF
+    sameSite: 'strict',//process.env.NODE_ENV === 'production' ? 'none': 'strict', // Prevent CSRF
     maxAge: +process.env.SESSION_MAX_AGE, // 1 day expiry
   }
 }));
 app.use(helmet({
   contentSecurityPolicy: true,
   xssFilter: true,
-  hsts: true,
+  hsts: false, //true,
   noSniff: true,
   referrerPolicy: { policy: 'same-origin' }
 }));
@@ -229,15 +227,13 @@ app.post('/api/import', [verifyLogin, myMulter.single('importData')], async (req
   await importData(req, res);
 });
 
-const certificate = fs.readFileSync(process.env.SSH_CERTIFICATE, 'utf8');
-const privateKey  = fs.readFileSync(process.env.SSH_PRIVATE_KEY, 'utf8');
-const credentials = {key: privateKey, cert: certificate};// passphrase: 'asdf'
-const httpsServer = https.createServer(credentials, app);
-httpsServer.listen(8443, () => {
-  console.log(`https server listening on port 8443`);
-  logger.info('https server listening on port 8443');
+const port = +(process.env.PORT);
+const host = process.env.HOST;
+const server = app.listen(port, host, () => {
+  console.log(`Listening at ${host}:${port}/api`);
+  logger.info(`Listening at ${host}:${port}/api`);
 });
-httpsServer.on('error', e => {
-  console.log('https server error', e);
-  logger.info('https server error' + JSON.stringify(e));
+server.on('error', e => {
+  console.error(e);
+  logger.error(e);
 });

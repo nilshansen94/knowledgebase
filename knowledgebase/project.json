@@ -99,11 +99,8 @@
           "buildTarget": "knowledgebase:build:production"
         },
         "development": {
-          "buildTarget": "knowledgebase:build:local-tls",
-          "port": 4262,
-          "host": "127.0.0.1",
-          "sslKey": "https2/key.pem",
-          "sslCert": "https2/cert.pem"
+          "buildTarget": "knowledgebase:build:development",
+          "port": 4262
         }
       },
       "defaultConfiguration": "development"
