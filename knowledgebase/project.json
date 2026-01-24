@@ -63,7 +63,7 @@
             }
           ],
           "outputHashing": "all",
-          "outputPath": "dist/ui-aws",
+          "outputPath": "dist/knowledgebase",
           "fileReplacements": [
             {
               "replace": "knowledgebase/src/environments/environment.ts",
