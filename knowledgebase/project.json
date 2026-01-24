@@ -19,6 +19,7 @@
           "knowledgebase/src/favicon.ico",
           "knowledgebase/src/assets",
           "knowledgebase/src/assets/kg-logo.png",
+          "knowledgebase/src/.htaccess",
           {
             "glob": "**/*",
             "input": "node_modules/ace-builds/src-min",
