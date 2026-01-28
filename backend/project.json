@@ -24,7 +24,7 @@
           "outputPath": "dist/backend-local"
         },
         "production": {
-          "outputPath": "dist/backend-aws"
+          "outputPath": "dist/backend"
         }
       }
     },
