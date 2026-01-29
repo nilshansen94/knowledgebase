@@ -1,4 +1,4 @@
-import {Folder} from '../api';
+import {Folder} from '@kb-rest/shared';
 
 /**
  * Get array of ids of the subFolders, including the searched id

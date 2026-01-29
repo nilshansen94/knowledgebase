@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, catchError, combineLatest, map, Observable, of, shareReplay, Subject, switchMap, take, tap} from 'rxjs';
 import {MyHttpService} from '../../../services/http/my-http.service';
-import {Snippet} from '../api/snippet';
+import {DbResult, Snippet, SnippetPinRequest} from '@kb-rest/shared';
 import {AppService} from '../../../services/app/app.service';
 import {ActivatedRoute} from '@angular/router';
-import {DbResult, SnippetPinRequest} from '@kb-rest/shared';
 import {PagingService} from './paging.service';
 
 @Injectable({
@@ -24,6 +23,7 @@ export class SnippetsService {
   private readonly selectedSnippet = new BehaviorSubject<number | null>(null);
   public readonly selectedSnippet$ = this.selectedSnippet.asObservable();
   private selectedSnippetTimeout: any;
+  private refreshSnippets = new BehaviorSubject<void>(null);
 
   private readonly snippetsStore = new Map<number, Snippet[]>();
 
@@ -35,12 +35,13 @@ export class SnippetsService {
   );
 
   snippets$: Observable<Snippet[]> = combineLatest([
-     this.selectedFolder$,
-     this.searchQuery,
-     this.appService.selectedUserId$,
-     this.pagingService.currentPage$,
-   ]).pipe(
-     map(([folder, query, user, page]) => [folder, this.mapUrlParams(query, user, page)]),
+    this.refreshSnippets,
+    this.selectedFolder$,
+    this.searchQuery,
+    this.appService.selectedUserId$,
+    this.pagingService.currentPage$,
+  ]).pipe(
+     map(([_,folder, query, user, page]) => [folder, this.mapUrlParams(query, user, page)]),
      switchMap(([folder, params]) => {
        if (!folder && !params) {
          this.snippetsStore.clear();
@@ -49,7 +50,7 @@ export class SnippetsService {
          return of(null);
        }
        this.pagingService.setLoading(true);
-       console.log('get snippets' + folder + params);
+       //console.log('get snippets' + folder + params);
        return this.httpService.get('snippets' + folder + params);
      }),
      catchError(e => {
@@ -104,14 +105,35 @@ export class SnippetsService {
     ).subscribe();
   }
 
-  editSnippet(snippet: Snippet) {
-    this.httpService.post('snippet', snippet).pipe(
-      tap(res => {
-        this.appService.refreshSelectedFolder();
-        this.updateResult.next(res as DbResult);
+  editSnippet$(snippet: Snippet) {
+    return this.httpService.post('snippet', snippet).pipe(
+      tap((edited: DbResult) => {
+        if(edited) {
+          this.updateStore(edited.data);
+        }
+        this.updateResult.next(edited);
       }),
       take(1),
-    ).subscribe();
+    );
+  }
+
+  updateStore(updatedSnippet: Snippet) {
+    for(const [page, snippets] of this.snippetsStore.entries()) {
+      let i = 0;
+      for(const snippet of snippets) {
+        if(snippet.id === updatedSnippet.id) {
+          const copy = {...snippet};
+          copy.title = updatedSnippet.title;
+          copy.content = updatedSnippet.content;
+          copy.public = updatedSnippet.public;
+          snippets[i] = copy;
+          this.snippetsStore.set(page, [...snippets]);
+          this.refreshSnippets.next();
+          return;
+        }
+        i++;
+      }
+    }
   }
 
   deleteSnippet(snippet: any) {
@@ -157,11 +179,14 @@ export class SnippetsService {
     this.snippetsStore.clear();
   }
 
-  togglePublicSnippet(snippet: Snippet) {
-    this.httpService.post('snippet-public', snippet).pipe(
-      tap(() => this.appService.refreshSelectedFolder()),
+  togglePublicSnippet$(snippet: Snippet) {
+    return this.httpService.post('snippet-public', snippet).pipe(
+      tap((res: DbResult) => {
+        this.updateStore(res.data);
+        this.updateResult.next(res);
+      }),
       take(1),
-    ).subscribe();
+    );
   }
 
   setSelectedSnippet(id: number | null) {

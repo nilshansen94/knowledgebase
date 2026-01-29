@@ -9,6 +9,7 @@
 <app-header
   [isLoggedIn]="authService.isLoggedIn$ | async"
   [currentPath]="currentPath$ | async"
+  [communityUserName]="communityUserName$ | async"
   (logout)="loginService.logout()"
   (toggleSidenav)="toggleSidenav()"
 />

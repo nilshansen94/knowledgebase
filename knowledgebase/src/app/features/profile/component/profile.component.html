@@ -1,0 +1,11 @@
+<h1>Hello {{username}}</h1>
+
+<h2>Export data</h2>
+Click here to export your data:<br>
+<a [href]="baseUrl + 'export'" target="_blank">Export</a>
+
+<h2>Import data</h2>
+<form>
+  <input type="file" (change)="fileChange($event)">
+  <button (click)="startImport($event)" [disabled]="!this.file">Import</button>
+</form>

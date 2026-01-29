@@ -4,8 +4,8 @@ import {SidenavComponent} from '../component/sidenav.component';
 import {SidenavService} from '../service/sidenav.service';
 import {AppService} from '../../../services/app/app.service';
 import {SnippetsService} from '../../snippets/service/snippets.service';
-import {Folder} from '../api/folder';
-import {catchError, tap} from 'rxjs/operators';
+import {Folder} from '@kb-rest/shared';
+import {catchError, map, tap} from 'rxjs/operators';
 import {NotificationService} from '../../../services/navigation/notification.service';
 
 @Component({
@@ -17,14 +17,14 @@ import {NotificationService} from '../../../services/navigation/notification.ser
       [navItems]="this.sidenavService.folders$ | async"
       [selectedItemId]="this.appService.selectedFolder$ | async"
       [snippets]="snippetService.snippets$ | async"
-      [selectedUserId]="appService.selectedUserId$ | async"
+      [allowAddFolder]="allowAddFolder | async"
       [selectedUserName]="sidenavService.selectedUserName$ | async"
       [renameComplete]="renameComplete"
       [deleteComplete]="deleteComplete"
       [addingFolderInProgress]="sidenavService.addingFolderInProgress$ | async"
       [showSidenav]="sidenavService.showSidenav$ | async"
       (showSidenavChange)="sidenavService.toggleSidenav()"
-      (selectedItemChange)="appService.setSelectedFolder($event)"
+      (selectedItemChange)="selectedItemChange($event)"
       (newFolder)="addFolder($event)"
       (movedFolders)="sidenavService.moveFolders($event)"
       (movedSnippets)="sidenavService.moveSnippets($event)"
@@ -38,13 +38,28 @@ import {NotificationService} from '../../../services/navigation/notification.ser
 export class SidenavContainerComponent {
   renameComplete = false;
   deleteComplete = false;
+  public isMobile: boolean;
 
   constructor(
     public sidenavService: SidenavService,
     public appService: AppService,
     public snippetService: SnippetsService,
     private notificationService: NotificationService,
-  ) {}
+  ) {
+    // todo replace with breakpointObserver
+    this.isMobile = window.innerWidth < 768;
+  }
+
+  allowAddFolder = this.appService.selectedUserId$.pipe(
+    map(userId => userId === null || userId === undefined),
+  );
+
+  public selectedItemChange(folder: Folder) {
+    this.appService.setSelectedFolder(folder);
+    if(this.isMobile) {
+      this.sidenavService.hideSidenav();
+    }
+  }
 
   public renameFolder(folder: Folder) {
     this.renameComplete = false;

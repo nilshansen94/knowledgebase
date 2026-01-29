@@ -7,12 +7,14 @@
   </div>
   <div class="justify-between">
     <div class="nav-items">
-      <div class="nav-item" [class.active]="currentPath === PATH.WELCOME">
-        <a [routerLink]="[PATH.WELCOME]" class="material-symbols-outlined mobile">home</a>
-        <a [routerLink]="[PATH.WELCOME]" class="desktop">Home</a>
-      </div>
+      @if(!isLoggedIn){
+        <div class="nav-item" [class.active]="currentPath === PATH.WELCOME">
+          <a [routerLink]="[PATH.WELCOME]" class="material-symbols-outlined mobile">home</a>
+          <a [routerLink]="[PATH.WELCOME]" class="desktop">Home</a>
+        </div>
+      }
       @if (isLoggedIn) {
-        <div class="nav-item" [class.active]="currentPath === PATH.HOME">
+        <div class="nav-item" [class.active]="currentPath === PATH.HOME && !communityUserName">
           <a [routerLink]="[PATH.HOME]" class="material-symbols-outlined mobile" style="transform: scaleX(-1)">clarify</a>
           <a [routerLink]="[PATH.HOME]" class="desktop">Knowledgebase</a>
         </div>
@@ -20,6 +22,12 @@
           <a [routerLink]="[PATH.COMMUNITY]" class="material-symbols-outlined mobile">groups</a>
           <a [routerLink]="[PATH.COMMUNITY]" class="desktop">Community</a>
         </div>
+        @if(communityUserName){
+          <div class="nav-item" [class.active]="!!communityUserName">
+            <a [routerLink]="undefined" class="material-symbols-outlined mobile">person</a>
+            <a [routerLink]="undefined" class="desktop">{{communityUserName}}</a>
+          </div>
+        }
       }
     </div>
     <div class="header-right">
@@ -30,7 +38,6 @@
         </div>
       } @else {
         <div class="nav-item">
-          <a (click)="emitLogout()" [routerLink]="[]" class="desktop">Logout</a>
           <a (click)="emitLogout()" [routerLink]="[]" class="material-symbols-outlined mobile">logout</a>
         </div>
       }

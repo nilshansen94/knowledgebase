@@ -18,11 +18,16 @@ import helmet from 'helmet';
 import {setupDb} from './utils/db/db-setup';
 import {configDotenv} from 'dotenv';
 import {logger} from './utils/logger';
-import * as https from 'https';
-import * as fs from 'fs';
+import fileStoreFactory from 'session-file-store';
+import multer from 'multer';
+import {exportData, getMyUsername, importData} from './utils/rest/profile-utils';
+
+const myMulter = multer({ storage: multer.memoryStorage() });
 
 configDotenv();
 const app = express();
+
+const FileStore = fileStoreFactory(session);
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use(cors({
@@ -34,17 +39,18 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  store: new FileStore(),
   cookie: {
-    secure: process.env.NODE_ENV === 'production',// Only transmit over HTTPS
+    secure: false,//process.env.NODE_ENV === 'production',// Only transmit over HTTPS
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none': 'strict', // Prevent CSRF
+    sameSite: 'strict',//process.env.NODE_ENV === 'production' ? 'none': 'strict', // Prevent CSRF
     maxAge: +process.env.SESSION_MAX_AGE, // 1 day expiry
   }
 }));
 app.use(helmet({
   contentSecurityPolicy: true,
   xssFilter: true,
-  hsts: true,
+  hsts: false, //true,
   noSniff: true,
   referrerPolicy: { policy: 'same-origin' }
 }));
@@ -136,7 +142,9 @@ app.get('/api/logout', async (req, res) => {
 })
 
 app.get('/api/folders', [verifyLogin], async (req, res) => {
-  return await getFolders(req, res);
+  const folders = await getFolders(req, res);
+  res.json(folders);
+  return res;
 });
 
 app.put('/api/addFolder', [verifyLogin], async (req, res) => {
@@ -192,6 +200,10 @@ app.get('/api/username/:id', [verifyLogin], async (req, res) => {
   return await getUserName(req, res);
 })
 
+app.get('/api/my-username', [verifyLogin], async (req, res) => {
+  return await getMyUsername(req, res);
+})
+
 app.get('/api/communitySnippets/:search?', [verifyLogin], async (req, res) => {
   return await getCommunitySnippets(req, res);
 })
@@ -202,17 +214,17 @@ app.get('/api/version', (req, res) => {
   res.end();
 })
 
-const certificate = fs.readFileSync(process.env.SSH_CERTIFICATE, 'utf8');
-const privateKey  = fs.readFileSync(process.env.SSH_PRIVATE_KEY, 'utf8');
-const credentials = {key: privateKey, cert: certificate};// passphrase: 'asdf'
-const httpsServer = https.createServer(credentials, app);
-httpsServer.listen(8443, () => {
-  console.log(`https server listening on port 8443`);
-  logger.info('https server listening on port 8443');
-});
-httpsServer.on('error', e => {
-  console.log('https server error', e);
-  logger.info('https server error' + JSON.stringify(e));
+app.get('/api/export', [verifyLogin], async (req, res ) => {
+  console.log('exportData starting');
+  const data = await exportData(req, res);
+  const jsonString = JSON.stringify(data, null, 2);
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="export.json"');
+  res.send(jsonString);
+})
+
+app.post('/api/import', [verifyLogin, myMulter.single('importData')], async (req, res) => {
+  await importData(req, res);
 });
 
 const port = +(process.env.PORT);

@@ -6,8 +6,8 @@
         {{ selectedUserName }}
       </div>
     }
-    <div class="add-folder">
-      <div *ngIf="!showAddFolderInput && !allowMoveFolders && !selectedUserId">
+    <div class="add-folder" *ngIf="allowAddFolder">
+      <div *ngIf="!showAddFolderInput && !allowMoveFolders">
         <button (click)="showAddFolderInput = true" [disabled]="folderPlaced" class="folder-mini-btn" tooltip="Create a new folder" placement="bottom" [delay]="300">
           <span class="folder-icon material-icons-outlined">create_new_folder</span>
         </button>

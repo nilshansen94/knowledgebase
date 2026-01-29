@@ -18,7 +18,7 @@
         </button>
       </ng-container>
       <ng-container *ngIf="!canEdit">
-        <button [disabled]="pendingRequest">
+        <button [disabled]="pendingRequest || !canPin">
           <span class="material-symbols-outlined" (click)="doPinSnippet()">{{snippet.is_pinned ? 'keep_off':'keep'}}</span>
         </button>
       </ng-container>
@@ -35,5 +35,5 @@
       <a class="user" [routerLink]="[]" [queryParams]="{user: snippet.user_id}"><span class="material-icons">account_circle</span>{{snippet.user_name}}</a>
     }
   </div>
-  <!--<span style="font-size: 0.5em;position: absolute;top: -2px;left: 0;">id {{snippet.id}}, user {{snippet.user_id}}, folder {{snippet.folder}}</span>-->
+  <!--<span style="font-size: 0.75em;position: absolute;top: -2px;left: 0;">isOwn{{snippet.is_own_snippet}}, user_id {{snippet.user_id}}, ufs_user {{snippet.ufs_user}}, canPin {{canPin}}</span>-->
 </div>

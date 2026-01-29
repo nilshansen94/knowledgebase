@@ -14,6 +14,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/community/container/community-container.component').then(mod => mod.CommunityContainerComponent)
   },
   {
+    path: PATHS.PROFILE,
+    canActivate: [authGuard()],
+    loadComponent: () => import('./features/profile/container/profile-container.component').then(mod => mod.ProfileContainerComponent)
+  },
+  {
     path: PATHS.LOGIN,
     loadComponent: () => import('./features/login/container/login-container.component').then(mod => mod.LoginContainerComponent)
   },

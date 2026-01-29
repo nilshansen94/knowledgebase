@@ -1,10 +1,9 @@
 import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, model, Output, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {Folder} from '../api/folder';
-import {ITreeOptions, TreeComponent, TreeModel, TreeModule, TreeNode} from '@odymaui/angular-tree-component';
+import {Folder, Snippet} from '@kb-rest/shared';
+import {ITreeOptions, TreeComponent, TreeModel, TreeModule, TreeNode} from '@ali-hm/angular-tree-component';
 import {FormsModule} from '@angular/forms';
 import {KbTreeNode} from '../api/kb-tree-node';
-import {Snippet} from '../../snippets/api/snippet';
 import {ContextMenuItem} from '../../../components/context-menu/context-menu.component';
 import {ContextMenuDirective} from '../../../components/context-menu/context-menu.directive';
 import {TooltipDirective} from 'ngx-bootstrap/tooltip';
@@ -68,13 +67,15 @@ export class SidenavComponent {
     }
   }
 
+  @Input() isMobile: boolean;
+
   @Input() selectedItemId: number;
 
   @Input()
   snippets: Snippet[];
 
   @Input()
-  selectedUserId: number;
+  allowAddFolder: boolean;
 
   @Input()
   selectedUserName: string;
@@ -238,7 +239,7 @@ export class SidenavComponent {
     // todo does not work for nested folders!
     if (this.newFolderNode) {
       const newFolderNode: TreeNode = this.tree.treeModel.getNodeById(-1);
-      this.removeNode(newFolderNode.data);
+      this.removeNode(newFolderNode?.data);
       this.updateTree();
     }
     this.newFolderNode = null;
@@ -306,6 +307,9 @@ export class SidenavComponent {
   }
 
   removeNode(node: Folder) {
+    if(!node) {
+      return;
+    }
     if (node.parent_id === null) {
       const index = this._navItems.findIndex(n => n.id === node.id);
       if (index >= 0) {

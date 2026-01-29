@@ -19,6 +19,7 @@
           "knowledgebase/src/favicon.ico",
           "knowledgebase/src/assets",
           "knowledgebase/src/assets/kg-logo.png",
+          "knowledgebase/src/.htaccess",
           {
             "glob": "**/*",
             "input": "node_modules/ace-builds/src-min",
@@ -63,6 +64,7 @@
             }
           ],
           "outputHashing": "all",
+          "outputPath": "dist/knowledgebase",
           "fileReplacements": [
             {
               "replace": "knowledgebase/src/environments/environment.ts",
@@ -77,6 +79,16 @@
           "extractLicenses": false,
           "sourceMap": true,
           "namedChunks": true
+        },
+        "local-tls": {
+          "sourceMap": true,
+          "outputPath": "dist/ui-local-tls",
+          "fileReplacements": [
+            {
+              "replace": "knowledgebase/src/environments/environment.ts",
+              "with": "knowledgebase/src/environments/environment.local-tls.ts"
+            }
+          ]
         }
       },
       "defaultConfiguration": "production"
@@ -89,7 +101,7 @@
         },
         "development": {
           "buildTarget": "knowledgebase:build:development",
-          "port": 4260
+          "port": 4262
         }
       },
       "defaultConfiguration": "development"

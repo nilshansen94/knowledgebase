@@ -14,16 +14,14 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs';
-import {Folder} from '../api/folder';
+import {DbResult, Folder, Snippet, SnippetPinRequest} from '@kb-rest/shared';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {AppService} from '../../../services/app/app.service';
 import {SnippetsService} from '../../snippets/service/snippets.service';
 import {KbTreeNode} from '../api/kb-tree-node';
-import {Snippet} from '../../snippets/api/snippet';
-import {SnippetPinRequest} from '@kb-rest/shared';
 import {ActivatedRoute} from '@angular/router';
 import {ModalService} from '../../../services/modal/modal.service';
-import {AuthService} from '../../../services/auth/auth.service';
+import {NotificationService} from '../../../services/navigation/notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -40,11 +38,15 @@ export class SidenavService {
     private readonly appService: AppService,
     private readonly snippetsService: SnippetsService,
     private readonly modalService: ModalService,
-    private readonly authService: AuthService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   toggleSidenav() {
     this.showSidenav.next(!this.showSidenav.getValue());
+  }
+
+  hideSidenav() {
+    this.showSidenav.next(false);
   }
 
   private foldersRefresh = new BehaviorSubject<void>(undefined);
@@ -52,12 +54,21 @@ export class SidenavService {
   private addingFolderInProgress = new BehaviorSubject<boolean>(false);
   public addingFolderInProgress$ = this.addingFolderInProgress.asObservable();
 
+  private ownFolders$ = this.foldersRefresh.pipe(
+    switchMap(() => this.httpService.get('folders')),
+    map(folders => folders as KbTreeNode[]),
+    catchError(error => {
+      console.error('Error loading folders:', error);
+      return of([]);
+    }),
+    shareReplay(),
+  );
+
+
   folders$: Observable<KbTreeNode[]> = combineLatest([
     this.foldersRefresh,
     this.appService.selectedUserId$,
-    //this.authService.isLoggedIn$,
   ]).pipe(
-    //filter(([_, loggedIn]: [void, boolean]) => loggedIn === true),
     switchMap(() => this.snippetsService.snippets$.pipe(
       withLatestFrom(this.appService.selectedUserId$),
       switchMap(([snippets, user]) => this.httpService.get('folders' + this.mapUrlParams(user)).pipe(
@@ -197,7 +208,7 @@ export class SidenavService {
     const user = this.route.snapshot.queryParamMap.get('user');
     let folderId = this.appService.getSelectedFolder();
     if (user) {
-      const folders = await firstValueFrom(this.folders$);
+      const folders = await firstValueFrom(this.ownFolders$);
       const selectedFolder = await this.modalService.openSelectFolderModal({folders});
       if (!selectedFolder) {
         return;
@@ -212,7 +223,12 @@ export class SidenavService {
     this.httpService.post('snippet-pin', request).pipe(
       tap(() => this.appService.refreshSelectedFolder()),
       take(1)
-    ).subscribe(r => console.log('snippet-pin request and result', request, r));
+    ).subscribe((res: DbResult) => {
+      console.log('snippet-pin request and result', request, res);
+      if (!res.success) {
+        this.notificationService.error('Error', 'Could not pin snippet.' + res?.error);
+      }
+    });
   }
 
 }

@@ -1,8 +1,18 @@
+export interface Folder {
+  id: number;
+  name: string;
+  parent_id?: number;
+  user_id?: number;
+  childNodes?: Folder[];
+  snippets?: Snippet[];
+}
+
 export interface Snippet {
   id: number;
   title: string;
   content: string;
   user_id: number;
+  ufs_user?: number;
   user_name: string;
   folder: number;
   is_own_snippet: boolean;

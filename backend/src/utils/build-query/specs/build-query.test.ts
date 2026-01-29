@@ -2,7 +2,7 @@ import {buildSelectSnippetQuery} from '../build-query';
 import {promisePoolTest} from './db-config-test';
 import {createSql} from './create';
 import {insertSql} from './insert';
-import {Snippet} from '../../../../../knowledgebase/src/app/features/snippets/api/snippet';
+import {Snippet} from '@kb-rest/shared';
 
 const executeSqlStatements = async (sql: string) => {
   // Split by semicolon and filter out empty statements

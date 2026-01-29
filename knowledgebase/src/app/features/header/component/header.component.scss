@@ -33,12 +33,12 @@ header {
 }
 
 img {
-  height: 50px;
+  height: 40px;
   background: white;
   cursor: pointer;
   border-radius: 50%;
   padding: 4px;
-  margin-left: 3px;
+  margin-left: 5px;
 }
 
 .justify-between {
@@ -81,8 +81,12 @@ img {
 }
 
 @media (max-width: variables.$media-query) {
+  img {
+    margin-left: 0;
+  }
   .burger-menu {
     display: block;
+    margin-right: 5px;
   }
   #logo {
     width: 70px;

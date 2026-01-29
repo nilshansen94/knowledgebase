@@ -5,6 +5,7 @@ import {KbUser} from '../db/db-models';
 
 export const verifyLogin = async (req, res, next) => {
   if(req.isAuthenticated() && req.session.isRegistered) {
+    console.log('verifyLogin accepted')
     return next();
   }
   console.log('verifyLogin denied', req.isAuthenticated(), req.session.isRegistered);
@@ -15,15 +16,15 @@ export const verifyLogin = async (req, res, next) => {
 export async function googleCallback(req: any, res: Response) {
   console.log('verify in callback')
   const user = req.user;
-  console.log('login google callback: user emails ', user.emails);
+  //console.log('login google callback: user emails ', user.emails);
   const userEmail = req.user.emails.find(e => e.verified === true).value;
   req.session.email = userEmail;
   const existingUser = await userExists(userEmail);
-  console.log('user exists ' + JSON.stringify(existingUser))
+  //console.log('user exists ' + JSON.stringify(existingUser))
   if (existingUser) {
     req.session.userId = user.userId;
     req.session.isRegistered = true;
-    console.log('session after login ' + JSON.stringify(req.session));
+    //console.log('session after login ' + JSON.stringify(req.session));
     res.redirect(process.env['UI_URL']);
   } else {
     res.redirect(process.env['UI_URL'] + '/register');

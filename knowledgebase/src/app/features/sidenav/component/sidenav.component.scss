@@ -46,6 +46,7 @@ p {
 .sidenav-left {
   border-right: 1px variables.$border-grey solid;
   width: 250px;
+  padding-top: 40px;
 
   &.adding-folder-in-progress {
     pointer-events: none;
@@ -96,11 +97,21 @@ p {
 }
 
 .add-folder {
+  position: absolute;
+  top: 1px;
+  background: variables.$background-dark;
+  z-index: 2;
+  border-right: 1px variables.$border-grey solid;
+
   padding: 0.25rem;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   gap: 0.25rem;
+}
+
+::ng-deep .hideNav .add-folder {
+  display: none;
 }
 
 .folder-mini-btn {
@@ -114,6 +125,9 @@ p {
 .new-folder-wrapper, .add-folder {
   //todo make width auto
   width: 250px;
+  p {
+    padding-left: 0.5em;
+  }
 }
 .new-folder {
   margin: 0.25rem;

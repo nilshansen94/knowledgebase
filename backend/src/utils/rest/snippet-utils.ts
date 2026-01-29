@@ -1,8 +1,7 @@
 import {listToTree} from '../list-to-tree';
-import {Folder} from '../../api';
 import {getSubFolders} from '../get-sub-folders';
 import {Request, Response} from 'express';
-import {SnippetPinRequest} from '@kb-rest/shared';
+import {Folder, SnippetPinRequest} from '@kb-rest/shared';
 import {deleteFrom, getTransaction, insert, select, seqCreateTables} from '../db/db-config';
 import {KbUser, Snippet, UsrFoldSnip} from '../db/db-models';
 import {buildSelectSnippetQueryPostgres} from '../build-query/build-query-pg';
@@ -30,7 +29,7 @@ export async function getSnippets(req: Request, res: Response) {
   const userParam = +req.query.user;
   //console.log('get snippets for user', userId, 'and folder', req.params.folderId)
   //https://stackoverflow.com/questions/53945089/nodejs-await-async-with-nested-mysql-query
-  const rows = await select('select * from folder where user_id = $1', [userParam ? userParam: loggedInUserId]);
+  const rows = await select('select * from folder where user_id = $1', [Number.isNaN(userParam) ? loggedInUserId:userParam]);
   //console.log('folders from query', rows)
   const tree = listToTree(rows as Folder[]);
   //console.log('tree',tree)
@@ -47,12 +46,21 @@ export async function getSnippets(req: Request, res: Response) {
     query = buildSelectSnippetQueryPostgres(searchParam, folderId, userParam, page);
   } else {
     query = buildSelectSnippetQuery(searchParam, folderId, userParam, page);
+    if (!Array.isArray(folderIds) || !folderIds.every(id => Number.isInteger(id) && id >= 0)) {
+      throw new Error('Invalid folderIds');
+    }
+    query = query.replace('$folderIds', folderIds.join(','));
   }
 
   //console.log(query.replace(/:search/g, `"${searchParam}"`).replace(/:userId/g, loggedInUserId.toString()).replace(/:folderIds/g, folderIds.join(',')).replace(/:userParam/g, userParam.toString()));
   //console.log(query.replace(/\$search/g, `'${searchParam}'`).replace(/\$userId/g, loggedInUserId.toString()).replace(/\$folderIds/g, folderIds.join(',')).replace(/\$userParam/g, userParam.toString()));
   //console.log(JSON.stringify({search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId}));
-  const rows2 = await select(query, {search: searchParam, folderIds: searchParam ? folderIds.join(','): folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId});
+  const rows2 = await select(query, {
+    search: searchParam,
+    userId: loggedInUserId,
+    folderIds: searchParam ? folderIds.join(','): folderId,
+    userParam: Number.isNaN(userParam) ? loggedInUserId:userParam
+  });
   //console.log(query);
   //console.log({search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId});
 
@@ -107,7 +115,7 @@ export async function updateSnippet(req: Request, res: Response) {
     const snip = await Snippet.findByPk(snippet.id);
     const updateResult = await snip.update({title: snippet.title, content: snippet.content, public: snippet.public});
     console.log('committed update-snip')
-    res.json({success: !!updateResult});
+    res.json({success: !!updateResult, data: updateResult});
     res.end();
     return;
   } catch(e) {
@@ -122,10 +130,9 @@ export async function toggleSnippetPublic(req: Request, res: Response){
   const snippet = req.body;
   try {
     const snip = await Snippet.findByPk(snippet.id);
-    await snip.update({public: !snippet.public});
+    const updatedSnippet = await snip.update({public: !snippet.public});
     console.log('committed snippet-public');
-    // todo get affected rows
-    const out = {success: true};
+    const out = {success: true, data: updatedSnippet};
     res.json(out);
   } catch(e) {
     console.log('could not toggle snippet-public', e)
@@ -160,9 +167,10 @@ export async function pinSnippet(req: Request, res: Response) {
     res.end();
     return res;
   } catch(e) {
-    console.log('could not (un)pin snippet', e)
+    console.log('could not (un)pin snippet', e);
     await trx.rollback();
-    const out = {success: false};
+    const errorMsg = e?.original?.code === '23505' ? ' Snippet is already pinned elsewhere.': '';
+    const out = {success: false, error: errorMsg};
     res.json(out);
     res.end();
     return res;

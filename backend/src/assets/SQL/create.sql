@@ -1,5 +1,5 @@
 use kb_rest;
-create table `user` (
+create table kb_user (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `name` varchar(200) DEFAULT NULL,
   `password` text NOT NULL,

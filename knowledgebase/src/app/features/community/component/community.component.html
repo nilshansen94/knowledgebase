@@ -23,6 +23,7 @@
                  [snippet]="snippet"
                  [attr.id]="'snippet'+snippet.id"
                  [canEdit]="false"
+                 [canPin]="!snippet.is_own_snippet"
                  [pinWithModal]="true"
                  (pinSnippet)="doPinSnippet(snippet)"
     />
