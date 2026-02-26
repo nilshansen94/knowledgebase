@@ -1,9 +1,8 @@
 import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, model, Output, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {Folder, Snippet} from '@kb-rest/shared';
+import {Folder, KbTreeNode, Snippet} from '@kb-rest/shared';
 import {ITreeOptions, TreeComponent, TreeModel, TreeModule, TreeNode} from '@ali-hm/angular-tree-component';
 import {FormsModule} from '@angular/forms';
-import {KbTreeNode} from '../api/kb-tree-node';
 import {ContextMenuItem} from '../../../components/context-menu/context-menu.component';
 import {ContextMenuDirective} from '../../../components/context-menu/context-menu.directive';
 import {TooltipDirective} from 'ngx-bootstrap/tooltip';

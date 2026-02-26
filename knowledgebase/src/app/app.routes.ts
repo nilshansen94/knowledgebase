@@ -30,4 +30,8 @@ export const routes: Routes = [
     path: PATHS.REGISTER,
     loadComponent: () => import('./features/registration/container/registration-container.component').then(mod => mod.RegistrationContainerComponent)
   },
+  {
+    path: PATHS.DEMO,
+    loadComponent: () => import('./features/demo/container/demo-container.component').then(mod => mod.DemoContainerComponent)
+  },
 ];

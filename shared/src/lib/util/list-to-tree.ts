@@ -1,8 +1,10 @@
+import {Folder, KbTreeNode} from '../api';
+
 export const listToTree = (
-  list: any[],
+  list: Folder[],
   parentKey = 'parent_id',
   idKey = 'id'
-) => {
+): KbTreeNode[] => {
   const map = new Map<string, any>();
   list.forEach(item => {
     map.set(item[idKey], {...item, isFolder: true, childNodes: []});

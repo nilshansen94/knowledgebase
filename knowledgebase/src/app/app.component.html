@@ -16,7 +16,11 @@
 
 <div class="main-wrapper">
   <nav [class.hideNav]="appService.hideNav$ |async">
-    <app-sidenav-container />
+    @if (authService.isLoggedIn$ |async) {
+      <app-sidenav-container/>
+    } @else {
+      <app-demo-sidenav-container/>
+    }
   </nav>
 
   <main>

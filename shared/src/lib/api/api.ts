@@ -7,6 +7,11 @@ export interface Folder {
   snippets?: Snippet[];
 }
 
+export interface KbTreeNode extends Folder{
+  isFolder: boolean;
+  childNodes?: KbTreeNode[];
+}
+
 export interface Snippet {
   id: number;
   title: string;

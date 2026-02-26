@@ -1,7 +1,6 @@
-import {listToTree} from '../list-to-tree';
 import {getSubFolders} from '../get-sub-folders';
 import {Request, Response} from 'express';
-import {Folder, SnippetPinRequest} from '@kb-rest/shared';
+import {Folder, listToTree, SnippetPinRequest} from '@kb-rest/shared';
 import {deleteFrom, getTransaction, insert, select, seqCreateTables} from '../db/db-config';
 import {KbUser, Snippet, UsrFoldSnip} from '../db/db-models';
 import {buildSelectSnippetQueryPostgres} from '../build-query/build-query-pg';
@@ -25,11 +24,12 @@ async function testSequelize() {
 
 export async function getSnippets(req: Request, res: Response) {
   // await testSequelize();
+  const trx = await getTransaction();
   const loggedInUserId = +req.session.userId;
   const userParam = +req.query.user;
   //console.log('get snippets for user', userId, 'and folder', req.params.folderId)
   //https://stackoverflow.com/questions/53945089/nodejs-await-async-with-nested-mysql-query
-  const rows = await select('select * from folder where user_id = $1', [Number.isNaN(userParam) ? loggedInUserId:userParam]);
+  const rows = await select('select * from folder where user_id = $1', [Number.isNaN(userParam) ? loggedInUserId:userParam], trx);
   //console.log('folders from query', rows)
   const tree = listToTree(rows as Folder[]);
   //console.log('tree',tree)
@@ -47,7 +47,12 @@ export async function getSnippets(req: Request, res: Response) {
   } else {
     query = buildSelectSnippetQuery(searchParam, folderId, userParam, page);
     if (!Array.isArray(folderIds) || !folderIds.every(id => Number.isInteger(id) && id >= 0)) {
-      throw new Error('Invalid folderIds');
+      //throw new Error('Invalid folderIds');
+      console.warn('invalid folderIds');
+      await trx.rollback();
+      res.status(500);
+      res.end();
+      return res;
     }
     query = query.replace('$folderIds', folderIds.join(','));
   }
@@ -68,6 +73,7 @@ export async function getSnippets(req: Request, res: Response) {
   //console.log('sql params', {search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId})
   //@ts-ignore
   //console.log(`get snippets (folderId ${folderId}) (folderIds ${JSON.stringify(folderIds)}) (search ${searchParam}). Found ${rows?.length} rows`)
+  await trx.commit();
   res.json(rows2);
   res.end();
   return res;
