@@ -21,6 +21,9 @@ import {DemoService} from '../service/demo.service';
     (newSnippet)="demoService.addSnippet($event)"
     (search)="demoService.search($event)"
     (pinSnippet)="demoService.pinSnippet($event)"
+    (deleteSnippet)="demoService.deleteSnippet($event)"
+    (editSnippet)="demoService.editSnippet($event)"
+    (togglePublic)="demoService.togglePublic($event)"
   />`,
 })
 export class DemoContainerComponent {

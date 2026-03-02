@@ -49,7 +49,7 @@ export class DemoService {
   );
   snippetIdCounter = 4;
 
-  communityUser$ = of(1);
+  communityUser$ = of(-1);
 
   loading$ = of(false);
   hasMore$ = of(false);
@@ -96,8 +96,7 @@ export class DemoService {
     const newSnippet = this.generateSnippet(this.snippetIdCounter++, snippet.title, snippet.content, snippet.public);
     snippets.push(newSnippet);
     this.snippets.set(this.selectedFolderId, snippets);
-    this.refreshSnippets$.next();
-    this.updateResult.next({success: true});
+    this.refreshSnippets();
   }
 
   generateSnippet(
@@ -112,7 +111,7 @@ export class DemoService {
       title,
       content,
       user_id: this.userId,
-      ufs_user: null,
+      ufs_user: isOwn ? -1: 99,
       user_name: isOwn ? null : 'nils',
       folder: null,
       is_own_snippet: isOwn,
@@ -134,14 +133,44 @@ export class DemoService {
         this.selectedFolderId,
         this.snippets.get(this.selectedFolderId)
         .filter(s => s.id !== snippet.id));
-      this.refreshSnippets$.next();
-      this.updateResult.next({success: true});
+      this.refreshSnippets();
       return;
     }
     if (!this.snippets.get(this.selectedFolderId)) {
       this.snippets.set(this.selectedFolderId, []);
     }
     this.snippets.get(this.selectedFolderId).push({...snippet, is_pinned: true});
+    this.refreshSnippets();
+  }
+
+  deleteSnippet(snippet: Snippet) {
+    const snippets = this.snippets.get(this.selectedFolderId);
+    if (!snippets) {
+      return;
+    }
+    const filtered = snippets.filter(s => s.id !== snippet.id);
+    this.snippets.set(this.selectedFolderId, filtered);
+    this.refreshSnippets();
+  }
+
+  editSnippet($event: Snippet) {
+    const snippets = this.snippets.get(this.selectedFolderId);
+    if (!snippets) {
+      return;
+    }
+    const index = snippets.findIndex(s => s.id === $event.id);
+    if (index !== -1) {
+      snippets[index] = {...snippets[index], ...$event};
+      this.snippets.set(this.selectedFolderId, snippets);
+      this.refreshSnippets();
+    }
+  }
+
+  togglePublic(snippet: Snippet) {
+    this.editSnippet({...snippet, public: !snippet.public});
+  }
+
+  private refreshSnippets() {
     this.refreshSnippets$.next();
     this.updateResult.next({success: true});
   }
