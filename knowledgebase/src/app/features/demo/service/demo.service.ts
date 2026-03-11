@@ -39,7 +39,7 @@ export class DemoService {
         return [];
       }
       const snippets = this.snippets.get(folder.id) || [];
-      if (this.searchQuery.value && !this.snippets.get(this.selectedFolderId).find(s => s.id === 99)) {
+      if (this.searchQuery.value && !this.getCurrentSnippets().find(s => s.id === 99)) {
         return [...snippets, this.generateSnippet(99, 'Community note', 'This is a demo note from a community user that appears, when you search for content.', true, false)];
       }
       return snippets;
@@ -54,19 +54,19 @@ export class DemoService {
   loading$ = of(false);
   hasMore$ = of(false);
 
-  folders: Folder[] = [];
+  folders: Folder[] = [
+    {id: 1, name: 'home', parent_id: null},
+    {id: 2, name: 'work', parent_id: null},
+  ];
   treeNodes: KbTreeNode[] = [];
   treeNodes$ = new BehaviorSubject<KbTreeNode[]>(
-    listToTree([
-      {id: 1, name: 'home'},
-      {id: 2, name: 'work'},
-    ])
+    listToTree(this.folders)
   );
 
   addingFolder$ = new Subject<boolean>();
   folderIdCounter = 3;
 
-  selectedFolderId: number;
+  selectedFolderId$ = new BehaviorSubject<number>(null);
 
   constructor() {}
 
@@ -82,20 +82,78 @@ export class DemoService {
 
   setSelectedFolder(folder: Folder) {
     if(!folder){
-      this.selectedFolderId = null;
+      this.selectedFolderId$.next(null);
       this.currentFolder.next(null);
       return;
     }
     // console.log('set selected folder', folder)
-    this.selectedFolderId = folder.id;
+    this.selectedFolderId$.next(folder.id);
     this.currentFolder.next({...folder, isFolder: true, childNodes: null});
   }
 
+  /**
+   * @param map movedFolderId -> targetFolderId
+   */
+  moveFolders(map: Map<number, number>) {
+    map.forEach((targetFolderId, movedFolderId) => {
+      const folderIndex = this.folders.findIndex(f => f.id === movedFolderId);
+      if (folderIndex !== -1) {
+        this.folders[folderIndex] = {
+          ...this.folders[folderIndex],
+          parent_id: targetFolderId
+        };
+      }
+    });
+    this.treeNodes = listToTree(this.folders);
+    this.treeNodes$.next(this.treeNodes);
+    this.updateResult.next({success: true});
+    this.selectedFolderId$.next(this.selectedFolderId$.value);
+  }
+
+  /**
+   * @param map movedSnippetId -> targetFolderId
+   */
+  //todo check this AI generated code
+  moveSnippets(map: Map<number, number>) {
+    map.forEach((targetFolderId, movedSnippetId) => {
+      // Finde das Snippet in allen Ordnern
+      let foundSnippet: Snippet | null = null;
+      let sourceFolderId: number | null = null;
+
+      this.snippets.forEach((snippets, folderId) => {
+        const index = snippets.findIndex(s => s.id === movedSnippetId);
+        if (index !== -1) {
+          foundSnippet = snippets[index];
+          sourceFolderId = folderId;
+        }
+      });
+
+      if (foundSnippet && sourceFolderId !== null) {
+        // Entferne das Snippet aus dem alten Ordner
+        const sourceSnippets = this.snippets.get(sourceFolderId);
+        if (sourceSnippets) {
+          const filtered = sourceSnippets.filter(s => s.id !== movedSnippetId);
+          this.snippets.set(sourceFolderId, filtered);
+        }
+
+        // Füge das Snippet zum neuen Ordner hinzu
+        const targetSnippets = this.snippets.get(targetFolderId) || [];
+        targetSnippets.push(foundSnippet);
+        this.snippets.set(targetFolderId, targetSnippets.sort((a,b) => a.title.localeCompare(b.title)));
+      }
+      this.selectedFolderId$.next(this.selectedFolderId$.value);
+    });
+
+    this.refreshSnippets();
+    this.treeNodes = listToTree(this.folders);
+    this.treeNodes$.next(this.treeNodes);
+  }
+
   addSnippet(snippet: Partial<Snippet>) {
-    const snippets = this.snippets.get(this.selectedFolderId) || [];
+    const snippets = this.getCurrentSnippets() || [];
     const newSnippet = this.generateSnippet(this.snippetIdCounter++, snippet.title, snippet.content, snippet.public);
     snippets.push(newSnippet);
-    this.snippets.set(this.selectedFolderId, snippets);
+    this.setCurrentSnippets(snippets);
     this.refreshSnippets();
   }
 
@@ -129,39 +187,36 @@ export class DemoService {
   pinSnippet(snippet: Snippet) {
     if (snippet.is_pinned) {
       //unpin
-      this.snippets.set(
-        this.selectedFolderId,
-        this.snippets.get(this.selectedFolderId)
-        .filter(s => s.id !== snippet.id));
+      this.setCurrentSnippets(this.getCurrentSnippets().filter(s => s.id !== snippet.id));
       this.refreshSnippets();
       return;
     }
-    if (!this.snippets.get(this.selectedFolderId)) {
-      this.snippets.set(this.selectedFolderId, []);
+    if (!this.getCurrentSnippets()) {
+      this.setCurrentSnippets([]);
     }
-    this.snippets.get(this.selectedFolderId).push({...snippet, is_pinned: true});
+    this.getCurrentSnippets().push({...snippet, is_pinned: true});
     this.refreshSnippets();
   }
 
   deleteSnippet(snippet: Snippet) {
-    const snippets = this.snippets.get(this.selectedFolderId);
+    const snippets = this.getCurrentSnippets();
     if (!snippets) {
       return;
     }
     const filtered = snippets.filter(s => s.id !== snippet.id);
-    this.snippets.set(this.selectedFolderId, filtered);
+    this.setCurrentSnippets(filtered);
     this.refreshSnippets();
   }
 
   editSnippet($event: Snippet) {
-    const snippets = this.snippets.get(this.selectedFolderId);
+    const snippets = this.getCurrentSnippets();
     if (!snippets) {
       return;
     }
     const index = snippets.findIndex(s => s.id === $event.id);
     if (index !== -1) {
       snippets[index] = {...snippets[index], ...$event};
-      this.snippets.set(this.selectedFolderId, snippets);
+      this.setCurrentSnippets(snippets);
       this.refreshSnippets();
     }
   }
@@ -173,5 +228,13 @@ export class DemoService {
   private refreshSnippets() {
     this.refreshSnippets$.next();
     this.updateResult.next({success: true});
+  }
+
+  private getCurrentSnippets() {
+    return this.snippets.get(this.selectedFolderId$.value);
+  }
+
+  private setCurrentSnippets(snippets: Snippet[]) {
+    this.snippets.set(this.selectedFolderId$.value, snippets);
   }
 }

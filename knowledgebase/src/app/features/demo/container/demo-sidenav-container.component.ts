@@ -9,18 +9,20 @@ import {DemoService} from '../service/demo.service';
   styles: ``,
   template: `
     <app-sidenav
-    [navItems]="this.demoService.treeNodes$ |async"
-    [selectedItemId]="demoService.selectedFolderId"
-    [snippets]="demoService.snippets$ | async"
-    [allowAddFolder]="true"
-    [selectedUserName]=""
-    [renameComplete]=""
-    [deleteComplete]=""
-    [addingFolderInProgress]="demoService.addingFolder$ |async"
-    [showSidenav]="true"
-    (newFolder)="demoService.addFolder($event)"
-    (selectedItemChange)="demoService.setSelectedFolder($event)"
-  />`,
+      [navItems]="this.demoService.treeNodes$ |async"
+      [selectedItemId]="demoService.selectedFolderId$ | async"
+      [snippets]="demoService.snippets$ | async"
+      [allowAddFolder]="true"
+      [selectedUserName]=""
+      [renameComplete]=""
+      [deleteComplete]=""
+      [addingFolderInProgress]="demoService.addingFolder$ |async"
+      [showSidenav]="true"
+      (newFolder)="demoService.addFolder($event)"
+      (selectedItemChange)="demoService.setSelectedFolder($event)"
+      (movedFolders)="demoService.moveFolders($event)"
+      (movedSnippets)="demoService.moveSnippets($event)"
+    />`,
 })
 export class DemoSidenavContainerComponent {
   public demoService = inject(DemoService);
