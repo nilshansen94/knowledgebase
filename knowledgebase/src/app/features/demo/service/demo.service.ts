@@ -113,34 +113,27 @@ export class DemoService {
   /**
    * @param map movedSnippetId -> targetFolderId
    */
-  //todo check this AI generated code
   moveSnippets(map: Map<number, number>) {
     map.forEach((targetFolderId, movedSnippetId) => {
-      // Finde das Snippet in allen Ordnern
-      let foundSnippet: Snippet | null = null;
-      let sourceFolderId: number | null = null;
-
-      this.snippets.forEach((snippets, folderId) => {
+      // search for snippet
+      this.snippets.forEach((snippets, sourceFolderId) => {
         const index = snippets.findIndex(s => s.id === movedSnippetId);
         if (index !== -1) {
-          foundSnippet = snippets[index];
-          sourceFolderId = folderId;
+          const foundSnippet = snippets[index];
+
+          const sourceSnippets = this.snippets.get(sourceFolderId);
+          if (sourceSnippets) {
+            const filtered = sourceSnippets.filter(s => s.id !== movedSnippetId);
+            this.snippets.set(sourceFolderId, filtered);
+          }
+
+          // add snippet to new folder
+          const targetSnippets = this.snippets.get(targetFolderId) || [];
+          targetSnippets.push(foundSnippet);
+          this.snippets.set(targetFolderId, targetSnippets.sort((a,b) => a.title.localeCompare(b.title)));
         }
       });
 
-      if (foundSnippet && sourceFolderId !== null) {
-        // Entferne das Snippet aus dem alten Ordner
-        const sourceSnippets = this.snippets.get(sourceFolderId);
-        if (sourceSnippets) {
-          const filtered = sourceSnippets.filter(s => s.id !== movedSnippetId);
-          this.snippets.set(sourceFolderId, filtered);
-        }
-
-        // Füge das Snippet zum neuen Ordner hinzu
-        const targetSnippets = this.snippets.get(targetFolderId) || [];
-        targetSnippets.push(foundSnippet);
-        this.snippets.set(targetFolderId, targetSnippets.sort((a,b) => a.title.localeCompare(b.title)));
-      }
       this.selectedFolderId$.next(this.selectedFolderId$.value);
     });
 
