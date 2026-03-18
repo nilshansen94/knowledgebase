@@ -25,3 +25,7 @@ export interface Snippet {
   public: boolean|number;//mysql returns 0 or 1
   isActive?: boolean;
 }
+
+export function isSnippet(obj: any) {
+  return obj?.hasOwnProperty('is_own_snippet');
+}

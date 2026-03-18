@@ -1,6 +1,5 @@
-import {getSubFolders} from '../get-sub-folders';
 import {Request, Response} from 'express';
-import {Folder, listToTree, SnippetPinRequest} from '@kb-rest/shared';
+import {Folder, getSubFolders, listToTree, SnippetPinRequest} from '@kb-rest/shared';
 import {deleteFrom, getTransaction, insert, select, seqCreateTables} from '../db/db-config';
 import {KbUser, Snippet, UsrFoldSnip} from '../db/db-models';
 import {buildSelectSnippetQueryPostgres} from '../build-query/build-query-pg';

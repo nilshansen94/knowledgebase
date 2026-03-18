@@ -5,6 +5,7 @@ import {AuthService} from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'kb-rest-welcome-container',
+  standalone: true,
   imports: [CommonModule, WelcomeComponent],
   template: `
   <kb-rest-welcome [loggedIn]="authService.isLoggedIn$ | async" />

@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, model, Output, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {Folder, KbTreeNode, Snippet} from '@kb-rest/shared';
+import {Folder, getSubFolders, isSnippet, KbTreeNode, Snippet} from '@kb-rest/shared';
 import {ITreeOptions, TreeComponent, TreeModel, TreeModule, TreeNode} from '@ali-hm/angular-tree-component';
 import {FormsModule} from '@angular/forms';
 import {ContextMenuItem} from '../../../components/context-menu/context-menu.component';
@@ -31,9 +31,40 @@ export class SidenavComponent {
   //angular-tree docs: https://angular2-tree.readme.io/docs/drag-drop
   treeOptions: ITreeOptions = {
     childrenField: 'childNodes',
-    allowDrag: (node) => node.data.id === -1 || this.allowMoveFolders,
+    allowDrag: (node) => {
+      /*if (node.data.hasOwnProperty('is_own_snippet')) {
+        return false;
+      }*/
+      return node.data.id === -1 || this.allowMoveFolders;
+    },
     //todo allow drop to root
-    allowDrop: (from, to) => to.parent.data.isFolder,
+    allowDrop: (_source, _target) => {
+      const target = _target.parent.data;
+      //allow dropping snippets on folders
+      const source = _source.hasOwnProperty('data') ? _source.data : _source;
+      const sourceIsSnippet = isSnippet(source);
+      if (sourceIsSnippet && target.isFolder) {
+        return true;
+      }
+      if(isSnippet(target)) {
+        return false;
+      }
+      if(target.virtual) {
+        console.log('target isVirtual true, allow');
+        return true;
+      }
+
+      console.log('abc2', source, target);
+
+      // disallow drop to target that is child of the source
+      const subFolders = getSubFolders(source.childNodes, target.id);
+      if (!(subFolders.length === 1 && subFolders[0] === -1)) {
+        return false;
+      }
+
+      // target needs to be a folder
+      return target.isFolder;
+    },
   };
 
   showAddFolderInput = false;

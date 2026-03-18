@@ -5,6 +5,7 @@ import {DemoService} from '../service/demo.service';
 
 @Component({
   selector: 'app-demo-sidenav-container',
+  standalone: true,
   imports: [CommonModule, SidenavComponent],
   styles: ``,
   template: `

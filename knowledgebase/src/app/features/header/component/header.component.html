@@ -13,6 +13,12 @@
           <a [routerLink]="[PATH.WELCOME]" class="desktop">Home</a>
         </div>
       }
+      @if (currentPath === PATH.DEMO) {
+        <div class="nav-item" [class.active]="true">
+          <a [routerLink]="[]" class="material-symbols-outlined mobile" style="transform: scaleX(-1)">clarify</a>
+          <a [routerLink]="[]" class="desktop">Demo</a>
+        </div>
+      }
       @if (isLoggedIn) {
         <div class="nav-item" [class.active]="currentPath === PATH.HOME && !communityUserName">
           <a [routerLink]="[PATH.HOME]" class="material-symbols-outlined mobile" style="transform: scaleX(-1)">clarify</a>
