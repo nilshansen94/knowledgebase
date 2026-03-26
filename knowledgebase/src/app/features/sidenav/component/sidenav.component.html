@@ -48,6 +48,7 @@
         [options]="treeOptions"
         (activate)="setSelectedItem($event)"
         (deactivate)="setSelectedItem($event)"
+        (moveNode)="onDropRoot($event)"
       >
         <ng-template #treeNodeWrapperTemplate let-node let-index="index">
           <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">

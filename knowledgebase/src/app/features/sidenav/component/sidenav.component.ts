@@ -49,12 +49,14 @@ export class SidenavComponent {
       if(isSnippet(target)) {
         return false;
       }
+      //root slot: allow only folders
       if(target.virtual) {
-        console.log('target isVirtual true, allow');
+        return !sourceIsSnippet;
+      }
+      //allow new folder
+      if(source.id === -1) {
         return true;
       }
-
-      console.log('abc2', source, target);
 
       // disallow drop to target that is child of the source
       const subFolders = getSubFolders(source.childNodes, target.id);
@@ -289,10 +291,25 @@ export class SidenavComponent {
     this.updateTree();
   }
 
+  /**
+   * When dropping an element on a drop slot on the root level
+   * @param event
+   */
+  onDropRoot(event) {
+    console.log('onDropRoot', event);
+    const isFolder = event.from.parent.isFolder;
+    if(!isFolder) {
+      console.log('You cannot drop a snippet on the root level');
+      return;
+    }
+    this.movedFoldersMap.set(event.node.id, null);
+    this.tree.treeModel.update();
+  }
+
   onDrop(e: {event: DragEvent, element: Snippet | any}, node: TreeNode) {
     //todo set movedFoldersMap and movedSnippetsMap, remove onMoveNode method
     //todo new folder was not placed in parent folder, but in root
-    console.log(e, node)
+    console.log('onDrop', e, node)
     //was: html: onDrop($event)
     if (e.element instanceof TreeNode) {
       const itemToMove = e.element.data;
