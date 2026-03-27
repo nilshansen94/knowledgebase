@@ -47,7 +47,6 @@ export class DemoService {
       return snippets;
     }),
     delay(0),
-    //tap(s => console.log('snippet$', s))
   );
   snippetIdCounter = 4;
 

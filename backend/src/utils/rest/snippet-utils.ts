@@ -46,7 +46,6 @@ export async function getSnippets(req: Request, res: Response) {
   } else {
     query = buildSelectSnippetQuery(searchParam, folderId, userParam, page);
     if (!Array.isArray(folderIds) || !folderIds.every(id => Number.isInteger(id) && id >= 0)) {
-      //throw new Error('Invalid folderIds');
       console.warn('invalid folderIds');
       await trx.rollback();
       res.status(500);
