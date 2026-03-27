@@ -1,13 +1,15 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, combineLatestWith, map, of, Subject} from 'rxjs';
 import {DbResult, Folder, KbTreeNode, listToTree, Snippet} from '@kb-rest/shared';
 import {delay} from 'rxjs/operators';
+import {NotificationService} from '../../../services/navigation/notification.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DemoService {
 
+  private readonly notificationService = inject(NotificationService);
   private readonly userId = 1;
 
   private readonly updateResult = new Subject<DbResult>();
@@ -68,6 +70,9 @@ export class DemoService {
 
   selectedFolderId$ = new BehaviorSubject<number>(null);
 
+  renameComplete$ = new Subject<boolean>();
+  deleteComplete$ = new Subject<boolean>();
+
   constructor() {}
 
   addFolder(folder: Folder) {
@@ -108,6 +113,40 @@ export class DemoService {
     this.treeNodes$.next(this.treeNodes);
     this.updateResult.next({success: true});
     this.selectedFolderId$.next(this.selectedFolderId$.value);
+  }
+
+  renameFolder(folder: Folder) {
+    this.renameComplete$.next(false);
+    const index = this.folders.findIndex(f => f.id === folder.id);
+    if (index !== -1) {
+      this.folders[index] = {...this.folders[index], name: folder.name};
+      this.treeNodes = listToTree(this.folders);
+      this.treeNodes$.next(this.treeNodes);
+    }
+    setTimeout(() => this.renameComplete$.next(true), 0);
+  }
+
+  deleteFolder(folder: Folder) {
+    this.deleteComplete$.next(false);
+    const hasSubFolders = this.folders.some(f => f.parent_id === folder.id);
+    if (hasSubFolders) {
+      this.notificationService.error('Error', `Cannot delete folder that contains subfolders`);
+      setTimeout(() => this.deleteComplete$.next(true), 0);
+      return;
+    }
+    const hasSnippets = (this.snippets.get(folder.id) || []).length > 0;
+    if (hasSnippets) {
+      this.notificationService.error('Error', `Cannot delete folder that contains snippets`);
+      setTimeout(() => this.deleteComplete$.next(true), 0);
+      return;
+    }
+    this.folders = this.folders.filter(f => f.id !== folder.id);
+    this.treeNodes = listToTree(this.folders);
+    this.treeNodes$.next(this.treeNodes);
+    if (this.selectedFolderId$.value === folder.id) {
+      this.setSelectedFolder(null);
+    }
+    setTimeout(() => this.deleteComplete$.next(true), 0);
   }
 
   /**

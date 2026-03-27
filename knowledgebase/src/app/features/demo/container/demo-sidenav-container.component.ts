@@ -15,14 +15,16 @@ import {DemoService} from '../service/demo.service';
       [snippets]="demoService.snippets$ | async"
       [allowAddFolder]="true"
       [selectedUserName]=""
-      [renameComplete]=""
-      [deleteComplete]=""
+      [renameComplete]="demoService.renameComplete$ | async"
+      [deleteComplete]="demoService.deleteComplete$ | async"
       [addingFolderInProgress]="demoService.addingFolder$ |async"
       [showSidenav]="true"
       (newFolder)="demoService.addFolder($event)"
       (selectedItemChange)="demoService.setSelectedFolder($event)"
       (movedFolders)="demoService.moveFolders($event)"
       (movedSnippets)="demoService.moveSnippets($event)"
+      (deleteFolder)="demoService.deleteFolder($event)"
+      (renameFolder)="demoService.renameFolder($event)"
     />`,
 })
 export class DemoSidenavContainerComponent {
