@@ -1,9 +1,9 @@
-import {listToTree} from "../list-to-tree";
-import {getSubFolders} from "../get-sub-folders";
+import {getSubFolders} from '../get-sub-folders';
+import {Folder, listToTree} from '@kb-rest/shared';
 
 describe('getSubFolders', () => {
 
-  const list = [
+  const list: Folder[] = [
     {id: 1, name: 'Akros', parent_id: null, user_id: 1},
     {id: 2, name: 'SQL', parent_id: null, user_id: 1},
     {id: 3, name: 'PSQL', parent_id: 2, user_id: 1},

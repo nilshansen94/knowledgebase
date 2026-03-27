@@ -1,9 +1,8 @@
 import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, model, Output, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {Folder, Snippet} from '@kb-rest/shared';
+import {Folder, getSubFolders, isSnippet, KbTreeNode, Snippet} from '@kb-rest/shared';
 import {ITreeOptions, TreeComponent, TreeModel, TreeModule, TreeNode} from '@ali-hm/angular-tree-component';
 import {FormsModule} from '@angular/forms';
-import {KbTreeNode} from '../api/kb-tree-node';
 import {ContextMenuItem} from '../../../components/context-menu/context-menu.component';
 import {ContextMenuDirective} from '../../../components/context-menu/context-menu.directive';
 import {TooltipDirective} from 'ngx-bootstrap/tooltip';
@@ -32,9 +31,42 @@ export class SidenavComponent {
   //angular-tree docs: https://angular2-tree.readme.io/docs/drag-drop
   treeOptions: ITreeOptions = {
     childrenField: 'childNodes',
-    allowDrag: (node) => node.data.id === -1 || this.allowMoveFolders,
+    allowDrag: (node) => {
+      /*if (node.data.hasOwnProperty('is_own_snippet')) {
+        return false;
+      }*/
+      return node.data.id === -1 || this.allowMoveFolders;
+    },
     //todo allow drop to root
-    allowDrop: (from, to) => to.parent.data.isFolder,
+    allowDrop: (_source, _target) => {
+      const target = _target.parent.data;
+      //allow dropping snippets on folders
+      const source = _source.hasOwnProperty('data') ? _source.data : _source;
+      const sourceIsSnippet = isSnippet(source);
+      if (sourceIsSnippet && target.isFolder) {
+        return true;
+      }
+      if(isSnippet(target)) {
+        return false;
+      }
+      //root slot: allow only folders
+      if(target.virtual) {
+        return !sourceIsSnippet;
+      }
+      //allow new folder
+      if(source.id === -1) {
+        return true;
+      }
+
+      // disallow drop to target that is child of the source
+      const subFolders = getSubFolders(source.childNodes, target.id);
+      if (!(subFolders.length === 1 && subFolders[0] === -1)) {
+        return false;
+      }
+
+      // target needs to be a folder
+      return target.isFolder;
+    },
   };
 
   showAddFolderInput = false;
@@ -259,10 +291,25 @@ export class SidenavComponent {
     this.updateTree();
   }
 
+  /**
+   * When dropping an element on a drop slot on the root level
+   * @param event
+   */
+  onDropRoot(event) {
+    console.log('onDropRoot', event);
+    const isFolder = event.from.parent.isFolder;
+    if(!isFolder) {
+      console.log('You cannot drop a snippet on the root level');
+      return;
+    }
+    this.movedFoldersMap.set(event.node.id, null);
+    this.tree.treeModel.update();
+  }
+
   onDrop(e: {event: DragEvent, element: Snippet | any}, node: TreeNode) {
     //todo set movedFoldersMap and movedSnippetsMap, remove onMoveNode method
     //todo new folder was not placed in parent folder, but in root
-    console.log(e, node)
+    console.log('onDrop', e, node)
     //was: html: onDrop($event)
     if (e.element instanceof TreeNode) {
       const itemToMove = e.element.data;

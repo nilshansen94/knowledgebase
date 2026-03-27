@@ -2,10 +2,9 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@
 import {CommonModule} from '@angular/common';
 import {SearchComponent} from '../../../components/search/search.component';
 import {DbUser} from '../../../../../../backend/src/api';
-import {Snippet, SnippetPinRequest} from '@kb-rest/shared';
+import {KbTreeNode, Snippet, SnippetPinRequest} from '@kb-rest/shared';
 import {SnippetComponent} from '../../snippets/component/snippet.component';
 import {RouterLink} from '@angular/router';
-import {KbTreeNode} from '../../sidenav/api/kb-tree-node';
 import {ModalService} from '../../../services/modal/modal.service';
 import {ModalModule} from 'ngx-bootstrap/modal';
 

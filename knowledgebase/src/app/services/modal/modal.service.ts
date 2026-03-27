@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
 import {BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
-import {Folder} from '@kb-rest/shared';
+import {Folder, KbTreeNode} from '@kb-rest/shared';
 import {ModalFolderSelectionComponent} from '../../components/modal-folder-selection/modal-folder-selection.component';
-import {KbTreeNode} from '../../features/sidenav/api/kb-tree-node';
 
 @Injectable({
   providedIn: 'root'

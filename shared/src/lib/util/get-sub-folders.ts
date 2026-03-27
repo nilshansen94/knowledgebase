@@ -23,6 +23,7 @@ const findInTree = (tree: Folder[], id: number): Folder => {
       if(result){return result}
     }
   }
+  return null;
 }
 
 const getChildrenOf = (folder: Folder): Folder[] => {

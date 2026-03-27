@@ -1,7 +1,6 @@
 import {Request, Response} from 'express';
-import {listToTree} from '../list-to-tree';
 import {deleteFrom, getTransaction, insert, select, update} from '../db/db-config';
-import {Folder} from '@kb-rest/shared';
+import {Folder, listToTree} from '@kb-rest/shared';
 
 export async function getFolders(req: Request, res: Response){
   /*

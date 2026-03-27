@@ -124,8 +124,7 @@ export class HomeComponent implements OnChanges, AfterViewInit {
     if(changes['snippets'] && !changes['snippets']?.firstChange){
       this.loadingSnippets = false;
     }
-    if(
-      changes['currentFolder'] && changes['currentFolder'].previousValue
+    if(changes['currentFolder'] && changes['currentFolder'].previousValue
       && changes['currentFolder'].previousValue?.id != changes['currentFolder'].currentValue?.id){
       this.loadingSnippets = true;
     }

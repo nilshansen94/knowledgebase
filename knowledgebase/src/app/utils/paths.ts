@@ -8,4 +8,5 @@ export const PATHS = {
   WELCOME: 'welcome',
   REGISTER: 'register',
   PROFILE: 'profile',
+  DEMO: 'demo',
 }

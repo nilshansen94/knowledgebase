@@ -14,6 +14,7 @@ import {NotificationService} from './services/navigation/notification.service';
 import {ContextMenuComponent} from './components/context-menu/context-menu.component';
 import {SidenavService} from './features/sidenav/service/sidenav.service';
 import {MyHttpService} from './services/http/my-http.service';
+import {DemoSidenavContainerComponent} from './features/demo/container/demo-sidenav-container.component';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +26,7 @@ import {MyHttpService} from './services/http/my-http.service';
     HeaderComponent,
     NotificationComponent,
     ContextMenuComponent,
+    DemoSidenavContainerComponent,
   ],
   providers: [
     provideMarkdown({})
@@ -59,6 +61,9 @@ export class AppComponent {
       }
       if(e.url.startsWith('/' + PATHS.PROFILE)){
         return PATHS.PROFILE;
+      }
+      if(e.url.startsWith('/' + PATHS.DEMO)){
+        return PATHS.DEMO;
       }
       return PATHS.HOME;
     })
