@@ -13,7 +13,7 @@ export class AuthService {
   private isLoggedInSubject = new ReplaySubject<boolean>(1);
 
   public isLoggedIn$ = this.isLoggedInSubject.asObservable().pipe(
-    tap(r => console.log('AuthService isLoggedIn$', r)),
+    //tap(r => console.log('AuthService isLoggedIn$', r)),
   );
 
   private checkLogin$: Observable<boolean> = this.http.get('checkLogin').pipe(
