@@ -343,8 +343,8 @@ export class SidenavComponent {
     //add snippet from snippet list
     const snippet = e.element;
     const targetFolder = node.data as Folder;
-    if(node.data.childNodes.find(e => e.id === snippet.id)){
-      console.log('ignore dropping a snippet again');
+    if(node.data.childNodes.find(e => e.id === snippet.id && !e.isFolder)){
+      console.log('ignore dropping a snippet again', node, e);
       return;
     }
     node.data.childNodes.push({...snippet, name: snippet.title, parent_id: targetFolder.id});

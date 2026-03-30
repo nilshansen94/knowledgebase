@@ -1,6 +1,7 @@
 import {Request, Response} from 'express';
 import {DbUser} from '../../api';
 import {select} from '../db/db-config';
+import process from 'node:process';
 
 export async function getUsers(req: Request, res: Response){
   const userId = req.session.userId;
@@ -29,7 +30,7 @@ export async function getCommunitySnippets(req: Request, res: Response) {
     res.end();
     return;
   }
-  const query = `SELECT snippet.*, kb_user.name as user_name,
+  let query = `SELECT snippet.*, kb_user.name as user_name,
        MATCH(title, content) against($search) as r1, match(title) against($search) as r2
        FROM usr_fold_snip
               join kb_user on kb_user.id = usr_fold_snip.user_id
@@ -40,6 +41,27 @@ export async function getCommunitySnippets(req: Request, res: Response) {
               AND snippet.user_id != $user_id
               AND snippet.public IS TRUE
               ORDER BY r1 DESC, r2 DESC, snippet.title`;
+  if(process.env.DB_DIALECT === 'postgres'){
+    query = `SELECT snippet.*, kb_user.name as user_name,
+              ts_rank(
+                to_tsvector('simple', coalesce(snippet.title,'') || ' ' || coalesce(snippet.content,'')),
+                plainto_tsquery('simple', $search)
+              ) AS r1,
+              ts_rank(
+                to_tsvector('simple', coalesce(snippet.title,'')),
+                plainto_tsquery('simple', $search)
+              ) AS r2
+             FROM usr_fold_snip
+               join kb_user on kb_user.id = usr_fold_snip.user_id
+               join folder on folder.id = usr_fold_snip.folder
+               join snippet on snippet.id = usr_fold_snip.snip_id
+             WHERE to_tsvector('simple', coalesce(snippet.title,'') || ' ' || coalesce(snippet.content,''))
+                       @@ plainto_tsquery('simple', $search)
+               AND kb_user.id != $user_id
+               AND snippet.user_id != $user_id
+               AND snippet.public IS TRUE
+             ORDER BY r1 DESC, r2 DESC, snippet.title`;
+  }
   const rows = await select(query, {search: searchParam, user_id: userId});
   res.json(rows);
   res.end();

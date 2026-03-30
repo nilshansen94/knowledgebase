@@ -15,7 +15,7 @@
 />
 
 <div class="main-wrapper">
-  <nav [class.hideNav]="appService.hideNav$ |async">
+  <nav [hidden]="appService.hideNav$ |async">
     @if (authService.isLoggedIn$ |async) {
       <app-sidenav-container/>
     } @else {

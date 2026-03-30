@@ -65,7 +65,6 @@ export class SnippetsService {
      map(folders => folders as (Snippet & { folder: number })[]),
      //convert tiny-int from mysql to boolean
      tap(snippets => {
-       console.log('get snippets', snippets?.length)
        this.pagingService.setLoading(false);
        this.pagingService.updatePagingState(snippets?.length || 0);
        if (this.pagingService.getCurrentPage() === 0) {
