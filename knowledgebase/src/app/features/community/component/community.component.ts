@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {SearchComponent} from '../../../components/search/search.component';
 import {DbUser} from '../../../../../../backend/src/api';
 import {KbTreeNode, Snippet, SnippetPinRequest} from '@kb-rest/shared';
@@ -11,7 +11,7 @@ import {ModalModule} from 'ngx-bootstrap/modal';
 @Component({
   selector: 'app-community',
   standalone: true,
-  imports: [CommonModule, SearchComponent, SnippetComponent, RouterLink, ModalModule],
+  imports: [SearchComponent, SnippetComponent, RouterLink, ModalModule],
   templateUrl: './community.component.html',
   styleUrls: ['./community.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

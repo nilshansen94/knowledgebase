@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, model, Output, ViewChild} from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {Folder, getSubFolders, isSnippet, KbTreeNode, Snippet} from '@kb-rest/shared';
 import {ITreeOptions, TreeComponent, TreeModel, TreeModule, TreeNode} from '@ali-hm/angular-tree-component';
 import {FormsModule} from '@angular/forms';
@@ -10,7 +10,7 @@ import {TooltipDirective} from 'ngx-bootstrap/tooltip';
 @Component({
   selector: 'app-sidenav',
   standalone: true,
-  imports: [CommonModule, FormsModule, TreeModule, ContextMenuDirective, TooltipDirective],
+  imports: [FormsModule, TreeModule, ContextMenuDirective, TooltipDirective],
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
   //todo onPush in all pure components !!

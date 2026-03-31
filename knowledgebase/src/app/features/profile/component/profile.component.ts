@@ -1,10 +1,10 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {environment} from '../../../../environments/environment';
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })

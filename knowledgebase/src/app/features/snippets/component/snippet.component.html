@@ -1,39 +1,49 @@
-<div class="snippet-container" *ngIf="snippet" [class.foreignSnippet]="!canEdit">
-  <div class="control-icons">
-    <div class="icons-status">
-      <span class="material-icons" *ngIf="canEdit">{{snippet.public ? 'public': 'lock'}}</span>
-      <span class="material-symbols-outlined" *ngIf="snippet.is_pinned">keep</span>
+@if (snippet) {
+  <div class="snippet-container" [class.foreignSnippet]="!canEdit">
+    <div class="control-icons">
+      <div class="icons-status">
+        @if (canEdit) {
+          <span class="material-icons">{{snippet.public ? 'public': 'lock'}}</span>
+        }
+        @if (snippet.is_pinned) {
+          <span class="material-symbols-outlined">keep</span>
+        }
+      </div>
+      <div class="icons-edit">
+        @if (canEdit) {
+          <button (click)="togglePublicSnippet()" title="Make snippet {{snippet.public ? 'private':'public'}}">
+            <span class="material-icons">{{snippet.public ? 'lock': 'public'}}</span>
+          </button>
+          <button (click)="doEditSnippet()" title="Edit snippet">
+            <span class="material-icons edit-snippet">edit</span>
+          </button>
+          <button (click)="doDeleteSnippet()" (mouseleave)="confirmDelete = false" title="Delete snippet" [disabled]="pendingRequest">
+            @if (!confirmDelete) {
+              <span class="material-icons delete-snippet">delete</span>
+            }
+            @if (confirmDelete) {
+              <span class="material-icons delete-snippet">question_mark</span>
+            }
+          </button>
+        }
+        @if (!canEdit) {
+          <button [disabled]="pendingRequest || !canPin">
+            <span class="material-symbols-outlined" (click)="doPinSnippet()">{{snippet.is_pinned ? 'keep_off':'keep'}}</span>
+          </button>
+        }
+      </div>
     </div>
-    <div class="icons-edit">
-      <ng-container *ngIf="canEdit">
-        <button (click)="togglePublicSnippet()" title="Make snippet {{snippet.public ? 'private':'public'}}">
-          <span class="material-icons">{{snippet.public ? 'lock': 'public'}}</span>
-        </button>
-        <button (click)="doEditSnippet()" title="Edit snippet">
-          <span class="material-icons edit-snippet">edit</span>
-        </button>
-        <button (click)="doDeleteSnippet()" (mouseleave)="confirmDelete = false" title="Delete snippet" [disabled]="pendingRequest">
-          <span *ngIf="!confirmDelete" class="material-icons delete-snippet">delete</span>
-          <span *ngIf="confirmDelete" class="material-icons delete-snippet">question_mark</span>
-        </button>
-      </ng-container>
-      <ng-container *ngIf="!canEdit">
-        <button [disabled]="pendingRequest || !canPin">
-          <span class="material-symbols-outlined" (click)="doPinSnippet()">{{snippet.is_pinned ? 'keep_off':'keep'}}</span>
-        </button>
-      </ng-container>
+    <h5>{{snippet.title}}</h5>
+    <div class="snippet-content">
+      <markdown
+        [data]="snippet.content"
+        />
     </div>
+    <div class="footer">
+      @if(!snippet.is_own_snippet){
+        <a class="user" [routerLink]="[]" [queryParams]="{user: snippet.user_id}"><span class="material-icons">account_circle</span>{{snippet.user_name}}</a>
+      }
+    </div>
+    <!--<span style="font-size: 0.75em;position: absolute;top: -2px;left: 0;">isOwn{{snippet.is_own_snippet}}, user_id {{snippet.user_id}}, ufs_user {{snippet.ufs_user}}, canPin {{canPin}}</span>-->
   </div>
-  <h5>{{snippet.title}}</h5>
-  <div class="snippet-content">
-    <markdown
-      [data]="snippet.content"
-    />
-  </div>
-  <div class="footer">
-    @if(!snippet.is_own_snippet){
-      <a class="user" [routerLink]="[]" [queryParams]="{user: snippet.user_id}"><span class="material-icons">account_circle</span>{{snippet.user_name}}</a>
-    }
-  </div>
-  <!--<span style="font-size: 0.75em;position: absolute;top: -2px;left: 0;">isOwn{{snippet.is_own_snippet}}, user_id {{snippet.user_id}}, ufs_user {{snippet.ufs_user}}, canPin {{canPin}}</span>-->
-</div>
+}

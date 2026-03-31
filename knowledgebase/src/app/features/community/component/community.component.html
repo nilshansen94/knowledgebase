@@ -7,25 +7,33 @@
       Browse user content to discover new ideas and inspiration for your own projects.
       Pin interesting notes directly into your personal folder structure for later use.
     </p>
-    <span *ngIf="!users" class="loading-icon spin material-symbols-outlined">sync</span>
+    @if (!users) {
+      <span class="loading-icon spin material-symbols-outlined">sync</span>
+    }
     <div class="users">
-      <div *ngFor="let user of users" class="user">
-        <a [routerLink]="['']" [queryParams]="{user: user.id}">{{user.name}}</a>
-      </div>
+      @for (user of users; track user.id) {
+        <div class="user">
+          <a [routerLink]="['']" [queryParams]="{user: user.id}">{{user.name}}</a>
+        </div>
+      }
     </div>
   </div>
 
   <h2>Snippets</h2>
   <app-search (search)="searchForCommunitySnippets($event)" />
   <div class="snippets-container">
-    <span *ngIf="(!communitySnippets || communitySnippets.length === 0) && currentSearch === ''">Search for something to get started.</span>
-    <app-snippet *ngFor="let snippet of communitySnippets"
-                 [snippet]="snippet"
-                 [attr.id]="'snippet'+snippet.id"
-                 [canEdit]="false"
-                 [canPin]="!snippet.is_own_snippet"
-                 [pinWithModal]="true"
-                 (pinSnippet)="doPinSnippet(snippet)"
-    />
+    @if ((!communitySnippets || communitySnippets.length === 0) && currentSearch === '') {
+      <span>Search for something to get started.</span>
+    }
+    @for (snippet of communitySnippets; track snippet.id) {
+      <app-snippet
+        [snippet]="snippet"
+        [attr.id]="'snippet'+snippet.id"
+        [canEdit]="false"
+        [canPin]="!snippet.is_own_snippet"
+        [pinWithModal]="true"
+        (pinSnippet)="doPinSnippet(snippet)"
+        />
+    }
   </div>
 </div>

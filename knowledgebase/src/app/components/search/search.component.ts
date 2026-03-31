@@ -1,12 +1,12 @@
 import {Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {debounceTime, distinctUntilChanged, fromEvent, Subscription, tap} from 'rxjs';
 import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })
