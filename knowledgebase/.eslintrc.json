@@ -1,6 +1,10 @@
 {
   "extends": ["../.eslintrc.json"],
-  "ignorePatterns": ["!**/*", "storybook-static"],
+  "ignorePatterns": [
+    "!**/*",
+    "storybook-static",
+    "**/vitest.config.*.timestamp*"
+  ],
   "overrides": [
     {
       "files": ["*.ts"],

@@ -53,3 +53,4 @@ Thumbs.db
 
 .claude/worktrees
 .claude/settings.local.json
+vitest.config.*.timestamp*

@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 
 import {RouterLink} from '@angular/router';
-import {PATHS} from 'knowledgebase/src/app/utils/paths';
+import {PATHS} from '../../../utils/paths';
 
 @Component({
   selector: 'app-header',
