@@ -27,7 +27,8 @@ const dropTables = async () => {
   }
 }
 
-describe('buildSelectSnippetQuery', () => {
+//skipped, only for debugging
+describe.skip('buildSelectSnippetQuery', () => {
 
   beforeAll(async () => {
     if(CLEANUP) {

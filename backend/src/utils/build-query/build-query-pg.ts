@@ -4,7 +4,7 @@ export const buildSelectSnippetQueryPostgres = (
   searchParam: string,
   folderId: number|string,
   userParam: number,
-  page: number = 0
+  page = 0
 ) => {
   //console.log('searchParam, folderId, userParam', searchParam, folderId, userParam);
   /*
@@ -17,7 +17,7 @@ export const buildSelectSnippetQueryPostgres = (
    */
 
   let withCteStart = 'with cte as (';
-  let select = `select snippet.*,
+  const select = `select snippet.*,
        usr_fold_snip.folder,
        usr_fold_snip.user_id                 as ufs_user,
        kb_user.name as user_name,
@@ -39,7 +39,6 @@ export const buildSelectSnippetQueryPostgres = (
   const where = `WHERE 1 = 1
       and usr_fold_snip.user_id = $userParam`;
   let whereFolder = `AND usr_fold_snip.folder = any(string_to_array($folderIds, ',')::int[])`;
-  //@ts-ignore
   if(!searchParam){
     whereFolder = `AND usr_fold_snip.folder = $folderIds`;
   }
@@ -71,8 +70,7 @@ export const buildSelectSnippetQueryPostgres = (
     unionFromWhere = '';
     unionCommunityWithoutOwnSnippets = '';//not really necessary
   }
-  //@ts-ignore
-  if(isNaN(folderId)){
+  if(isNaN(folderId as number)){
     whereFolder = '';
   }
   if(!userParam){

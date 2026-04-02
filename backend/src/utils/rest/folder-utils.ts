@@ -118,7 +118,7 @@ export async function moveSnippets(req: Request, res: Response) {
 }
 
 export async function deleteFolder(req: Request, res: Response) {
-  const folderId = parseInt(req.params.id);
+  const folderId = parseInt(req.params.id as string);
   const userId = req.session.userId;
   const trx = await getTransaction();
 
