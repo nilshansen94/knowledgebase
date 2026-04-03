@@ -1,4 +1,4 @@
-import {Component, DestroyRef, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
 import {SidenavComponent} from '../../features/sidenav/component/sidenav.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -14,11 +14,8 @@ import {Folder, KbTreeNode} from '@kb-rest/shared';
   styleUrl: './modal-folder-selection.component.scss'
 })
 export class ModalFolderSelectionComponent implements OnInit {
-
-  constructor(
-    public bsModalRef: BsModalRef,
-    private readonly destroyRef: DestroyRef,
-    ) {}
+  public readonly bsModalRef = inject(BsModalRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   selectedFolder: Folder;
 

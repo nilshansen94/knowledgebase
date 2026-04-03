@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {Folder, KbTreeNode} from '@kb-rest/shared';
 import {ModalFolderSelectionComponent} from '../../components/modal-folder-selection/modal-folder-selection.component';
@@ -7,8 +7,7 @@ import {ModalFolderSelectionComponent} from '../../components/modal-folder-selec
   providedIn: 'root'
 })
 export class ModalService {
-
-  constructor(private readonly modalService: BsModalService) { }
+  private readonly modalService = inject(BsModalService);
 
   openSelectFolderModal(state: {folders: KbTreeNode[]}): Promise<Folder>{
     const initialState: ModalOptions = {

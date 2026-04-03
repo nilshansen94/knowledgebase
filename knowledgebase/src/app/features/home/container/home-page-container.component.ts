@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {HomeComponent} from '../component/home.component';
 import {SnippetsService} from '../../snippets/service/snippets.service';
@@ -39,15 +39,13 @@ import {take} from 'rxjs';
 })
 export class HomePageContainerComponent implements OnInit, OnDestroy {
 
-  constructor(
-    public appService: AppService,
-    public snippetsService: SnippetsService,
-    public pagingService: PagingService,
-    public sidenavService: SidenavService,
-    private acitvatedRoute: ActivatedRoute,
-  ) {}
+  public readonly appService = inject(AppService);
+  public readonly snippetsService = inject(SnippetsService);
+  public readonly pagingService = inject(PagingService);
+  public readonly sidenavService = inject(SidenavService);
+  private readonly activatedRoute = inject(ActivatedRoute);
 
-  communityUser$ = this.acitvatedRoute.queryParamMap.pipe(
+  communityUser$ = this.activatedRoute.queryParamMap.pipe(
     map(queryParamMap => {
       const user = queryParamMap.get('user');
       if(!user){

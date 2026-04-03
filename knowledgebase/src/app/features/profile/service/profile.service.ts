@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {map} from 'rxjs/operators';
 import {take} from 'rxjs';
@@ -7,12 +7,13 @@ import {take} from 'rxjs';
   providedIn: 'root'
 })
 export class ProfileService {
+  private readonly http = inject(MyHttpService);
 
   myUsername$ = this.http.get2<{name: string}>('my-username').pipe(
     map(res => res?.name)
   );
 
-  constructor(private readonly http: MyHttpService) { }
+  constructor() { }
 
   importFile(file: File) {
     const formData = new FormData();

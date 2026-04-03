@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ProfileComponent} from '../component/profile.component';
 import {ProfileService} from '../service/profile.service';
@@ -14,6 +14,6 @@ import {ProfileService} from '../service/profile.service';
 })
 export class ProfileContainerComponent {
 
-  constructor(public profileService: ProfileService) {}
+  public readonly profileService = inject(ProfileService);
 
 }

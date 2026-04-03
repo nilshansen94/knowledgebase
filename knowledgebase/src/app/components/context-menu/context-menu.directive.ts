@@ -1,4 +1,4 @@
-import {Directive, ElementRef, EventEmitter, HostListener, Input, Output} from '@angular/core';
+import {Directive, EventEmitter, HostListener, inject, Input, Output} from '@angular/core';
 import {ContextMenuItem} from './context-menu.component';
 import {ContextMenuService} from './context-menu.service';
 import {take, takeUntil} from 'rxjs/operators';
@@ -13,10 +13,7 @@ export class ContextMenuDirective {
 
   @Output() contextMenuClick = new EventEmitter<ContextMenuItem>();
 
-  constructor(
-    private elementRef: ElementRef,
-    private contextMenuService: ContextMenuService
-  ) {}
+  private readonly contextMenuService = inject(ContextMenuService);
 
   @HostListener('contextmenu', ['$event'])
   onContextMenu(event: MouseEvent) {

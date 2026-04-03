@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {
   BehaviorSubject,
   catchError,
@@ -27,18 +27,16 @@ import {NotificationService} from '../../../services/navigation/notification.ser
 })
 export class SidenavService {
 
+  private readonly httpService = inject(MyHttpService);
+  private readonly appService = inject(AppService);
+  private readonly snippetsService = inject(SnippetsService);
+  private readonly modalService = inject(ModalService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly route = inject(ActivatedRoute);
+
 
   private showSidenav = new BehaviorSubject<boolean>(false);
   public showSidenav$ = this.showSidenav.asObservable();
-
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly httpService: MyHttpService,
-    private readonly appService: AppService,
-    private readonly snippetsService: SnippetsService,
-    private readonly modalService: ModalService,
-    private readonly notificationService: NotificationService,
-  ) {}
 
   toggleSidenav() {
     this.showSidenav.next(!this.showSidenav.getValue());

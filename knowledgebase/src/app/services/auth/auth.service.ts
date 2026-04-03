@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {MyHttpService} from '../http/my-http.service';
 import {catchError, map, Observable, of, ReplaySubject, take, tap} from 'rxjs';
 import {environment} from '../../../environments/environment';
@@ -8,6 +8,12 @@ import {environment} from '../../../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
+
+  private readonly http = inject(MyHttpService);
+
+  constructor() {
+    this.checkLogin();
+  }
 
   //see https://stackoverflow.com/questions/67027172/subscribing-subject-in-guard-not-giving-response
   private isLoggedInSubject = new ReplaySubject<boolean>(1);
@@ -20,10 +26,6 @@ export class AuthService {
     map((r: any) => r?.success === true),
     catchError(e => of(false)),
   );
-
-  constructor(private http: MyHttpService) {
-    this.checkLogin();
-  }
 
   checkLogin() {
     this.checkLogin$.pipe(

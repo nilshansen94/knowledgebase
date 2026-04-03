@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, catchError, combineLatest, map, Observable, of, shareReplay, Subject, switchMap, take, tap} from 'rxjs';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {DbResult, Snippet, SnippetPinRequest} from '@kb-rest/shared';
@@ -10,13 +10,10 @@ import {PagingService} from './paging.service';
   providedIn: 'root'
 })
 export class SnippetsService {
-
-  constructor(
-    private readonly httpService: MyHttpService,
-    private readonly appService: AppService,
-    private readonly route: ActivatedRoute,
-    private readonly pagingService: PagingService,
-  ) { }
+  private readonly httpService = inject(MyHttpService);
+  private readonly appService = inject(AppService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly pagingService = inject(PagingService);
 
   private readonly searchQuery = new BehaviorSubject<string>('');
 

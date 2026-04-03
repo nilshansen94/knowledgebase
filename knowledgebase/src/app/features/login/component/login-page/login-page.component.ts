@@ -18,6 +18,4 @@ export class LoginPageComponent {
   @Output()
   loginByGoogle = new EventEmitter<void>();
 
-  constructor() {}
-
 }

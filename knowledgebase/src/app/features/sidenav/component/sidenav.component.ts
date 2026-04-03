@@ -20,7 +20,7 @@ export class SidenavComponent {
 
   currentlySelectedItem: Folder;
   renamingNode: TreeNode | null = null;
-  renamingNodeName: string = '';
+  renamingNodeName = '';
   renamingInProgressNodeId: number | null = null;
   deletingInProgressNodeId: number | null = null;
   isAddingFolderInProgress = false;
@@ -151,8 +151,6 @@ export class SidenavComponent {
   ];
 
   showSidenav = model<boolean>();
-
-  constructor() {}
 
   onContextMenuItemClick(node: TreeNode, item: ContextMenuItem) {
     const folder = node.data as Folder;

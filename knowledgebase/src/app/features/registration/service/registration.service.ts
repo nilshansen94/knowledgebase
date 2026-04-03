@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {RegistrationRequest, RegistrationResponse} from '../api/registration.model';
@@ -8,8 +8,7 @@ import {MyHttpService} from '../../../services/http/my-http.service';
   providedIn: 'root'
 })
 export class RegistrationService {
-
-  constructor(private readonly http: MyHttpService) {}
+  private readonly http = inject(MyHttpService);
 
   checkUsername(username: string): Observable<boolean> {
     return this.http.get(`check-username/${username}`).pipe(

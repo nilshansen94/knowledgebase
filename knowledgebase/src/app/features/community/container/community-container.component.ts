@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {CommunityComponent} from '../component/community.component';
 import {MyHttpService} from '../../../services/http/my-http.service';
@@ -27,11 +27,9 @@ import {SnippetsService} from '../../snippets/service/snippets.service';
 })
 export class CommunityContainerComponent {
 
-  constructor(
-    public httpService: MyHttpService,
-    public sidenavService: SidenavService,
-    public snippetService: SnippetsService,
-  ) {}
+  public readonly httpService = inject(MyHttpService);
+  public readonly sidenavService = inject(SidenavService);
+  public readonly snippetService = inject(SnippetsService);
 
   private readonly searchCommunitySnippet = new BehaviorSubject<string>('');
 

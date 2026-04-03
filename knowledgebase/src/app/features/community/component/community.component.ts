@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output} from '@angular/core';
 
 import {SearchComponent} from '../../../components/search/search.component';
 import {DbUser} from '../../../../../../backend/src/api';
@@ -18,7 +18,7 @@ import {ModalModule} from 'ngx-bootstrap/modal';
 })
 export class CommunityComponent {
 
-  constructor(private readonly modalService: ModalService) {}
+  private readonly modalService = inject(ModalService);
 
   currentSearch = '';
 
