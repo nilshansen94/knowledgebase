@@ -29,11 +29,11 @@ jobs:
           cache: 'npm'
       - name: npm ci
         run: npm ci
-      - name: Build knowledgebase
-        run: npm run kb:build:prod
-      - name: Build backend
-        run: npm run backend:build:prod
+      - name: Build all
+        run: npm run all:build
       - name: Build storybook
         run: npm run kb:storybook:build
-      - name: Test knowledgebase
-        run: npm run kb:test
+      - name: Test all
+        run: npm run all:test
+      - name: Lint all
+        run: npm run all:lint
