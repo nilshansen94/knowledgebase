@@ -1,8 +1,7 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output} from '@angular/core';
 
 import {SearchComponent} from '../../../components/search/search.component';
-import {DbUser} from '../../../../../../backend/src/api';
-import {KbTreeNode, Snippet, SnippetPinRequest} from '@kb-rest/shared';
+import {KbTreeNode, Snippet, SnippetPinRequest, User} from '@kb-rest/shared';
 import {SnippetComponent} from '../../snippets/component/snippet.component';
 import {RouterLink} from '@angular/router';
 import {ModalService} from '../../../services/modal/modal.service';
@@ -23,7 +22,7 @@ export class CommunityComponent {
   currentSearch = '';
 
   @Input()
-  users: DbUser[]
+  users: User[];
 
   @Input()
   communitySnippets: Snippet[];

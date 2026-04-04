@@ -41,7 +41,7 @@ export class SidenavComponent {
     allowDrop: (_source, _target) => {
       const target = _target.parent.data;
       //allow dropping snippets on folders
-      const source = _source.hasOwnProperty('data') ? _source.data : _source;
+      const source = Object.hasOwn(_source, 'data') ? _source.data : _source;
       const sourceIsSnippet = isSnippet(source);
       if (sourceIsSnippet && target.isFolder) {
         return true;

@@ -20,7 +20,7 @@
   </div>
 
   <h2>Snippets</h2>
-  <app-search (search)="searchForCommunitySnippets($event)" />
+  <app-search (searchChange)="searchForCommunitySnippets($event)" />
   <div class="snippets-container">
     @if ((!communitySnippets || communitySnippets.length === 0) && currentSearch === '') {
       <span>Search for something to get started.</span>

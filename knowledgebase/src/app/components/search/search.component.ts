@@ -17,7 +17,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput', {static: true}) searchInput: ElementRef;
   inputSubscription: Subscription;
 
-  @Output() search = new EventEmitter<string>();
+  @Output() searchChange = new EventEmitter<string>();
 
   ngOnInit() {
     this.inputSubscription = fromEvent(this.searchInput.nativeElement, 'keyup').pipe(
@@ -26,10 +26,10 @@ export class SearchComponent implements OnInit, OnDestroy {
       tap((e: KeyboardEvent) => {
         if(e.key === 'Escape'){
           this.currentSearch = '';
-          this.search.emit('');
+          this.searchChange.emit('');
           return;
         }
-        this.search.emit(this.currentSearch);
+        this.searchChange.emit(this.currentSearch);
       })
     ).subscribe();
   }
@@ -43,6 +43,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       return;
     }
     this.currentSearch = '';
-    this.search.emit('');
+    this.searchChange.emit('');
   }
 }

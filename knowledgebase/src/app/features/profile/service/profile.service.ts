@@ -13,8 +13,6 @@ export class ProfileService {
     map(res => res?.name)
   );
 
-  constructor() { }
-
   importFile(file: File) {
     const formData = new FormData();
     formData.append('importData', file, file.name);

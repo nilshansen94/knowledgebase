@@ -6,7 +6,7 @@ import {tap} from 'rxjs';
 import {Folder, KbTreeNode} from '@kb-rest/shared';
 
 @Component({
-  selector: 'kb-rest-modal-folder-selection',
+  selector: 'app-modal-folder-selection',
   imports: [
     SidenavComponent
   ],
@@ -21,17 +21,17 @@ export class ModalFolderSelectionComponent implements OnInit {
 
   @Input() folders: KbTreeNode[];
 
-  @Output() onSave: EventEmitter<Folder|null> = new EventEmitter();
+  @Output() save: EventEmitter<Folder|null> = new EventEmitter();
 
   ngOnInit() {
     this.bsModalRef.onHide?.pipe(
       takeUntilDestroyed(this.destroyRef),
-      tap(() => this.onSave.emit(null))
+      tap(() => this.save.emit(null))
     ).subscribe();
   }
 
   closeModal() {
-    this.onSave.emit(null);
+    this.save.emit(null);
     this.bsModalRef.hide();
   }
 
@@ -42,7 +42,7 @@ export class ModalFolderSelectionComponent implements OnInit {
 
   saveFolder() {
     console.log('save folder', this.selectedFolder);
-    this.onSave.emit(this.selectedFolder);
+    this.save.emit(this.selectedFolder);
     this.bsModalRef.hide();
   }
 }

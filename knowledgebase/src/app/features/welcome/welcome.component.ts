@@ -3,7 +3,7 @@ import {Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 
 @Component({
-  selector: 'kb-rest-welcome',
+  selector: 'app-welcome',
   standalone: true,
   imports: [RouterLink],
   templateUrl: './welcome.component.html',

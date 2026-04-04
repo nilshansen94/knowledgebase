@@ -3,8 +3,7 @@ import {CommonModule} from '@angular/common';
 import {CommunityComponent} from '../component/community.component';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {BehaviorSubject, map, switchMap} from 'rxjs';
-import {DbUser} from '../../../../../../backend/src/api';
-import {Snippet} from '@kb-rest/shared';
+import {Snippet, User} from '@kb-rest/shared';
 import {SidenavService} from '../../sidenav/service/sidenav.service';
 import {SnippetsService} from '../../snippets/service/snippets.service';
 
@@ -34,7 +33,7 @@ export class CommunityContainerComponent {
   private readonly searchCommunitySnippet = new BehaviorSubject<string>('');
 
   users$ = this.httpService.get('users').pipe(
-    map(users => users as DbUser[])
+    map(users => users as User[])
   );
 
   communitySnippets$ = this.searchCommunitySnippet.pipe(

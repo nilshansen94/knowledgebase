@@ -31,7 +31,7 @@ import {take} from 'rxjs';
         (deleteSnippet)="snippetsService.deleteSnippet($event)"
         (togglePublic)="togglePublicSnippet($event)"
         (pinSnippet)="sidenavService.pinSnippet($event)"
-        (search)="snippetsService.searchSnippet($event)"
+        (searchChange)="snippetsService.searchSnippet($event)"
     />
   `,
   styles: [

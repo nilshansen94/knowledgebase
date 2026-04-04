@@ -29,3 +29,9 @@ export interface Snippet {
 export function isSnippet(obj: any) {
   return obj?.hasOwnProperty('is_own_snippet');
 }
+
+export interface User {
+  id: number;
+  name: string;
+  email?: string;
+}

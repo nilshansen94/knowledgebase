@@ -13,8 +13,6 @@ export class LoginService {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
-  constructor() {}
-
   logout() {
     this.httpService.get('logout').pipe(
       tap(res => {

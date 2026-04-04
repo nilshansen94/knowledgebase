@@ -17,7 +17,7 @@ export class ModalService {
       }
     };
     const bsModalRef = this.modalService.show(ModalFolderSelectionComponent, initialState);
-    return new Promise<Folder>((resolve, reject) => bsModalRef.content.onSave.subscribe(result => resolve(result)));
+    return new Promise<Folder>((resolve, reject) => bsModalRef.content.save.subscribe(result => resolve(result)));
   }
 
 }

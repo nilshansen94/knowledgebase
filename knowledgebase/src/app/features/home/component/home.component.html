@@ -34,7 +34,7 @@
   </div>
 }
 
-<app-search (search)="searchSnippets($event)"/>
+<app-search (searchChange)="searchSnippets($event)"/>
 
 @if (hasFolders && snippets?.length === 0 && !currentSearch && !currentFolder) {
   <span>Welcome to your personal knowledgebase!<br>Select a folder or search for content to get started.</span>

@@ -1,7 +1,7 @@
 @if((notificationService.notifications$ | async)?.length > 0){
   <app-notification
     [notifications]="notificationService.notifications$ | async"
-    (close)="notificationService.remove($event)"
+    (closed)="notificationService.remove($event)"
     (clearAll)="notificationService.clear()"
   />
 }

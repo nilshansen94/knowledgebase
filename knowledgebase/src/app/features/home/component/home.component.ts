@@ -83,7 +83,7 @@ export class HomeComponent implements OnChanges, AfterViewInit {
 
   @Output() pinSnippet = new EventEmitter<Snippet>();
 
-  @Output() search = new EventEmitter<string>();
+  @Output() searchChange = new EventEmitter<string>();
 
   ngAfterViewInit() {
     this.setupInfiniteScroll();
@@ -163,7 +163,7 @@ export class HomeComponent implements OnChanges, AfterViewInit {
   }
 
   searchSnippets(search: string) {
-    this.search.emit(search);
+    this.searchChange.emit(search);
     this.currentSearch = search;
   }
 

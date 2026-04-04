@@ -17,7 +17,7 @@
           "error",
           {
             "type": "attribute",
-            "prefix": "kbRest",
+            "prefix": "app",
             "style": "camelCase"
           }
         ],
@@ -25,7 +25,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "kb-rest",
+            "prefix": "app",
             "style": "kebab-case"
           }
         ]

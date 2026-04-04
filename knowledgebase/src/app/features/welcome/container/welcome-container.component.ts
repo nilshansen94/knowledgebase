@@ -4,11 +4,11 @@ import {WelcomeComponent} from '../welcome.component';
 import {AuthService} from '../../../services/auth/auth.service';
 
 @Component({
-  selector: 'kb-rest-welcome-container',
+  selector: 'app-welcome-container',
   standalone: true,
   imports: [CommonModule, WelcomeComponent],
   template: `
-  <kb-rest-welcome [loggedIn]="authService.isLoggedIn$ | async" />
+  <app-welcome [loggedIn]="authService.isLoggedIn$ | async" />
   `,
   styles: ``,
 })
