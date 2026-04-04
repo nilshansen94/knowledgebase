@@ -1,11 +1,11 @@
 import {Component, input} from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {RouterLink} from '@angular/router';
 
 @Component({
-  selector: 'kb-rest-welcome',
+  selector: 'app-welcome',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.scss',
 })

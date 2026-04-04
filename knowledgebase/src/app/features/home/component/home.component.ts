@@ -10,7 +10,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {FormsModule} from '@angular/forms';
 import {LMarkdownEditorModule} from 'ngx-markdown-editor';
 import {DbResult, Folder, Snippet} from '@kb-rest/shared';
@@ -22,7 +22,7 @@ import {TooltipDirective} from 'ngx-bootstrap/tooltip';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, LMarkdownEditorModule, SnippetComponent, SearchComponent, NgxMasonryModule, TooltipDirective],
+  imports: [FormsModule, LMarkdownEditorModule, SnippetComponent, SearchComponent, NgxMasonryModule, TooltipDirective],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -83,7 +83,7 @@ export class HomeComponent implements OnChanges, AfterViewInit {
 
   @Output() pinSnippet = new EventEmitter<Snippet>();
 
-  @Output() search = new EventEmitter<string>();
+  @Output() searchChange = new EventEmitter<string>();
 
   ngAfterViewInit() {
     this.setupInfiniteScroll();
@@ -163,7 +163,7 @@ export class HomeComponent implements OnChanges, AfterViewInit {
   }
 
   searchSnippets(search: string) {
-    this.search.emit(search);
+    this.searchChange.emit(search);
     this.currentSearch = search;
   }
 

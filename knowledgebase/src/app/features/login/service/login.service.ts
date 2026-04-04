@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {MyHttpService} from '../../../services/http/my-http.service';
 import {tap} from 'rxjs';
 import {Router} from '@angular/router';
@@ -9,12 +9,9 @@ import {PATHS} from '../../../utils/paths';
   providedIn: 'root'
 })
 export class LoginService {
-
-  constructor(
-    private readonly httpService: MyHttpService,
-    private readonly router: Router,
-    private readonly authService: AuthService,
-  ) {}
+  private readonly httpService = inject(MyHttpService);
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
   logout() {
     this.httpService.get('logout').pipe(

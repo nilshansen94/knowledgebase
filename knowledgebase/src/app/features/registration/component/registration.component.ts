@@ -23,8 +23,6 @@ export class RegistrationComponent {
     Validators.pattern('^[a-zA-Z0-9_]+$'),
   ]);
 
-  constructor() {}
-
   onRegister() {
     if (this.usernameControl.value && this.isValid) {
       this.register.emit(this.usernameControl.value);

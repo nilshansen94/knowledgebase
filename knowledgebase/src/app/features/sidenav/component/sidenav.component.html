@@ -6,41 +6,49 @@
         {{ selectedUserName }}
       </div>
     }
-    <div class="add-folder" *ngIf="allowAddFolder">
-      <div *ngIf="!showAddFolderInput && !allowMoveFolders">
-        <button (click)="showAddFolderInput = true" [disabled]="folderPlaced" class="folder-mini-btn" tooltip="Create a new folder" placement="bottom" [delay]="300">
-          <span class="folder-icon material-icons-outlined">create_new_folder</span>
-        </button>
-        <button (click)="doAllowMoveFolders()" [disabled]="folderPlaced" class="folder-mini-btn" tooltip="Move folders and snippets" placement="bottom" [delay]="300">
-          <span class="folder-icon material-symbols-outlined">drag_pan</span>
-        </button>
-      </div>
-      <ng-container *ngIf="showAddFolderInput">
-        <input type="text"
-               placeholder="folder-name"
-               [(ngModel)]="folderNameToAdd"
-               (keydown.enter)="addFolderDragItem()"
-               (keydown.escape)="showAddFolderInput = false"
-               [disabled]="!!folderToDrag || folderPlaced"
-        >
-        <button (click)="addFolderDragItem()" [disabled]="!!folderToDrag || folderPlaced">+</button>
-      </ng-container>
-      <ng-container *ngIf="allowMoveFolders">
-        <button (click)="cancelMovingFolders()">Cancel</button>
-        <button class="primary" (click)="saveMovedFolders()">Save moved folders</button>
-      </ng-container>
-    </div>
-    <div *ngIf="folderToDrag" class="new-folder-wrapper">
-      <p>Place the new folder at the location you want and click on save</p>
-      <div [treeDrag]="folderToDrag" [treeDragEnabled]="true" class="node-content-wrapper new-folder">{{folderToDrag.name}}</div>
-    </div>
-    <div *ngIf="folderPlaced" class="new-folder-wrapper">
-      <p>Click on save when the folder is placed at the right location</p>
+    @if (allowAddFolder) {
       <div class="add-folder">
-        <button (click)="cancelAddingFolder()">cancel</button>
-        <button class="primary" (click)="saveAddedFolder()">save</button>
+        @if (!showAddFolderInput && !allowMoveFolders) {
+          <div>
+            <button (click)="showAddFolderInput = true" [disabled]="folderPlaced" class="folder-mini-btn" tooltip="Create a new folder" placement="bottom" [delay]="300">
+              <span class="folder-icon material-icons-outlined">create_new_folder</span>
+            </button>
+            <button (click)="doAllowMoveFolders()" [disabled]="folderPlaced" class="folder-mini-btn" tooltip="Move folders and snippets" placement="bottom" [delay]="300">
+              <span class="folder-icon material-symbols-outlined">drag_pan</span>
+            </button>
+          </div>
+        }
+        @if (showAddFolderInput) {
+          <input type="text"
+            placeholder="folder-name"
+            [(ngModel)]="folderNameToAdd"
+            (keydown.enter)="addFolderDragItem()"
+            (keydown.escape)="showAddFolderInput = false"
+            [disabled]="!!folderToDrag || folderPlaced"
+            >
+          <button (click)="addFolderDragItem()" [disabled]="!!folderToDrag || folderPlaced">+</button>
+        }
+        @if (allowMoveFolders) {
+          <button (click)="cancelMovingFolders()">Cancel</button>
+          <button class="primary" (click)="saveMovedFolders()">Save moved folders</button>
+        }
       </div>
-    </div>
+    }
+    @if (folderToDrag) {
+      <div class="new-folder-wrapper">
+        <p>Place the new folder at the location you want and click on save</p>
+        <div [treeDrag]="folderToDrag" [treeDragEnabled]="true" class="node-content-wrapper new-folder">{{folderToDrag.name}}</div>
+      </div>
+    }
+    @if (folderPlaced) {
+      <div class="new-folder-wrapper">
+        <p>Click on save when the folder is placed at the right location</p>
+        <div class="add-folder">
+          <button (click)="cancelAddingFolder()">cancel</button>
+          <button class="primary" (click)="saveAddedFolder()">save</button>
+        </div>
+      </div>
+    }
 
     <div class="tree-root-wrapper">
       <tree-root
@@ -49,33 +57,39 @@
         (activate)="setSelectedItem($event)"
         (deactivate)="setSelectedItem($event)"
         (moveNode)="onDropRoot($event)"
-      >
+        >
         <ng-template #treeNodeWrapperTemplate let-node let-index="index">
           <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
             <tree-node-expander [node]="node"></tree-node-expander>
             <div class="node-content-wrapper"
-                 [class.node-content-wrapper-active]="node.isActive"
-                 [class.node-content-wrapper-focused]="node.isFocused"
-                 [class.adding]="node.id === -1"
-                 [class.isMoved]="node.data.isMoved === true"
-                 [class.isSnippet]="!node.data.isFolder"
-                 [class.deleting]="deletingInProgressNodeId === node.id"
+              [class.node-content-wrapper-active]="node.isActive"
+              [class.node-content-wrapper-focused]="node.isFocused"
+              [class.adding]="node.id === -1"
+              [class.isMoved]="node.data.isMoved === true"
+              [class.isSnippet]="!node.data.isFolder"
+              [class.deleting]="deletingInProgressNodeId === node.id"
 
-                 (click)="node.mouseAction('click', $event)"
-                 (dblclick)="node.mouseAction('dblClick', $event)"
-                 appContextMenu
-                 [contextMenuItems]="node.data.isFolder ? contextMenuItems : []"
-                 [contextMenuEnabled]="node.data.id !== renamingInProgressNodeId && node.data.id !== deletingInProgressNodeId && node.data.id !== renamingNode?.id"
-                 (contextMenuClick)="onContextMenuItemClick(node, $event)"
-                 (treeDrop)="onDrop($event, node)"
-                 [treeAllowDrop]="node.allowDrop"
-                 [treeDrag]="node"
-                 [treeDragEnabled]="node.allowDrag()">
+              (click)="node.mouseAction('click', $event)"
+              (dblclick)="node.mouseAction('dblClick', $event)"
+              appContextMenu
+              [contextMenuItems]="node.data.isFolder ? contextMenuItems : []"
+              [contextMenuEnabled]="node.data.id !== renamingInProgressNodeId && node.data.id !== deletingInProgressNodeId && node.data.id !== renamingNode?.id"
+              (contextMenuClick)="onContextMenuItemClick(node, $event)"
+              (treeDrop)="onDrop($event, node)"
+              [treeAllowDrop]="node.allowDrop"
+              [treeDrag]="node"
+              [treeDragEnabled]="node.allowDrag()">
 
               <!-- *ngIf on node.id or sth like that and switch between tree-node-content and own stuff -->
-              <span *ngIf="node.data.isFolder && node.isCollapsed" class="folder-icon material-icons-outlined">folder</span>
-              <span *ngIf="node.data.isFolder && !node.isCollapsed" class="folder-icon material-symbols-outlined">folder_open</span>
-              <span *ngIf="!node.data.isFolder" class="folder-icon material-symbols-outlined">description</span>
+              @if (node.data.isFolder && node.isCollapsed) {
+                <span class="folder-icon material-icons-outlined">folder</span>
+              }
+              @if (node.data.isFolder && !node.isCollapsed) {
+                <span class="folder-icon material-symbols-outlined">folder_open</span>
+              }
+              @if (!node.data.isFolder) {
+                <span class="folder-icon material-symbols-outlined">description</span>
+              }
               @if (renamingNode?.id === node.id) {
                 <input
                   type="text"
@@ -85,7 +99,7 @@
                   (keydown.enter)="onRenameEnter(node)"
                   (keydown.escape)="onRenameEscape()"
                   (blur)="renamingNode = null"
-                >
+                  >
               } @else {
                 <tree-node-content [node]="node" [index]="index"></tree-node-content>
                 @if (node.data.id === renamingInProgressNodeId || node.data.id === deletingInProgressNodeId) {
@@ -104,14 +118,17 @@
 
   </div>
   <div class="sidenav-left-2">
-    <div class="sidenav-snippet-list" *ngIf="snippets?.length > 0">
-      <span
-        [treeDrag]="snippet"
-        [treeDragEnabled]="allowMoveFolders"
-        class="sidebar-snippet"
-        *ngFor="let snippet of snippets"
-        (click)="scrollToSnippet(snippet.id)"
-      >{{snippet.title}}</span>
-    </div>
+    @if (snippets?.length > 0) {
+      <div class="sidenav-snippet-list">
+        @for (snippet of snippets; track snippet.id) {
+          <span
+            [treeDrag]="snippet"
+            [treeDragEnabled]="allowMoveFolders"
+            class="sidebar-snippet"
+            (click)="scrollToSnippet(snippet.id)"
+          >{{snippet.title}}</span>
+        }
+      </div>
+    }
   </div>
 </div>

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {BehaviorSubject, distinctUntilChanged, filter, map, tap} from 'rxjs';
 import {Folder} from '@kb-rest/shared';
@@ -9,6 +9,20 @@ import {MyHttpService} from '../http/my-http.service';
   providedIn: 'root'
 })
 export class AppService {
+
+  private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly httpClient = inject(MyHttpService);
+
+  constructor() {
+    this.activatedRoute.queryParams.pipe(
+      filter(params => !!params),
+      tap(params => {
+        this.selectedFolder.next(params['folder'] || null);
+        this.selectedUserId.next(+params['user'] || null);
+      })
+    ).subscribe();
+  }
 
   //todo move all to sidenavService ?
   hideNav$ = this.router.events.pipe(
@@ -31,20 +45,6 @@ export class AppService {
   );
 
   public version$ = this.httpClient.get2<{version: string}>('version');
-
-  constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private httpClient: MyHttpService,
-  ) {
-    this.activatedRoute.queryParams.pipe(
-      filter(params => !!params),
-      tap(params => {
-        this.selectedFolder.next(params['folder'] || null);
-        this.selectedUserId.next(+params['user'] || null);
-      })
-    ).subscribe();
-  }
 
   setSelectedFolder(folder: Folder) {
     //selectedFolder$ listens to ActivatedRoute

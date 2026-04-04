@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {SidenavComponent} from '../component/sidenav.component';
 import {SidenavService} from '../service/sidenav.service';
@@ -40,12 +40,12 @@ export class SidenavContainerComponent {
   deleteComplete = false;
   public isMobile: boolean;
 
-  constructor(
-    public sidenavService: SidenavService,
-    public appService: AppService,
-    public snippetService: SnippetsService,
-    private notificationService: NotificationService,
-  ) {
+  public readonly sidenavService = inject(SidenavService);
+  public readonly appService = inject(AppService);
+  public readonly snippetService = inject(SnippetsService);
+  private readonly notificationService = inject(NotificationService);
+
+  constructor() {
     // todo replace with breakpointObserver
     this.isMobile = window.innerWidth < 768;
   }

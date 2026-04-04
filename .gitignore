@@ -50,3 +50,7 @@ main.log
 Thumbs.db
 
 .angular
+
+.claude/worktrees
+.claude/settings.local.json
+vitest.config.*.timestamp*

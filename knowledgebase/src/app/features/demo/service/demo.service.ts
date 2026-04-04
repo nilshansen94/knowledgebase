@@ -72,8 +72,6 @@ export class DemoService {
   renameComplete$ = new Subject<boolean>();
   deleteComplete$ = new Subject<boolean>();
 
-  constructor() {}
-
   addFolder(folder: Folder) {
     this.addingFolder$.next(true);
     folder.id = this.folderIdCounter++;

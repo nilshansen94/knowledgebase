@@ -1,8 +1,7 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output} from '@angular/core';
+
 import {SearchComponent} from '../../../components/search/search.component';
-import {DbUser} from '../../../../../../backend/src/api';
-import {KbTreeNode, Snippet, SnippetPinRequest} from '@kb-rest/shared';
+import {KbTreeNode, Snippet, SnippetPinRequest, User} from '@kb-rest/shared';
 import {SnippetComponent} from '../../snippets/component/snippet.component';
 import {RouterLink} from '@angular/router';
 import {ModalService} from '../../../services/modal/modal.service';
@@ -11,19 +10,19 @@ import {ModalModule} from 'ngx-bootstrap/modal';
 @Component({
   selector: 'app-community',
   standalone: true,
-  imports: [CommonModule, SearchComponent, SnippetComponent, RouterLink, ModalModule],
+  imports: [SearchComponent, SnippetComponent, RouterLink, ModalModule],
   templateUrl: './community.component.html',
   styleUrls: ['./community.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommunityComponent {
 
-  constructor(private readonly modalService: ModalService) {}
+  private readonly modalService = inject(ModalService);
 
   currentSearch = '';
 
   @Input()
-  users: DbUser[]
+  users: User[];
 
   @Input()
   communitySnippets: Snippet[];

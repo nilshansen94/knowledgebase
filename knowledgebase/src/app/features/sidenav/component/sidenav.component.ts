@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, model, Output, ViewChild} from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {Folder, getSubFolders, isSnippet, KbTreeNode, Snippet} from '@kb-rest/shared';
 import {ITreeOptions, TreeComponent, TreeModel, TreeModule, TreeNode} from '@ali-hm/angular-tree-component';
 import {FormsModule} from '@angular/forms';
@@ -10,7 +10,7 @@ import {TooltipDirective} from 'ngx-bootstrap/tooltip';
 @Component({
   selector: 'app-sidenav',
   standalone: true,
-  imports: [CommonModule, FormsModule, TreeModule, ContextMenuDirective, TooltipDirective],
+  imports: [FormsModule, TreeModule, ContextMenuDirective, TooltipDirective],
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
   //todo onPush in all pure components !!
@@ -20,7 +20,7 @@ export class SidenavComponent {
 
   currentlySelectedItem: Folder;
   renamingNode: TreeNode | null = null;
-  renamingNodeName: string = '';
+  renamingNodeName = '';
   renamingInProgressNodeId: number | null = null;
   deletingInProgressNodeId: number | null = null;
   isAddingFolderInProgress = false;
@@ -41,7 +41,7 @@ export class SidenavComponent {
     allowDrop: (_source, _target) => {
       const target = _target.parent.data;
       //allow dropping snippets on folders
-      const source = _source.hasOwnProperty('data') ? _source.data : _source;
+      const source = Object.hasOwn(_source, 'data') ? _source.data : _source;
       const sourceIsSnippet = isSnippet(source);
       if (sourceIsSnippet && target.isFolder) {
         return true;
@@ -151,8 +151,6 @@ export class SidenavComponent {
   ];
 
   showSidenav = model<boolean>();
-
-  constructor() {}
 
   onContextMenuItemClick(node: TreeNode, item: ContextMenuItem) {
     const folder = node.data as Folder;

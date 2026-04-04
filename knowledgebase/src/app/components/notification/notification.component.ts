@@ -11,13 +11,13 @@ import {Notification} from '../../services/navigation/notification.service';
 })
 export class NotificationComponent {
   notifications = input.required<Notification[]>();
-  close = output<number>();
+  closed = output<number>();
   clearAll = output<void>();
 
   showClearAll = computed(() => (this.notifications()?.length ?? 0) >= 2);
 
   closeNotification(id: number): void {
-    this.close.emit(id);
+    this.closed.emit(id);
   }
 
   clearAllNotifications(): void {

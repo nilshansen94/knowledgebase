@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostListener} from '@angular/core';
+import {Component, ElementRef, HostListener, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ContextMenuService} from './context-menu.service';
 
@@ -15,12 +15,11 @@ export interface ContextMenuItem {
   styleUrls: ['./context-menu.component.scss']
 })
 export class ContextMenuComponent {
-  state$ = this.contextMenuService.state$;
 
-  constructor(
-    private elementRef: ElementRef,
-    private contextMenuService: ContextMenuService
-  ) {}
+  private readonly elementRef = inject(ElementRef);
+  private readonly contextMenuService = inject(ContextMenuService);
+
+  state$ = this.contextMenuService.state$;
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {

@@ -7,8 +7,6 @@ import {BehaviorSubject} from 'rxjs';
 })
 export class PagingService {
 
-  constructor() { }
-
   private readonly currentPage = new BehaviorSubject<number>(0);
   private readonly loading = new BehaviorSubject<boolean>(false);
   private readonly hasMore = new BehaviorSubject<boolean>(true);

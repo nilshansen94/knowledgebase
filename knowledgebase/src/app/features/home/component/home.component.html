@@ -1,54 +1,74 @@
-<button id="add-snippet-btn"
-        class="material-symbols-outlined"
-        *ngIf="!addSnippet && !editingSnippet" (click)="addSnippet = !addSnippet"
-        [disabled]="!hasFolders"
-        tooltip="add item"
-        placement="bottom"
-        [delay]="300"
->add_notes</button>
+@if (!addSnippet && !editingSnippet) {
+  <button id="add-snippet-btn"
+    class="material-symbols-outlined"
+    (click)="addSnippet = !addSnippet"
+    [disabled]="!hasFolders"
+    tooltip="add item"
+    placement="bottom"
+    [delay]="300"
+  >add_notes</button>
+}
 
-<div class="editor" *ngIf="addSnippet || editingSnippet">
-  <input type="text" placeholder="title" [(ngModel)]="newSnippetTitle">
-  <button class="secondary snippet-public" (click)="newSnippetPublic = !newSnippetPublic">
-    <span class="material-icons">{{newSnippetPublic ? 'public': 'lock'}}</span>
-  </button>
-  <!-- todo maybe use ngx-editor (based on ProseMirror) -->
-  <md-editor
-    [(ngModel)]="newSnippetContent"
-  />
-  <div class="action-bar" *ngIf="addSnippet">
-    <button (click)="saveSnippet()" class="primary">save</button>
-    <button (click)="resetState()">cancel</button>
+@if (addSnippet || editingSnippet) {
+  <div class="editor">
+    <input type="text" placeholder="title" [(ngModel)]="newSnippetTitle">
+    <button class="secondary snippet-public" (click)="newSnippetPublic = !newSnippetPublic">
+      <span class="material-icons">{{newSnippetPublic ? 'public': 'lock'}}</span>
+    </button>
+    <!-- todo maybe use ngx-editor (based on ProseMirror) -->
+    <md-editor
+      [(ngModel)]="newSnippetContent"
+      />
+    @if (addSnippet) {
+      <div class="action-bar">
+        <button (click)="saveSnippet()" class="primary">save</button>
+        <button (click)="resetState()">cancel</button>
+      </div>
+    }
+    @if (editingSnippet) {
+      <div class="action-bar">
+        <button (click)="doEditSnippet()" class="primary">edit</button>
+        <button (click)="resetState()">cancel</button>
+      </div>
+    }
   </div>
-  <div class="action-bar" *ngIf="editingSnippet">
-    <button (click)="doEditSnippet()" class="primary">edit</button>
-    <button (click)="resetState()">cancel</button>
-  </div>
-</div>
+}
 
-<app-search (search)="searchSnippets($event)"/>
+<app-search (searchChange)="searchSnippets($event)"/>
 
-<span *ngIf="hasFolders && snippets?.length === 0 && !currentSearch && !currentFolder">Welcome to your personal knowledgebase!<br>Select a folder or search for content to get started.</span>
-<span *ngIf="!hasFolders">Create a folder to get started! A snippet needs to be placed inside a folder.</span>
-<span *ngIf="!loadingSnippets && snippets?.length === 0 && (currentSearch || currentFolder)">No snippets found</span>
-<span *ngIf="loadingSnippets && (currentSearch || currentFolder)">Loading snippets...</span>
+@if (hasFolders && snippets?.length === 0 && !currentSearch && !currentFolder) {
+  <span>Welcome to your personal knowledgebase!<br>Select a folder or search for content to get started.</span>
+}
+@if (!hasFolders) {
+  <span>Create a folder to get started! A snippet needs to be placed inside a folder.</span>
+}
+@if (!loadingSnippets && snippets?.length === 0 && (currentSearch || currentFolder)) {
+  <span>No snippets found</span>
+}
+@if (loadingSnippets && (currentSearch || currentFolder)) {
+  <span>Loading snippets...</span>
+}
 
 <ngx-masonry [options]="masonryOptions">
-  <app-snippet *ngFor="let snippet of snippets"
-               ngxMasonryItem
-               class="masonry-item"
-               [class.loading]="loadingSnippets"
-               [class.active]="selectedSnippetId === snippet.id"
-               [snippet]="snippet"
-               [attr.id]="'snippet'+snippet.id"
-               [pinWithModal]="communityUser > -1"
-               [canEdit]="snippet.is_own_snippet && communityUser === -1"
-               [canPin]="communityUser === -1 || !snippet.is_own_snippet"
-               (editSnippet)="startEditingSnippet($event)"
-               (deleteSnippet)="this.deleteSnippet.emit($event)"
-               (togglePublic)="togglePublic.emit($event)"
-               (pinSnippet)="pinSnippet.emit($event)"
-  />
+  @for (snippet of snippets; track snippet.id) {
+    <app-snippet
+      ngxMasonryItem
+      class="masonry-item"
+      [class.loading]="loadingSnippets"
+      [class.active]="selectedSnippetId === snippet.id"
+      [snippet]="snippet"
+      [attr.id]="'snippet'+snippet.id"
+      [pinWithModal]="communityUser > -1"
+      [canEdit]="snippet.is_own_snippet && communityUser === -1"
+      [canPin]="communityUser === -1 || !snippet.is_own_snippet"
+      (editSnippet)="startEditingSnippet($event)"
+      (deleteSnippet)="this.deleteSnippet.emit($event)"
+      (togglePublic)="togglePublic.emit($event)"
+      (pinSnippet)="pinSnippet.emit($event)"
+      />
+  }
 </ngx-masonry>
 <div #scrollSentinel class="scroll-sentinel"></div>
-<div *ngIf="loading" class="loading-more">Loading more snippets...</div>
+@if (loading) {
+  <div class="loading-more">Loading more snippets...</div>
+}

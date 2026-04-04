@@ -35,7 +35,7 @@ type Story = StoryObj<CommunityComponent>;
 
 export const Default: Story = {
   args: {
-    users: [{id: 1, name: 'user2', password: null, salt: null, secret: null}],
+    users: [{id: 1, name: 'user2'}],
     communitySnippets: [
       {id:1, title: 'Title', content: 'Lorem ipsum', user_id: 1, user_name: 'user1', folder: null, is_own_snippet: true, is_pinned: false, public: true},
     ],

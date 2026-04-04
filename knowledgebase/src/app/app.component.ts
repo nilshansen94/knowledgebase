@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ActivatedRoute, NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {SidenavContainerComponent} from './features/sidenav/container/sidenav-container.component';
@@ -36,16 +36,14 @@ import {DemoSidenavContainerComponent} from './features/demo/container/demo-side
 })
 export class AppComponent {
 
-  constructor(
-    public appService: AppService,
-    public loginService: LoginService,
-    public authService: AuthService,
-    private router: Router,
-    public notificationService: NotificationService,
-    private sidenavService: SidenavService,
-    private activatedRoute: ActivatedRoute,
-    private http: MyHttpService,
-  ) {}
+  public readonly appService = inject(AppService);
+  public readonly loginService = inject(LoginService);
+  public readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  public readonly notificationService = inject(NotificationService);
+  private readonly sidenavService = inject(SidenavService);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly http = inject(MyHttpService);
 
   currentPath$ = this.router.events.pipe(
     filter(e => e instanceof NavigationEnd),

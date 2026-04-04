@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
@@ -7,13 +7,11 @@ import {Observable} from 'rxjs';
   providedIn: 'root'
 })
 export class MyHttpService {
+  private readonly http = inject(HttpClient);
 
   baseUrl = environment.baseUrl;
 
   options = {withCredentials: true};
-
-  constructor(private http: HttpClient) {
-  }
 
   get(path: string) {
     return this.http.get(this.baseUrl + path, this.options);

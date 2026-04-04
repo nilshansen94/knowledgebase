@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {LoginPageComponent} from '../component/login-page/login-page.component';
 import {AuthService} from '../../../services/auth/auth.service';
@@ -19,11 +19,8 @@ import {map} from 'rxjs/operators';
   ]
 })
 export class LoginContainerComponent {
-
-  constructor(
-    public readonly authService: AuthService,
-    private readonly activatedRoute: ActivatedRoute,
-  ) { }
+  public readonly authService = inject(AuthService);
+  private readonly activatedRoute = inject(ActivatedRoute);
 
   public redirectedFromRegistration$ = this.activatedRoute.queryParamMap.pipe(
     map(params => params.has('redirectedFromRegistration'))

@@ -4,7 +4,7 @@ export const buildSelectSnippetQuery = (
   searchParam: string,
   folderId: number,
   userParam: number,
-  page: number = 0
+  page = 0
 ) => {
   //console.log('searchParam, folderId, userParam', searchParam, folderId, userParam);
   /*
@@ -17,7 +17,7 @@ export const buildSelectSnippetQuery = (
    */
 
   let withCteStart = 'with cte as (';
-  let select = `select snippet.*,
+  const select = `select snippet.*,
        usr_fold_snip.folder,
        usr_fold_snip.user_id                 as ufs_user,
        kb_user.name as user_name,

@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {Snippet} from '@kb-rest/shared';
 import {MarkdownComponent} from 'ngx-markdown';
 import {RouterLink} from '@angular/router';
@@ -7,7 +7,7 @@ import {RouterLink} from '@angular/router';
 @Component({
   selector: 'app-snippet',
   standalone: true,
-  imports: [CommonModule, MarkdownComponent, RouterLink],
+  imports: [MarkdownComponent, RouterLink],
   templateUrl: './snippet.component.html',
   styleUrls: ['./snippet.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

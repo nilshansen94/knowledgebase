@@ -69,7 +69,6 @@ export async function getSnippets(req: Request, res: Response) {
 
   //console.log('buildQuery:', searchParam, folderId, userParam);
   //console.log('sql params', {search: searchParam, folderIds: searchParam ? folderIds: folderId, userId: loggedInUserId, userParam: userParam ? userParam: loggedInUserId})
-  //@ts-ignore
   //console.log(`get snippets (folderId ${folderId}) (folderIds ${JSON.stringify(folderIds)}) (search ${searchParam}). Found ${rows?.length} rows`)
   await trx.commit();
   res.json(rows2);
@@ -90,7 +89,6 @@ export async function addSnippet(req: Request, res: Response) {
     const r = await newSnip.save({transaction: trx});
     //console.log('insert snip res', r)
     //console.log('saving snippet', JSON.stringify(newSnip))
-    // @ts-ignore
     //const snippetId = insertResult.insertId;
     const newUsrFoldSnip = new UsrFoldSnip({user_id: userId, snip_id: newSnip.id, folder: snippet.folder});
     const r2 = await newUsrFoldSnip.save({transaction: trx});
@@ -191,11 +189,9 @@ export async function deleteSnippet(req: Request, res: Response) {
     const result = await deleteFrom('DELETE FROM snippet WHERE id = $1', [snippetId], trx);
     //todo add delete cascade
     const result2 = await deleteFrom('DELETE FROM usr_fold_snip WHERE snip_id = $1', [snippetId], trx);
-    // @ts-ignore
     console.log(result);
     await trx.commit();
     console.log('committed delete-snip')
-    // @ts-ignore
     //todo affected rows
     res.json({success: true});
     res.end();

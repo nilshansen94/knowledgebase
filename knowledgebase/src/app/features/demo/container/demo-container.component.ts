@@ -19,7 +19,7 @@ import {DemoService} from '../service/demo.service';
     [selectedSnippetId]="null"
     [hasFolders]="(demoService.treeNodes$ | async).length > 0"
     (newSnippet)="demoService.addSnippet($event)"
-    (search)="demoService.search($event)"
+    (searchChange)="demoService.search($event)"
     (pinSnippet)="demoService.pinSnippet($event)"
     (deleteSnippet)="demoService.deleteSnippet($event)"
     (editSnippet)="demoService.editSnippet($event)"

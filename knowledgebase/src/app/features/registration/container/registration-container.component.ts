@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {RegistrationComponent} from '../component/registration.component';
 import {RegistrationService} from '../service/registration.service';
@@ -50,10 +50,10 @@ export class RegistrationContainerComponent {
     )
   );
 
-  constructor(
-    private readonly registrationService: RegistrationService,
-    private readonly router: Router
-  ) {
+  private readonly registrationService = inject(RegistrationService);
+  private readonly router = inject(Router);
+
+  constructor() {
     this.registration$.subscribe();
   }
 }

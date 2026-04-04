@@ -1,4 +1,4 @@
-import {Component, DestroyRef, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
 import {SidenavComponent} from '../../features/sidenav/component/sidenav.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -6,7 +6,7 @@ import {tap} from 'rxjs';
 import {Folder, KbTreeNode} from '@kb-rest/shared';
 
 @Component({
-  selector: 'kb-rest-modal-folder-selection',
+  selector: 'app-modal-folder-selection',
   imports: [
     SidenavComponent
   ],
@@ -14,27 +14,24 @@ import {Folder, KbTreeNode} from '@kb-rest/shared';
   styleUrl: './modal-folder-selection.component.scss'
 })
 export class ModalFolderSelectionComponent implements OnInit {
-
-  constructor(
-    public bsModalRef: BsModalRef,
-    private readonly destroyRef: DestroyRef,
-    ) {}
+  public readonly bsModalRef = inject(BsModalRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   selectedFolder: Folder;
 
   @Input() folders: KbTreeNode[];
 
-  @Output() onSave: EventEmitter<Folder|null> = new EventEmitter();
+  @Output() save: EventEmitter<Folder|null> = new EventEmitter();
 
   ngOnInit() {
     this.bsModalRef.onHide?.pipe(
       takeUntilDestroyed(this.destroyRef),
-      tap(() => this.onSave.emit(null))
+      tap(() => this.save.emit(null))
     ).subscribe();
   }
 
   closeModal() {
-    this.onSave.emit(null);
+    this.save.emit(null);
     this.bsModalRef.hide();
   }
 
@@ -45,7 +42,7 @@ export class ModalFolderSelectionComponent implements OnInit {
 
   saveFolder() {
     console.log('save folder', this.selectedFolder);
-    this.onSave.emit(this.selectedFolder);
+    this.save.emit(this.selectedFolder);
     this.bsModalRef.hide();
   }
 }

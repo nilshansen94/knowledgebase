@@ -1,18 +1,6 @@
-import {DbResult} from './db-result';
-import {LoginRequest} from './login-request';
-import {LoginState} from './login-state';
-import {RegistrationRequest} from './registration-request';
-import {SnippetPinRequest} from './snippet-pin-request';
-import {Folder, isSnippet, KbTreeNode, Snippet} from './api';
-
-export {
-  LoginState,
-  LoginRequest,
-  RegistrationRequest,
-  DbResult,
-  SnippetPinRequest,
-  Folder,
-  Snippet,
-  KbTreeNode,
-  isSnippet,
-}
+export {DbResult} from './db-result';
+export {LoginRequest} from './login-request';
+export {LoginState} from './login-state';
+export {RegistrationRequest} from './registration-request';
+export {SnippetPinRequest} from './snippet-pin-request';
+export {Folder, isSnippet, KbTreeNode, Snippet, User} from './api';
