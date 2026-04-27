@@ -5,12 +5,12 @@ name: Node.js CI
 
 on:
   push:
-    # branches: [ "main" ]
     branches:
-      - "**"
+      - "main"
   pull_request:
     branches:
       - "**"
+  workflow_dispatch:
 
 jobs:
   build_and_test:
@@ -29,11 +29,48 @@ jobs:
           cache: 'npm'
       - name: npm ci
         run: npm ci
-      - name: Build all
-        run: npm run all:build
+      - name: Build kb
+        run: |
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            npm run knowledgebase:build
+          else
+            npm run knowledgebase:build:staging
+          fi
+      - name: Build backend
+        run: npm run backend:build
       - name: Build storybook
         run: npm run kb:storybook:build
       - name: Test all
         run: npm run all:test
       - name: Lint all
         run: npm run all:lint
+
+  docker_build_and_push:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract npm version
+        id: version
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
+
+      - name: Docker Login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login registry.my-knowledgebase.ch -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Build and Push Docker Images
+        run: |
+          docker build --platform linux/arm64 -t kb/kb-backend --no-cache -f ./docker/backend/Dockerfile .
+          docker build --platform linux/arm64 -t kb/kb-ui --no-cache -f ./docker/knowledgebase/Dockerfile .
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            docker tag kb/kb-backend registry.my-knowledgebase.ch/kb-backend:${{ env.version }}
+            docker tag kb/kb-ui registry.my-knowledgebase.ch/kb-ui:${{ env.version }}
+            docker push registry.my-knowledgebase.ch/kb-backend:${{ env.version }}
+            docker push registry.my-knowledgebase.ch/kb-ui:${{ env.version }}
+          else
+            docker tag kb/kb-backend registry.my-knowledgebase.ch/kb-backend:test-${{ env.version }}
+            docker tag kb/kb-ui registry.my-knowledgebase.ch/kb-ui:test-${{ env.version }}
+            docker push registry.my-knowledgebase.ch/kb-backend:test-${{ env.version }}
+            docker push registry.my-knowledgebase.ch/kb-ui:test-${{ env.version }}
+          fi

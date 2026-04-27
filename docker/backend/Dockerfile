@@ -2,8 +2,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY dist/backend/package*.json ./
-RUN npm install --only=production
+COPY dist/backend/package.json ./
+COPY dist/backend/package-lock.json ./
+RUN npm ci
 RUN npm install pg
 
 COPY dist/backend .
