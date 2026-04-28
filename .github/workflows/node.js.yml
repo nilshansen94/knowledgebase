@@ -32,9 +32,9 @@ jobs:
       - name: Build kb
         run: |
           if [ "${{ github.ref_name }}" == "main" ]; then
-            npm run knowledgebase:build
+            npm run kb:build
           else
-            npm run knowledgebase:build:staging
+            npm run kb:build:staging
           fi
       - name: Build backend
         run: npm run backend:build
