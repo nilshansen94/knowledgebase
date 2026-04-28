@@ -37,7 +37,7 @@ jobs:
             npm run kb:build:staging
           fi
       - name: Build backend
-        run: npm run backend:build
+        run: npm run backend:build:prod
       - name: Build storybook
         run: npm run kb:storybook:build
       - name: Test all
