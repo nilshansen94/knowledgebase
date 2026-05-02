@@ -1,10 +1,11 @@
-FROM node:20-alpine
+FROM --platform=$BUILDPLATFORM node:22-alpine
 
 WORKDIR /app
 
-COPY dist/backend/package*.json ./
-RUN npm install --only=production
-RUN npm install pg
+COPY dist/backend/package.json ./
+COPY dist/backend/package-lock.json ./
+RUN npm ci --platform=linux/arm64
+RUN npm install pg --platform=linux/arm64
 
 COPY dist/backend .
 

@@ -5,12 +5,12 @@ name: Node.js CI
 
 on:
   push:
-    # branches: [ "main" ]
     branches:
-      - "**"
+      - "main"
   pull_request:
     branches:
       - "**"
+  workflow_dispatch:
 
 jobs:
   build_and_test:
@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [ 22.x ]
 
     steps:
       - uses: actions/checkout@v4
@@ -29,11 +29,66 @@ jobs:
           cache: 'npm'
       - name: npm ci
         run: npm ci
-      - name: Build all
-        run: npm run all:build
+      - name: Build kb
+        run: |
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            npm run kb:build
+          else
+            npm run kb:build:staging
+          fi
+      - name: Build backend
+        run: npm run backend:build:prod
       - name: Build storybook
         run: npm run kb:storybook:build
       - name: Test all
         run: npm run all:test
       - name: Lint all
         run: npm run all:lint
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            dist/backend/
+            dist/knowledgebase/
+
+  docker_build_and_push:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || true # github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+      - name: Move artifacts to dist folder
+        run: |
+          mkdir dist
+          mv backend dist/
+          mv knowledgebase dist/
+      - name: Extract npm version
+        id: version
+        run: |
+          version=$(jq -r '.version' package.json)
+          echo "version=$version" >> $GITHUB_ENV
+
+      - name: Docker Login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login registry.my-knowledgebase.ch -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and Push Multi-Arch Docker Images
+        run: |
+          tag_prefix=""
+          if [ "${{ github.ref_name }}" != "main" ]; then
+           tag_prefix="test-"
+          fi
+          docker buildx build --platform linux/amd64,linux/arm64 \
+           -t registry.my-knowledgebase.ch/kb-backend:${tag_prefix}${{ env.version }} \
+           --push -f ./docker/backend/Dockerfile .
+          docker buildx build --platform linux/amd64,linux/arm64 \
+           -t registry.my-knowledgebase.ch/kb-ui:${tag_prefix}${{ env.version }} \
+           --push -f ./docker/knowledgebase/Dockerfile .

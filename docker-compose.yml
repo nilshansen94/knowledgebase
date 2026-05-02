@@ -2,13 +2,38 @@ version: '3.8'
 
 services:
 
+  knowledgebase-postgres:
+    image: postgres:15.3
+    restart: always
+    container_name: kb_postgres_podman
+    env_file:
+      - .env-docker
+    environment:
+      PGPORT: ${DB_PORT}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - pg-local:/var/lib/postgresql/data
+    networks:
+      - my_network
+    ports:
+      - "8863:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h knowledgebase-postgres -U kb_rest" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
   frontend:
     build:
       context: .
       dockerfile: ./docker/knowledgebase/Dockerfile
+    image: kb/kb-ui
     container_name: kb_ui
     ports:
-      - "4261:80"
+      - "4262:80"
     networks:
       - my_network
     #depends_on:
@@ -18,32 +43,17 @@ services:
     build:
       context: .
       dockerfile: ./docker/backend/Dockerfile
+    image: kb/kb-backend
     container_name: kb_backend
     ports:
-      - "3333:3000"
+      - "3335:3000"
     env_file:
       - .env-docker
     networks:
       - my_network
     depends_on:
-      - knowledgebase-postgres
-
-  knowledgebase-postgres:
-    image: postgres:15.3
-    restart: always
-    #shm_size: 128mb
-    container_name: kb_postgres
-    environment:
-      PGPORT: 5432
-      POSTGRES_PASSWORD: root
-      POSTGRES_USER: root
-      POSTGRES_DB: kb_rest
-    volumes:
-      - pg-local:/var/lib/postgresql/data
-    networks:
-      - my_network
-    ports:
-      - "8862:5432"
+      knowledgebase-postgres:
+        condition: service_healthy
 
   #pgadmin:
   #  image: dpage/pgadmin4
