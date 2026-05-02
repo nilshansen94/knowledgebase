@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY dist/backend/package.json ./
 COPY dist/backend/package-lock.json ./
-RUN npm ci
-RUN npm install pg
+RUN npm ci --platform=linux/arm64
+RUN npm install pg --platform=linux/arm64
 
 COPY dist/backend .
 
