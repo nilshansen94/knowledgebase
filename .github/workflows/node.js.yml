@@ -38,8 +38,6 @@ jobs:
           fi
       - name: Build backend
         run: npm run backend:build:prod
-      - name: list directory
-        run: ls && ls dist && ls dist/backend
       - name: Build storybook
         run: npm run kb:storybook:build
       - name: Test all
@@ -70,8 +68,6 @@ jobs:
           mkdir dist
           mv backend dist/
           mv knowledgebase dist/
-      - name: List downloaded artifacts
-        run: ls && ls dist && ls dist/backend
       - name: Extract npm version
         id: version
         run: |
@@ -96,4 +92,3 @@ jobs:
           docker buildx build --platform linux/amd64,linux/arm64 \
            -t registry.my-knowledgebase.ch/kb-ui:${tag_prefix}${{ env.version }} \
            --push -f ./docker/knowledgebase/Dockerfile .
-#test
