@@ -24,6 +24,19 @@ type Story = StoryObj<SnippetComponent>;
 
 export const Default: Story = {
   args: {
-    snippet: {id:1, title: 'Title', content: 'Lorem ipsum', user_id: 1, user_name: 'user1', folder: null, is_own_snippet: true, is_pinned: false, public: true},
+    snippet: {
+      id: 1,
+      title: 'Title',
+      content: 'Lorem ipsum',
+      user_id: 1,
+      user_name: 'user1',
+      folder: null,
+      is_own_snippet: true,
+      is_pinned: false,
+      public: true,
+      folder_name: 'my_folder',
+      original_folder_id: 2,
+      original_folder_name: 'original_folder',
+    },
   }
 };

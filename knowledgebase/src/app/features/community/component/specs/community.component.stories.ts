@@ -37,7 +37,20 @@ export const Default: Story = {
   args: {
     users: [{id: 1, name: 'user2'}],
     communitySnippets: [
-      {id:1, title: 'Title', content: 'Lorem ipsum', user_id: 1, user_name: 'user1', folder: null, is_own_snippet: true, is_pinned: false, public: true},
+      {
+        id: 1,
+        title: 'Title',
+        content: 'Lorem ipsum',
+        user_id: 1,
+        user_name: 'user1',
+        folder: null,
+        is_own_snippet: true,
+        is_pinned: false,
+        public: true,
+        folder_name: 'my_folder',
+        original_folder_id: 2,
+        original_folder_name: 'original_folder',
+      },
     ],
     folders: testFolders,
   }
