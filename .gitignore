@@ -2,6 +2,7 @@
 
 backup/
 aws
+sessions
 
 # compiled output
 dist

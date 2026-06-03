@@ -57,8 +57,8 @@ app.use(helmet({
 app.use(cookieParser());
 
 setupDb().then(res => {
-  logger.info('DB setup successful', res);
-  console.log('DB setup successful', res)
+  logger.info('DB setup successful');
+  console.log('DB setup successful');
 }).catch(e => {
   logger.info('DB setup failed,', e.stack.split('\n')[0]);
   console.log('DB setup failed,', e.stack.split('\n')[0]);
