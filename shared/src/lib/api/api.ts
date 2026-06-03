@@ -19,6 +19,9 @@ export interface Snippet {
   user_id: number;
   ufs_user?: number;
   user_name: string;
+  folder_name: string;
+  original_folder_id: number;
+  original_folder_name: string;
   folder: number;
   is_own_snippet: boolean;
   is_pinned: boolean|number;//mysql returns 0 or 1

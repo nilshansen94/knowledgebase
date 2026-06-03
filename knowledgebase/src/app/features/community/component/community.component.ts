@@ -29,6 +29,8 @@ export class CommunityComponent {
 
   @Input() folders: KbTreeNode[];
 
+  @Input() currentFolderId: number;
+
   @Output()
   searchSnippet = new EventEmitter<string>();
 

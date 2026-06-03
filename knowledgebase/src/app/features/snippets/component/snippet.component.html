@@ -40,8 +40,10 @@
         />
     </div>
     <div class="footer">
-      @if(!snippet.is_own_snippet){
-        <a class="user" [routerLink]="[]" [queryParams]="{user: snippet.user_id}"><span class="material-icons">account_circle</span>{{snippet.user_name}}</a>
+      @if(!snippet.is_own_snippet && !snippet.is_pinned){
+        <a class="user" [routerLink]="['']" [queryParams]="{user: snippet.user_id, folder: snippet.original_folder_id}"><span class="material-icons">account_circle</span>{{snippet.user_name}}</a>
+      } @else if (currentFolderId !== snippet.folder) {
+        <a class="user" [routerLink]="['']" [queryParams]="{folder: snippet.folder}"><span class="material-icons">folder</span>{{snippet.folder_name}}</a>
       }
     </div>
     <!--<span style="font-size: 0.75em;position: absolute;top: -2px;left: 0;">isOwn{{snippet.is_own_snippet}}, user_id {{snippet.user_id}}, ufs_user {{snippet.ufs_user}}, canPin {{canPin}}</span>-->

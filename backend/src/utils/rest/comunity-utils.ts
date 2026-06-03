@@ -31,6 +31,7 @@ export async function getCommunitySnippets(req: Request, res: Response) {
     return;
   }
   let query = `SELECT snippet.*, kb_user.name as user_name,
+                      folder.id as original_folder_id, folder.name as original_folder_name,
        MATCH(title, content) against($search) as r1, match(title) against($search) as r2
        FROM usr_fold_snip
               join kb_user on kb_user.id = usr_fold_snip.user_id
@@ -43,6 +44,7 @@ export async function getCommunitySnippets(req: Request, res: Response) {
               ORDER BY r1 DESC, r2 DESC, snippet.title`;
   if(process.env.DB_DIALECT === 'postgres'){
     query = `SELECT snippet.*, kb_user.name as user_name,
+                    folder.id as original_folder_id, folder.name as original_folder_name,
               ts_rank(
                 to_tsvector('simple', coalesce(snippet.title,'') || ' ' || coalesce(snippet.content,'')),
                 plainto_tsquery('simple', $search)

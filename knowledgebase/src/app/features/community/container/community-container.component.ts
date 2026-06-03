@@ -16,6 +16,7 @@ import {SnippetsService} from '../../snippets/service/snippets.service';
       [users]="users$ | async"
       [communitySnippets]="communitySnippets$ | async"
       [folders]="sidenavService.folders$ | async"
+      [currentFolderId]="sidenavService.currentFolderId$ | async"
       (searchSnippet)="searchSnippet($event)"
       (pinSnippet)="snippetService.pinCommunitySnippet($event)"
     />

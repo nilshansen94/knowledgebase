@@ -113,6 +113,10 @@ export class SidenavService {
     map(([currentFolder, folders]) => folders.find(f => f.id === +currentFolder)),
   );
 
+  currentFolderId$: Observable<number> = this.currentFolder$.pipe(
+    map(folder => folder?.id),
+  );
+
   public selectedUserName$ = this.appService.selectedUserId$.pipe(
     switchMap(id => {
       if(id === null || id < 0) {

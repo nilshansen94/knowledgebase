@@ -80,6 +80,16 @@
           "sourceMap": true,
           "namedChunks": true
         },
+        "staging": {
+          "outputPath": "dist/knowledgebase",
+          "fileReplacements": [
+            {
+              "replace": "knowledgebase/src/environments/environment.ts",
+              "with": "knowledgebase/src/environments/environment.staging.ts"
+            }
+          ],
+          "sourceMap": true
+        },
         "local-tls": {
           "sourceMap": true,
           "outputPath": "dist/ui-local-tls",

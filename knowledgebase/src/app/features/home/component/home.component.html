@@ -61,6 +61,7 @@
       [pinWithModal]="communityUser > -1"
       [canEdit]="snippet.is_own_snippet && communityUser === -1"
       [canPin]="communityUser === -1 || !snippet.is_own_snippet"
+      [currentFolderId]="currentFolder?.id"
       (editSnippet)="startEditingSnippet($event)"
       (deleteSnippet)="this.deleteSnippet.emit($event)"
       (togglePublic)="togglePublic.emit($event)"

@@ -25,6 +25,8 @@ export class SnippetComponent {
 
   @Input() snippet: Snippet;
 
+  @Input() currentFolderId: number;
+
   @Output() editSnippet = new EventEmitter<Snippet>();
 
   @Output() deleteSnippet = new EventEmitter<Snippet>();
